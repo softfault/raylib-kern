@@ -1,0 +1,36 @@
+use base.test;
+use raylib;
+
+fn check_color_constants() void {
+    let white = raylib.white();
+    test.eq(white.r, u8.{255});
+    test.eq(white.g, u8.{255});
+    test.eq(white.b, u8.{255});
+    test.eq(white.a, u8.{255});
+    test.eq(raylib.blank().a, u8.{0});
+}
+
+fn check_constructors() void {
+    let v = raylib.vector2(f32.{3.0}, f32.{4.0});
+    test.eq(v.x, f32.{3.0});
+    test.eq(v.y, f32.{4.0});
+
+    let c = raylib.color(u8.{1}, u8.{2}, u8.{3}, u8.{4});
+    test.eq(c.r, u8.{1});
+    test.eq(c.g, u8.{2});
+    test.eq(c.b, u8.{3});
+    test.eq(c.a, u8.{4});
+}
+
+fn check_input_constants() void {
+    test.eq(raylib.KEY_A, i32.{65});
+    test.eq(raylib.KEY_ESCAPE, i32.{256});
+    test.eq(raylib.MOUSE_BUTTON_LEFT, i32.{0});
+}
+
+fn main() i32 {
+    check_color_constants();
+    check_constructors();
+    check_input_constants();
+    return 0;
+}

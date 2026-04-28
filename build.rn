@@ -1,0 +1,32 @@
+use craft.builder;
+
+pub fn build(b: *mut builder.Builder) void {
+    if (b.unit.domain != .target) {
+        return;
+    }
+
+    b.link_system_lib("raylib");
+
+    if (b.target.os == .linux) {
+        b.link_system_lib("m");
+        b.link_system_lib("dl");
+        b.link_system_lib("pthread");
+        b.link_system_lib("GL");
+        b.link_system_lib("X11");
+        return;
+    }
+
+    if (b.target.os == .darwin) {
+        b.link_framework("OpenGL");
+        b.link_framework("Cocoa");
+        b.link_framework("IOKit");
+        b.link_framework("CoreVideo");
+        return;
+    }
+
+    if (b.target.os == .windows) {
+        b.link_system_lib("winmm");
+        b.link_system_lib("gdi32");
+        b.link_system_lib("opengl32");
+    }
+}

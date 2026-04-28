@@ -1,0 +1,18 @@
+[package]
+name = "raylib"
+version = "0.1.0"
+kern = "0.7.2"
+description = "Kern bindings for raylib"
+readme = "README.md"
+license = "MIT"
+
+[lib]
+root = "src/lib.rn"
+
+[example]
+roots = [
+    "examples/basic_window.rn",
+]
+
+[test]
+roots = ["tests/smoke.rn"]
