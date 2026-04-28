@@ -16,3 +16,6 @@ roots = [
 
 [test]
 roots = ["tests/smoke.rn"]
+
+[resources]
+raylib = { git = "https://github.com/raysan5/raylib.git", tag = "6.0" }

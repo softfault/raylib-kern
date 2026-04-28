@@ -2,12 +2,12 @@ use base.test;
 use raylib;
 
 fn check_color_constants() void {
-    let white = raylib.white();
+    let white = raylib.WHITE;
     test.eq(white.r, u8.{255});
     test.eq(white.g, u8.{255});
     test.eq(white.b, u8.{255});
     test.eq(white.a, u8.{255});
-    test.eq(raylib.blank().a, u8.{0});
+    test.eq(raylib.BLANK.a, u8.{0});
 }
 
 fn check_constructors() void {

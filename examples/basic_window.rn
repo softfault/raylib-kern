@@ -20,8 +20,8 @@ fn main() i32 {
 
     while (!raylib.window_should_close()) {
         raylib.begin_drawing();
-        raylib.clear_background(raylib.raywhite());
-        raylib.draw_text(MESSAGE.[0 .. 25], 190, 200, 20, raylib.darkgray());
+        raylib.clear_background(raylib.RAYWHITE);
+        raylib.draw_text(MESSAGE.[0 .. 25], 190, 200, 20, raylib.DARKGRAY);
         raylib.draw_fps(10, 10);
         raylib.end_drawing();
     }

@@ -8,25 +8,21 @@ use raylib;
 ```
 
 This repository is intentionally a normal third-party Kern package rather than
-a generated artifact checked into another workspace. The public shape is:
+a generated artifact checked into another workspace. It pins raylib as a Craft
+resource and builds the C sources through Craft instead of requiring a system
+`libraylib`.
+
+The public shape is:
 
 - `raylib.raw`: direct C ABI declarations using raylib's C names.
-- `raylib`: Kern-style type aliases, scalar constants, color constructors, and small helpers.
+- `raylib`: Kern-style type aliases, constants, color constructors, and small helpers.
 
 ## Requirements
 
-Install raylib development headers and libraries before building examples or
-applications that link this package.
-
-On many Linux distributions the dynamic package is enough:
-
-```sh
-pkg-config --modversion raylib
-```
-
-If raylib is installed in a custom prefix, expose it through the system linker
-search path before invoking Craft. The build script links `raylib` and common
-platform libraries for Linux, macOS, and Windows.
+Craft fetches raylib from Git and compiles the required C modules from the
+resource tree. Platform system libraries are still linked by the build script.
+On Linux that means OpenGL and X11 development libraries must be present for
+examples or applications to link.
 
 ## Quick Start
 
@@ -42,7 +38,7 @@ Local development can use a path dependency:
 raylib = { path = "../raylib-kern" }
 ```
 
-Run the included example after raylib is installed:
+Run the included example after platform development libraries are installed:
 
 ```sh
 craft build --examples
@@ -65,13 +61,20 @@ temporary C string with `base.abi.cstr`.
 
 ## Colors
 
-raylib's named colors are exposed as functions such as `raylib.raywhite()` and
-`raylib.darkgray()`. This avoids exporting aggregate constants until Kern's
-cross-package constant linkage has a stable story.
+raylib's named colors are exposed as `pub const` values such as
+`raylib.RAYWHITE` and `raylib.DARKGRAY`. They rely on Kern's `const`
+compile-time semantics and must not lower to linkable global storage.
+
+## Binding Generation
+
+raylib changes its API regularly. The long-term source of truth for this package
+is raylib's parser output (`parser/output/raylib_api.json`), not a hand-maintained
+copy of `raylib.h`. The generator lives in `scripts/generate_bindings.py` and is
+being moved into the Craft build flow as host-tool support matures.
 
 ## Scope
 
-The first binding pass targets raylib 5.x's stable C ABI and covers core,
+The first binding pass targets raylib 6.0's stable C ABI and covers core,
 shapes, textures, text, models, and audio. Variadic C helpers are deliberately
 not wrapped as Kern varargs until the language has a clear FFI story for them.
 
