@@ -24,6 +24,12 @@ resource tree. Platform system libraries are still linked by the build script.
 On Linux that means OpenGL and X11 development libraries must be present for
 examples or applications to link.
 
+On Fedora:
+
+```sh
+sudo dnf install mesa-libGL-devel libX11-devel libXrandr-devel libXinerama-devel libXi-devel libXcursor-devel
+```
+
 ## Quick Start
 
 ```toml
@@ -68,9 +74,9 @@ compile-time semantics and must not lower to linkable global storage.
 ## Binding Generation
 
 raylib changes its API regularly. The long-term source of truth for this package
-is raylib's parser output (`parser/output/raylib_api.json`), not a hand-maintained
-copy of `raylib.h`. The generator lives in `scripts/generate_bindings.py` and is
-being moved into the Craft build flow as host-tool support matures.
+is raylib's parser output, not a hand-maintained copy of `raylib.h`. Craft builds
+and runs the Kern host tool in `tools/raylib-bindgen` against
+`tools/rlparser/output/raylib_api.txt` from the pinned raylib resource.
 
 ## Scope
 

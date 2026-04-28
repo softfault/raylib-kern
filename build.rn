@@ -11,6 +11,7 @@ fn compile_raylib_module(b: *mut builder.Builder, source: []u8) void {
             "PLATFORM_DESKTOP",
             "GRAPHICS_API_OPENGL_33",
             "_DEFAULT_SOURCE",
+            "_GLFW_X11",
         },
         args: .{
             "-std=c99",
@@ -26,8 +27,17 @@ pub fn build(b: *mut builder.Builder) void {
         return;
     }
 
+    if (b.unit.kind == .lib) {
+        let api = b.resource_path("raylib", "tools/rlparser/output/raylib_api.txt");
+        let raw = b.stage_generated_from_tool("raylib-bindgen", "raylib-bindgen", "src/raw.rn", .{ "raw", api });
+        let public = b.stage_generated_from_tool("raylib-bindgen", "raylib-bindgen", "src/lib.rn", .{ "public", api });
+        b.depend(public, raw);
+        b.set_source_root_from(public);
+    }
+
     if (b.unit.kind == .bin or b.unit.kind == .example or b.unit.kind == .test) {
         compile_raylib_module(b, "src/rcore.c");
+        compile_raylib_module(b, "src/rglfw.c");
         compile_raylib_module(b, "src/rshapes.c");
         compile_raylib_module(b, "src/rtextures.c");
         compile_raylib_module(b, "src/rtext.c");
@@ -36,11 +46,17 @@ pub fn build(b: *mut builder.Builder) void {
     }
 
     if (b.target.os == .linux) {
+        b.link_system_lib("c");
         b.link_system_lib("m");
         b.link_system_lib("dl");
         b.link_system_lib("pthread");
+        b.link_system_lib("rt");
         b.link_system_lib("GL");
         b.link_system_lib("X11");
+        b.link_system_lib("Xrandr");
+        b.link_system_lib("Xinerama");
+        b.link_system_lib("Xi");
+        b.link_system_lib("Xcursor");
         return;
     }
 

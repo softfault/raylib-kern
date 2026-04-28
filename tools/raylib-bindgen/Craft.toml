@@ -1,0 +1,11 @@
+[package]
+name = "raylib-bindgen"
+version = "0.1.0"
+kern = "0.7.2"
+publish = false
+description = "Generate Kern raylib bindings from raylib rlparser output"
+license = "MIT"
+
+[[bin]]
+name = "raylib-bindgen"
+root = "src/main.rn"

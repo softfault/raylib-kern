@@ -9,6 +9,9 @@ license = "MIT"
 [lib]
 root = "src/lib.rn"
 
+[build-dependencies]
+raylib-bindgen = { path = "tools/raylib-bindgen", package = "raylib-bindgen" }
+
 [example]
 roots = [
     "examples/basic_window.rn",
