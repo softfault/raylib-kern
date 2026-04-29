@@ -2,7 +2,7 @@ pub fn is_public_define_name(name: []u8) bool {
     if (name.len() == 0) {
         return false;
     }
-    let mut i = usize.{0};
+    let mut i = 0;
     while (i < name.len()) {
         let byte = name.[i];
         if (!((byte >= b'A' and byte <= b'Z') or (byte >= b'0' and byte <= b'9') or byte == b'_')) {

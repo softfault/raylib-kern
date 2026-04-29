@@ -46,8 +46,8 @@ pub fn emit_kern_type(out: *mut Emitter, c_type: []u8) void {
         return;
     }
 
-    let mut stars = usize.{0};
-    let mut i = usize.{0};
+    let mut stars = 0;
+    let mut i = 0;
     while (i < clean.len()) {
         if (clean.[i] == b'*') {
             stars += 1;

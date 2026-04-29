@@ -3,38 +3,38 @@ use raylib;
 
 fn check_color_constants() void {
     let white = raylib.WHITE;
-    test.eq(white.r, u8.{255});
-    test.eq(white.g, u8.{255});
-    test.eq(white.b, u8.{255});
-    test.eq(white.a, u8.{255});
-    test.eq(raylib.BLANK.a, u8.{0});
+    test.eq(white.r, 255);
+    test.eq(white.g, 255);
+    test.eq(white.b, 255);
+    test.eq(white.a, 255);
+    test.eq(raylib.BLANK.a, 0);
 }
 
 fn check_constructors() void {
-    let v = raylib.vector2(f32.{3.0}, f32.{4.0});
-    test.eq(v.x, f32.{3.0});
-    test.eq(v.y, f32.{4.0});
+    let v = raylib.vector2(3.0, 4.0);
+    test.eq(v.x, 3.0);
+    test.eq(v.y, 4.0);
 
-    let c = raylib.color(u8.{1}, u8.{2}, u8.{3}, u8.{4});
-    test.eq(c.r, u8.{1});
-    test.eq(c.g, u8.{2});
-    test.eq(c.b, u8.{3});
-    test.eq(c.a, u8.{4});
+    let c = raylib.color(1, 2, 3, 4);
+    test.eq(c.r, 1);
+    test.eq(c.g, 2);
+    test.eq(c.b, 3);
+    test.eq(c.a, 4);
 }
 
 fn check_input_constants() void {
     test.eq(match (raylib.Key.A) {
-        .A => i32.{65},
-        _ => i32.{0},
-    }, i32.{65});
+        .A => 65,
+        _ => 0,
+    }, 65);
     test.eq(match (raylib.Key.ESCAPE) {
-        .ESCAPE => i32.{256},
-        _ => i32.{0},
-    }, i32.{256});
+        .ESCAPE => 256,
+        _ => 0,
+    }, 256);
     test.eq(match (raylib.MouseButton.LEFT) {
-        .LEFT => i32.{1},
-        _ => i32.{0},
-    }, i32.{1});
+        .LEFT => 1,
+        _ => 0,
+    }, 1);
 }
 
 fn main() i32 {

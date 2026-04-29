@@ -124,10 +124,10 @@ is held. Use `_pressed` for one-frame actions, such as toggling a menu or
 changing color on a mouse click.
 
 ```kern
-var pos = raylib.vector2(f32.{400.0}, f32.{225.0});
+var pos = raylib.vector2(400.0, 225.0);
 
 if (raylib.is_key_down(raylib.Key.RIGHT)) {
-    pos.x += f32.{2.0};
+    pos.x += 2.0;
 }
 
 if (raylib.is_mouse_button_pressed(raylib.MouseButton.LEFT)) {

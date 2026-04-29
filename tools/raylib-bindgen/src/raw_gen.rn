@@ -122,7 +122,7 @@ pub fn emit_raw(text: []u8) i32 {
     out.write("//! Generated low-level raylib C ABI declarations.\n");
     out.write("//! Source: raylib tools/rlparser/output/raylib_api.txt\n\n");
 
-    let mut index = usize.{0};
+    let mut index = 0;
     while (true) {
         let .{ Some: item } = next_line(text, index) else break;
         index = item.next;

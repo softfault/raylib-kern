@@ -1,6 +1,6 @@
 use ..types.Color;
 
-// raylib's built-in palette, kept as compile-time constants instead of global
+// raylib's built-in palette, these are compile-time constants instead of global
 // storage. Use `color()` or `Color.rgba()` for project-specific colors.
 pub const LIGHTGRAY = Color.{ r: 200, g: 200, b: 200, a: 255 };
 pub const GRAY = Color.{ r: 130, g: 130, b: 130, a: 255 };
