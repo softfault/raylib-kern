@@ -155,7 +155,7 @@ fn emit_kern_type(out: *mut Writer, c_type: []u8) void {
     }
 
     let base_text = no_ptr.&.as_str().trim_ascii();
-    let mut array_size = "";
+    let mut array_size = "".[0 .. 0];
     let mut array_base = base_text;
     match (base_text.find_byte(b'[')) {
         .{ Some: open } => match (base_text.find_byte(b']')) {
@@ -418,9 +418,9 @@ fn emit_public(text: []u8) i32 {
     let mut in_structs = false;
     let mut in_aliases = false;
     let mut in_enums = false;
-    let mut define_name = "";
-    let mut define_type = "";
-    let mut alias_type = "";
+    let mut define_name = "".[0 .. 0];
+    let mut define_type = "".[0 .. 0];
+    let mut alias_type = "".[0 .. 0];
 
     write(out, "//! Generated raylib bindings.\n");
     write(out, "//! Source: raylib tools/rlparser/output/raylib_api.txt\n\n");

@@ -27,14 +27,6 @@ pub fn build(b: *mut builder.Builder) void {
         return;
     }
 
-    if (b.unit.kind == .lib) {
-        let api = b.resource_path("raylib", "tools/rlparser/output/raylib_api.txt");
-        let raw = b.stage_generated_from_tool("raylib-bindgen", "raylib-bindgen", "src/raw.rn", .{ "raw", api });
-        let public = b.stage_generated_from_tool("raylib-bindgen", "raylib-bindgen", "src/lib.rn", .{ "public", api });
-        b.depend(public, raw);
-        b.set_source_root_from(public);
-    }
-
     if (b.unit.kind == .bin or b.unit.kind == .example or b.unit.kind == .test) {
         compile_raylib_module(b, "src/rcore.c");
         compile_raylib_module(b, "src/rglfw.c");
