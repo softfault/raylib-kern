@@ -12,8 +12,11 @@ through Craft instead of requiring a system `libraylib`.
 
 The public shape is:
 
-- `raylib.raw`: direct C ABI declarations using raylib's C names.
-- `raylib`: Kern-style type aliases, constants, color constructors, and small helpers.
+- `raylib`: Kern-style type aliases, constants, constructors, and snake_case
+  wrappers for raylib functions.
+
+`src/raw.rn` is still generated as the direct C ABI layer, but it is a private
+implementation detail used by `src/lib.rn`.
 
 ## Requirements
 
@@ -65,7 +68,7 @@ raylib.draw_text(MESSAGE, 190, 200, 20, raylib.DARKGRAY);
 ```
 
 For runtime text that is not already terminated, allocate a temporary C string
-with `base.abi.cstr` or call `raylib.raw.*` directly with your own pointer.
+with `base.abi.cstr` before passing it to the public wrapper.
 
 ## Colors
 
@@ -92,9 +95,10 @@ tools/raylib-bindgen/.craft/build/dev/target/out/raylib-bindgen-0.1.0/bin/raylib
 
 ## Scope
 
-The first binding pass targets raylib 6.0's stable C ABI and covers core,
-shapes, textures, text, models, and audio. Variadic C helpers are deliberately
-not wrapped as Kern varargs until the language has a clear FFI story for them.
+The binding pass targets raylib 6.0's stable C ABI and covers core, shapes,
+textures, text, models, and audio through the public wrapper layer. Variadic C
+helpers and callback registration APIs are deliberately not wrapped until Kern
+has a clear FFI story for those ABI shapes.
 
 ## License
 
