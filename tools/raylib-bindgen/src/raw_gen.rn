@@ -1,0 +1,259 @@
+use base.io.Writer;
+use base.mem.alloc.GPA;
+use sys.mem.Page;
+use ..emit.Emitter;
+use ..names.{enum_is_flags, sanitize_name};
+use ..parser.{Line, last_space, next_line, strip_prefix_or_empty};
+use ..types.{emit_enum_start, emit_enum_value, emit_flag_value, emit_kern_type, emit_param_type};
+
+type FunctionState = struct {
+    active: bool = false,
+    name: []u8 = "",
+    ret: []u8 = "",
+    params: base.coll.String = base.coll.String.{},
+    skip: bool = false,
+};
+
+impl *mut FunctionState {
+    pub fn begin() void {
+        self.active = true;
+        self.name = "";
+        self.ret = "";
+        self.skip = false;
+        self.params..&.clear();
+    }
+
+    pub fn should_emit() bool {
+        return self.active and !self.skip and self.name.len() != 0 and self.ret.len() != 0;
+    }
+
+    pub fn finish() void {
+        self.params..&.clear();
+    }
+}
+
+fn field_parts(line: []u8) ?Line {
+    let .{ Some: split } = line.find("]: ") else return .None;
+    let mut body = line.[split + 3 .. line.len()];
+    match (body.find(" //")) {
+        .{ Some: comment } => body = body.[0 .. comment],
+        .None => {},
+    }
+    let .{ Some: space } = last_space(body) else return .None;
+    return .{ Some: Line.{ text: body.[0 .. space].trim_ascii(), next: space + 1 } };
+}
+
+fn emit_raw_struct_field(out: *mut Emitter, line: []u8) void {
+    let .{ Some: parts } = field_parts(line) else return;
+    let .{ Some: split } = line.find("]: ") else return;
+    let name = line.[split + 3 + parts.next .. line.len()];
+    let clean_name = sanitize_name(match (name.find(" //")) {
+        .{ Some: comment } => name.[0 .. comment],
+        .None => name,
+    }.trim_ascii());
+    out.fmt("    pub {}: ", .{ clean_name });
+    emit_kern_type(out, parts.text);
+    out.write(",\n");
+}
+
+fn parse_param(function_name: []u8, line: []u8, out: *mut base.coll.String, alloc: *mut base.mem.alloc.Allocator) bool {
+    let .{ Some: split } = line.find("]: ") else return true;
+    let rest = line.[split + 3 .. line.len()];
+    let .{ Some: type_marker } = rest.find(" (type: ") else return true;
+    let name = rest.[0 .. type_marker].trim_ascii();
+    let type_start = type_marker + 8;
+    let mut type_end = rest.len();
+    if (type_end > 0 and rest.[type_end - 1] == b')') {
+        type_end -= 1;
+    }
+    let c_type = rest.[type_start .. type_end].trim_ascii();
+    if (c_type == "..." or c_type == "va_list" or c_type.ends_with("Callback")) {
+        // Kern cannot express C varargs/callback ABI here, so omit the whole function.
+        return false;
+    }
+    if (!out.is_empty()) {
+        if (!out.push_str(alloc, ", ")) return false;
+    }
+    if (!out.push_str(alloc, sanitize_name(name)) or !out.push_str(alloc, ": ")) {
+        return false;
+    }
+
+    let mut tmp = base.coll.String.{};
+    defer tmp..&.deinit(alloc);
+    let mut writer = base.io.string_writer(alloc, tmp..&);
+    let type_writer = *mut Writer.{ writer..& };
+    let mut emitter = Emitter.{ out: type_writer };
+    emit_param_type(emitter..&, function_name, name, c_type);
+    if (writer..&.did_fail()) {
+        return false;
+    }
+    return out.push_str(alloc, tmp.&.as_str());
+}
+
+fn finish_function(out: *mut Emitter, state: *mut FunctionState) void {
+    if (!state.should_emit()) {
+        state.finish();
+        return;
+    }
+    out.fmt("    pub fn {}(", .{ state.*.name });
+    out.write(state.*.params.&.as_str());
+    out.write(") ");
+    emit_kern_type(out, state.*.ret);
+    out.write(";\n");
+    state.finish();
+}
+
+pub fn emit_raw(text: []u8) i32 {
+    let page = Page.{}..&;
+    let gpa = GPA.{ backing: page }..&;
+    let mut stdout_file = std.io.stdout();
+    let stdout_writer = *mut Writer.{ stdout_file..& };
+    let mut emitter = Emitter.{ out: stdout_writer };
+    let out = emitter..&;
+    let mut in_struct = false;
+    let mut in_enums = false;
+    let mut in_functions = false;
+    let mut struct_open = false;
+    let mut enum_open = false;
+    let mut enum_name = "".[0 .. 0];
+    let mut function = FunctionState.{};
+    defer function.params..&.deinit(gpa);
+
+    out.write("//! Generated low-level raylib C ABI declarations.\n");
+    out.write("//! Source: raylib tools/rlparser/output/raylib_api.txt\n\n");
+
+    let mut index = usize.{0};
+    while (true) {
+        let .{ Some: item } = next_line(text, index) else break;
+        index = item.next;
+        let line = item.text;
+
+        // rlparser groups declarations by textual section headers, so the raw
+        // pass is a small state machine over those headers.
+        if (line.starts_with("Struct ")) {
+            if (struct_open) out.write("};\n\n");
+            if (enum_open) out.write("};\n\n");
+            in_struct = true;
+            in_enums = false;
+            struct_open = false;
+            enum_open = false;
+            continue;
+        }
+        if (line.starts_with("Aliases found")) {
+            if (struct_open) out.write("};\n\n");
+            if (enum_open) out.write("};\n\n");
+            in_struct = false;
+            in_enums = false;
+            struct_open = false;
+            enum_open = false;
+            continue;
+        }
+        if (line.starts_with("Enums found")) {
+            if (struct_open) out.write("};\n\n");
+            in_struct = false;
+            in_enums = true;
+            struct_open = false;
+            out.write("\n");
+            continue;
+        }
+        if (line.starts_with("Functions found")) {
+            if (enum_open) out.write("};\n\n");
+            in_enums = false;
+            enum_open = false;
+            in_functions = true;
+            out.write("extern {\n");
+            continue;
+        }
+        if (line.starts_with("Callbacks found")) {
+            if (enum_open) out.write("};\n\n");
+            in_enums = false;
+            enum_open = false;
+            continue;
+        }
+        if (in_struct and line.starts_with("  Name: ")) {
+            let name = strip_prefix_or_empty(line, "  Name: ");
+            out.fmt("pub extern type {} = struct {{\n", .{ name });
+            struct_open = true;
+            continue;
+        }
+        if (in_struct and line.starts_with("  Field[")) {
+            emit_raw_struct_field(out, line);
+            continue;
+        }
+        if (in_enums and line.starts_with("Enum ")) {
+            if (enum_open) out.write("};\n\n");
+            enum_open = false;
+            enum_name = "";
+            continue;
+        }
+        if (in_enums and line.starts_with("  Name: ")) {
+            enum_name = strip_prefix_or_empty(line, "  Name: ");
+            if (!enum_is_flags(enum_name)) {
+                emit_enum_start(out, enum_name);
+                enum_open = true;
+            }
+            continue;
+        }
+        if (in_enums and line.starts_with("  Value[")) {
+            let .{ Some: open } = line.find_byte(b'[') else continue;
+            let .{ Some: close } = line.find_byte(b']') else continue;
+            let .{ Some: colon } = line.find("]: ") else continue;
+            let name = line.[open + 1 .. close];
+            let value = line.[colon + 3 .. line.len()].trim_ascii();
+            if (enum_is_flags(enum_name)) {
+                // Flag enums are generated as constants so bitwise combinations stay usable.
+                emit_flag_value(out, enum_name, name, value);
+            } else {
+                emit_enum_value(out, enum_name, name, value);
+            }
+            continue;
+        }
+        if (!in_functions and line.starts_with("  Type: ") and !in_struct and !in_enums) {
+            let alias_type = strip_prefix_or_empty(line, "  Type: ");
+            let .{ Some: item2 } = next_line(text, index) else continue;
+            if (!item2.text.starts_with("  Name: ")) {
+                continue;
+            }
+            index = item2.next;
+            // Alias entries are split across adjacent Type/Name lines.
+            let alias_name_raw = strip_prefix_or_empty(item2.text, "  Name: ");
+            let alias_name = if (alias_name_raw.starts_with("*")) alias_name_raw.[1 .. alias_name_raw.len()] else alias_name_raw;
+            out.fmt("pub type {} = ", .{ alias_name });
+            if (alias_name_raw.starts_with("*")) {
+                out.write("*mut ");
+            }
+            emit_kern_type(out, alias_type);
+            out.write(";\n\n");
+            continue;
+        }
+        if (in_functions and line.starts_with("Function ")) {
+            // A new Function marker closes the previous accumulated signature.
+            finish_function(out, function..&);
+            function..&.begin();
+            continue;
+        }
+        if (in_functions and line.starts_with("  Name: ")) {
+            function.name = strip_prefix_or_empty(line, "  Name: ");
+            if (function.name == "TraceLog" or function.name == "TextFormat") {
+                // These are vararg-style text helpers in raylib; keep them out of raw ABI.
+                function.skip = true;
+            }
+            continue;
+        }
+        if (in_functions and line.starts_with("  Return type: ")) {
+            function.ret = strip_prefix_or_empty(line, "  Return type: ");
+            continue;
+        }
+        if (in_functions and line.starts_with("  Param[")) {
+            if (!parse_param(function.name, line, function.params..&, gpa)) {
+                function.skip = true;
+            }
+            continue;
+        }
+    }
+    finish_function(out, function..&);
+    if (in_functions) {
+        out.write("}\n");
+    }
+    return 0;
+}

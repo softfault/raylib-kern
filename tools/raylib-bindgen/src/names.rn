@@ -1,0 +1,120 @@
+pub fn is_public_define_name(name: []u8) bool {
+    if (name.len() == 0) {
+        return false;
+    }
+    let mut i = usize.{0};
+    while (i < name.len()) {
+        let byte = name.[i];
+        if (!((byte >= b'A' and byte <= b'Z') or (byte >= b'0' and byte <= b'9') or byte == b'_')) {
+            return false;
+        }
+        i += 1;
+    }
+    return true;
+}
+
+pub fn sanitize_name(name: []u8) []u8 {
+    if (name == "type") {
+        return "kind";
+    }
+    return name;
+}
+
+pub fn enum_backing_type(name: []u8) []u8 {
+    if (name == "ConfigFlags" or name == "Gesture") {
+        return "u32";
+    }
+    return "i32";
+}
+
+pub fn enum_is_flags(name: []u8) bool {
+    return name == "ConfigFlags" or name == "Gesture";
+}
+
+fn enum_value_prefix(name: []u8) []u8 {
+    if (name == "ConfigFlags") return "FLAG_";
+    if (name == "TraceLogLevel") return "LOG_";
+    if (name == "KeyboardKey") return "KEY_";
+    if (name == "MouseButton") return "MOUSE_BUTTON_";
+    if (name == "MouseCursor") return "MOUSE_CURSOR_";
+    if (name == "GamepadButton") return "GAMEPAD_BUTTON_";
+    if (name == "GamepadAxis") return "GAMEPAD_AXIS_";
+    if (name == "MaterialMapIndex") return "MATERIAL_MAP_";
+    if (name == "ShaderLocationIndex") return "SHADER_LOC_";
+    if (name == "ShaderUniformDataType") return "SHADER_UNIFORM_";
+    if (name == "ShaderAttributeDataType") return "SHADER_ATTRIB_";
+    if (name == "PixelFormat") return "PIXELFORMAT_";
+    if (name == "TextureFilter") return "TEXTURE_FILTER_";
+    if (name == "TextureWrap") return "TEXTURE_WRAP_";
+    if (name == "CubemapLayout") return "CUBEMAP_LAYOUT_";
+    if (name == "FontType") return "FONT_";
+    if (name == "BlendMode") return "BLEND_";
+    if (name == "Gesture") return "GESTURE_";
+    if (name == "CameraMode") return "CAMERA_";
+    if (name == "CameraProjection") return "CAMERA_";
+    if (name == "NPatchLayout") return "NPATCH_";
+    return "";
+}
+
+pub fn enum_variant_name(enum_name: []u8, value_name: []u8) []u8 {
+    let prefix = enum_value_prefix(enum_name);
+    if (prefix.len() == 0) {
+        return value_name;
+    }
+    return match (value_name.strip_prefix(prefix)) {
+        .{ Some: rest } => rest,
+        .None => value_name,
+    };
+}
+
+pub fn public_enum_alias(name: []u8) []u8 {
+    if (name == "KeyboardKey") return "Key";
+    return name;
+}
+
+fn enum_name_for_value(value_name: []u8) []u8 {
+    if (value_name.starts_with("LOG_")) return "TraceLogLevel";
+    if (value_name.starts_with("KEY_")) return "KeyboardKey";
+    if (value_name.starts_with("MOUSE_BUTTON_")) return "MouseButton";
+    if (value_name.starts_with("MOUSE_CURSOR_")) return "MouseCursor";
+    if (value_name.starts_with("GAMEPAD_BUTTON_")) return "GamepadButton";
+    if (value_name.starts_with("GAMEPAD_AXIS_")) return "GamepadAxis";
+    if (value_name.starts_with("MATERIAL_MAP_")) return "MaterialMapIndex";
+    if (value_name.starts_with("SHADER_LOC_")) return "ShaderLocationIndex";
+    if (value_name.starts_with("SHADER_UNIFORM_")) return "ShaderUniformDataType";
+    if (value_name.starts_with("SHADER_ATTRIB_")) return "ShaderAttributeDataType";
+    if (value_name.starts_with("PIXELFORMAT_")) return "PixelFormat";
+    if (value_name.starts_with("TEXTURE_FILTER_")) return "TextureFilter";
+    if (value_name.starts_with("TEXTURE_WRAP_")) return "TextureWrap";
+    if (value_name.starts_with("CUBEMAP_LAYOUT_")) return "CubemapLayout";
+    if (value_name.starts_with("FONT_")) return "FontType";
+    if (value_name.starts_with("BLEND_")) return "BlendMode";
+    if (value_name.starts_with("CAMERA_")) return "CameraMode";
+    if (value_name.starts_with("NPATCH_")) return "NPatchLayout";
+    return "";
+}
+
+pub fn skip_public_enum_define_alias(value: []u8) bool {
+    let enum_name = enum_name_for_value(value);
+    if (enum_name.len() == 0 or enum_is_flags(enum_name)) {
+        return false;
+    }
+    // Non-flag enum values are already exposed through the typed enum alias.
+    return true;
+}
+
+pub fn mapped_enum_param_type(function_name: []u8, param_name: []u8, c_type: []u8) []u8 {
+    if (c_type == "int") {
+        if (param_name == "key") return "KeyboardKey";
+        if (param_name == "button" and function_name.starts_with("IsMouseButton")) return "MouseButton";
+        if (param_name == "button" and function_name.starts_with("GetGamepadButton")) return "GamepadButton";
+        if (param_name == "axis") return "GamepadAxis";
+        if (param_name == "cursor") return "MouseCursor";
+        if (param_name == "logLevel") return "TraceLogLevel";
+        if (param_name == "mode" and function_name == "BeginBlendMode") return "BlendMode";
+        if (param_name == "uniformType") return "ShaderUniformDataType";
+        if (param_name == "filter") return "TextureFilter";
+        if (param_name == "wrap") return "TextureWrap";
+    }
+    return "";
+}

@@ -1,0 +1,121 @@
+use base.mem.alloc.GPA;
+use sys.mem.Page;
+use ..emit.Emitter;
+use ..names.{enum_backing_type, enum_variant_name, mapped_enum_param_type};
+
+fn remove_words(text: []u8) []u8 {
+    let mut out = text.trim_ascii();
+    if (out.starts_with("const ")) {
+        out = out.[6 .. out.len()].trim_ascii();
+    }
+    if (out.starts_with("struct ")) {
+        out = out.[7 .. out.len()].trim_ascii();
+    }
+    if (out.starts_with("enum ")) {
+        out = out.[5 .. out.len()].trim_ascii();
+    }
+    return out;
+}
+
+fn emit_base_type(out: *mut Emitter, c_type: []u8) void {
+    let base = remove_words(c_type);
+    if (base == "void") out.write("void")
+    else if (base == "bool") out.write("bool")
+    else if (base == "char") out.write("u8")
+    else if (base == "unsigned char") out.write("u8")
+    else if (base == "short") out.write("i16")
+    else if (base == "unsigned short") out.write("u16")
+    else if (base == "int") out.write("i32")
+    else if (base == "unsigned int") out.write("u32")
+    else if (base == "long") out.write("isize")
+    else if (base == "unsigned long") out.write("usize")
+    else if (base == "long long") out.write("i64")
+    else if (base == "unsigned long long") out.write("u64")
+    else if (base == "float") out.write("f32")
+    else if (base == "double") out.write("f64")
+    else if (base == "size_t") out.write("usize")
+    else if (base == "rAudioBuffer") out.write("void")
+    else if (base == "rAudioProcessor") out.write("void")
+    else out.fmt("{}", .{ base });
+}
+
+pub fn emit_kern_type(out: *mut Emitter, c_type: []u8) void {
+    let clean = remove_words(c_type);
+    if (clean == "..." or clean == "va_list") {
+        out.write("void");
+        return;
+    }
+
+    let mut stars = usize.{0};
+    let mut i = usize.{0};
+    while (i < clean.len()) {
+        if (clean.[i] == b'*') {
+            stars += 1;
+        }
+        i += 1;
+    }
+
+    let mut no_ptr = base.coll.String.{};
+    let page = Page.{}..&;
+    let gpa = GPA.{ backing: page }..&;
+    defer no_ptr..&.deinit(gpa);
+    i = 0;
+    while (i < clean.len()) {
+        if (clean.[i] != b'*') {
+            let _ = no_ptr..&.push_char(gpa, clean.[i]);
+        }
+        i += 1;
+    }
+
+    let base_text = no_ptr.&.as_str().trim_ascii();
+    let mut array_size = "".[0 .. 0];
+    let mut array_base = base_text;
+    // rlparser stores fixed array suffixes on the C type; Kern wants `[N]T`.
+    match (base_text.find_byte(b'[')) {
+        .{ Some: open } => match (base_text.find_byte(b']')) {
+            .{ Some: close } => if (close > open) {
+                array_base = base_text.[0 .. open].trim_ascii();
+                array_size = base_text.[open + 1 .. close].trim_ascii();
+            },
+            .None => {},
+        },
+        .None => {},
+    }
+
+    if (array_size.len() != 0) {
+        out.fmt("[{}]", .{ array_size });
+    }
+
+    let pointer_base_is_char = remove_words(array_base) == "char" or remove_words(array_base) == "unsigned char";
+    while (stars > 0) {
+        if (stars == 1 and pointer_base_is_char) {
+            // raylib text APIs expect C strings; keep a single char pointer as `*u8`.
+            out.write("*");
+        } else {
+            out.write("*mut ");
+        }
+        stars -= 1;
+    }
+    emit_base_type(out, array_base);
+}
+
+pub fn emit_param_type(out: *mut Emitter, function_name: []u8, param_name: []u8, c_type: []u8) void {
+    let enum_type = mapped_enum_param_type(function_name, param_name, c_type);
+    if (enum_type.len() != 0) {
+        out.write(enum_type);
+        return;
+    }
+    emit_kern_type(out, c_type);
+}
+
+pub fn emit_enum_start(out: *mut Emitter, name: []u8) void {
+    out.fmt("pub type {}: {} = enum {{\n", .{ name, enum_backing_type(name) });
+}
+
+pub fn emit_enum_value(out: *mut Emitter, enum_name: []u8, value_name: []u8, value: []u8) void {
+    out.fmt("    {} = {},\n", .{ enum_variant_name(enum_name, value_name), value });
+}
+
+pub fn emit_flag_value(out: *mut Emitter, enum_name: []u8, value_name: []u8, value: []u8) void {
+    out.fmt("pub const {} = {}.{{{}}};\n", .{ value_name, enum_backing_type(enum_name), value });
+}
