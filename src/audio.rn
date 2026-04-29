@@ -1,0 +1,9 @@
+use ..raw;
+
+pub fn init_audio_device() void {
+    raw.InitAudioDevice();
+}
+
+pub fn close_audio_device() void {
+    raw.CloseAudioDevice();
+}

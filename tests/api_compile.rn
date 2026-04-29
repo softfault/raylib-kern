@@ -1,0 +1,78 @@
+use raylib;
+
+const TITLE = "compile-only\0";
+const TEXT = "hello\0";
+const TEXTURE_PATH = "missing.png\0";
+
+fn use_window_api() void {
+    raylib.init_window(640, 480, TITLE);
+    raylib.set_target_fps(60);
+    raylib.set_window_title(TITLE);
+    let _ = raylib.window_should_close();
+    let _ = raylib.is_window_ready();
+    let _ = raylib.get_fps();
+    let _ = raylib.get_frame_time();
+    let _ = raylib.get_time();
+    raylib.close_window();
+}
+
+fn use_drawing_api() void {
+    let p = raylib.vector2(f32.{10.0}, f32.{20.0});
+    let q = raylib.vector2(f32.{30.0}, f32.{40.0});
+    let size = raylib.vector2(f32.{50.0}, f32.{60.0});
+    let rec = raylib.rectangle(f32.{1.0}, f32.{2.0}, f32.{3.0}, f32.{4.0});
+
+    raylib.begin_drawing();
+    raylib.clear_background(raylib.RAYWHITE);
+    raylib.draw_pixel(1, 2, raylib.RED);
+    raylib.draw_line(0, 0, 10, 10, raylib.BLUE);
+    raylib.draw_line_v(p, q, raylib.GREEN);
+    raylib.draw_circle(20, 20, f32.{10.0}, raylib.ORANGE);
+    raylib.draw_circle_v(p, f32.{8.0}, raylib.PURPLE);
+    raylib.draw_rectangle(1, 2, 3, 4, raylib.GRAY);
+    raylib.draw_rectangle_v(p, size, raylib.DARKGRAY);
+    raylib.draw_rectangle_rec(rec, raylib.BLACK);
+    raylib.draw_rectangle_lines(1, 2, 3, 4, raylib.WHITE);
+    raylib.draw_fps(10, 10);
+    raylib.draw_text(TEXT, 10, 40, 20, raylib.DARKGRAY);
+    let _ = raylib.measure_text(TEXT, 20);
+    raylib.end_drawing();
+}
+
+fn use_input_api() void {
+    let _ = raylib.is_key_pressed(raylib.Key.A);
+    let _ = raylib.is_key_down(raylib.Key.SPACE);
+    let _ = raylib.is_key_released(raylib.Key.ESCAPE);
+    let _ = raylib.is_key_up(raylib.Key.ENTER);
+    let _ = raylib.is_mouse_button_pressed(raylib.MouseButton.LEFT);
+    let _ = raylib.is_mouse_button_down(raylib.MouseButton.RIGHT);
+    let _ = raylib.is_mouse_button_released(raylib.MouseButton.MIDDLE);
+    let _ = raylib.is_mouse_button_up(raylib.MouseButton.LEFT);
+    let _ = raylib.get_mouse_position();
+    let _ = raylib.get_mouse_delta();
+}
+
+fn use_texture_api() void {
+    let tex = raylib.load_texture(TEXTURE_PATH);
+    let pos = raylib.vector2(f32.{0.0}, f32.{0.0});
+    let src = raylib.rectangle(f32.{0.0}, f32.{0.0}, f32.{16.0}, f32.{16.0});
+    raylib.draw_texture(tex, 0, 0, raylib.WHITE);
+    raylib.draw_texture_v(tex, pos, raylib.WHITE);
+    raylib.draw_texture_ex(tex, pos, f32.{0.0}, f32.{1.0}, raylib.WHITE);
+    raylib.draw_texture_rec(tex, src, pos, raylib.WHITE);
+    raylib.unload_texture(tex);
+}
+
+fn main() i32 {
+    // Keep these calls behind an impossible branch so the test locks API shape
+    // without opening a real window in CI or headless development shells.
+    if (false) {
+        use_window_api();
+        use_drawing_api();
+        use_input_api();
+        use_texture_api();
+        raylib.init_audio_device();
+        raylib.close_audio_device();
+    }
+    return 0;
+}

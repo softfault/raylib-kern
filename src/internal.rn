@@ -1,0 +1,8 @@
+use base.mem.null_ptr;
+
+pub fn z_ptr(text_z: []u8) *u8 {
+    if (text_z.len() == 0) {
+        return null_ptr[u8]();
+    }
+    return text_z.[0].& as *u8;
+}

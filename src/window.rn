@@ -1,0 +1,38 @@
+use ..raw;
+use ..internal.z_ptr;
+
+pub fn init_window(width: i32, height: i32, title_z: []u8) void {
+    raw.InitWindow(width, height, z_ptr(title_z));
+}
+
+pub fn close_window() void {
+    raw.CloseWindow();
+}
+
+pub fn window_should_close() bool {
+    return raw.WindowShouldClose();
+}
+
+pub fn is_window_ready() bool {
+    return raw.IsWindowReady();
+}
+
+pub fn set_target_fps(fps: i32) void {
+    raw.SetTargetFPS(fps);
+}
+
+pub fn get_fps() i32 {
+    return raw.GetFPS();
+}
+
+pub fn get_frame_time() f32 {
+    return raw.GetFrameTime();
+}
+
+pub fn get_time() f64 {
+    return raw.GetTime();
+}
+
+pub fn set_window_title(title_z: []u8) void {
+    raw.SetWindowTitle(z_ptr(title_z));
+}

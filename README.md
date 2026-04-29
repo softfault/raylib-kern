@@ -10,13 +10,13 @@ use raylib;
 This repository pins raylib 6.0 as a Craft resource and builds the C sources
 through Craft instead of requiring a system `libraylib`.
 
-The public shape is:
+The public shape is hand-maintained:
 
-- `raylib`: Kern-style type aliases, constants, constructors, and snake_case
+- `raylib`: Kern-style type aliases, constants, constructor helpers, and snake_case
   wrappers for raylib functions.
 
-`src/raw.rn` is still generated as the direct C ABI layer, but it is a private
-implementation detail used by `src/lib.rn`.
+`src/raw.rn` is generated as the direct C ABI layer, but it is a private
+implementation detail used by the small modules under `src/`.
 
 ## Requirements
 
@@ -78,10 +78,13 @@ compile-time semantics and must not lower to linkable global storage.
 
 ## Binding Generation
 
-raylib changes its API regularly. The long-term source of truth for this package
+raylib changes its API regularly. The long-term source of truth for the raw ABI
 is raylib's parser output, not a hand-maintained copy of `raylib.h`. Craft builds
 and runs the Kern host tool in `tools/raylib-bindgen` against
 `tools/rlparser/output/raylib_api.txt` from the pinned raylib resource.
+
+Only `src/raw.rn` is regenerated. The public wrapper modules are hand-maintained
+so they can use Kern naming, module boundaries, and focused convenience helpers.
 
 Regenerate the checked-in bindings after updating the pinned raylib resource:
 
@@ -89,16 +92,15 @@ Regenerate the checked-in bindings after updating the pinned raylib resource:
 craft build --project-path tools/raylib-bindgen
 tools/raylib-bindgen/.craft/build/dev/target/out/raylib-bindgen-0.1.0/bin/raylib-bindgen raw \
   .craft/resources/raylib-*/raylib/tools/rlparser/output/raylib_api.txt > src/raw.rn
-tools/raylib-bindgen/.craft/build/dev/target/out/raylib-bindgen-0.1.0/bin/raylib-bindgen public \
-  .craft/resources/raylib-*/raylib/tools/rlparser/output/raylib_api.txt > src/lib.rn
 ```
 
 ## Scope
 
-The binding pass targets raylib 6.0's stable C ABI and covers core, shapes,
-textures, text, models, and audio through the public wrapper layer. Variadic C
-helpers and callback registration APIs are deliberately not wrapped until Kern
-has a clear FFI story for those ABI shapes.
+The generated raw layer targets raylib 6.0's stable C ABI. The public wrapper
+currently covers the window lifecycle, drawing basics, input, text, textures,
+audio device setup, color constants, and common value constructors. Additional
+raylib areas should be added as focused hand-written modules with compile
+coverage.
 
 ## License
 

@@ -1,0 +1,101 @@
+use ..raw;
+
+pub type Vector2 = raw.Vector2;
+pub type Vector3 = raw.Vector3;
+pub type Vector4 = raw.Vector4;
+pub type Matrix = raw.Matrix;
+pub type Color = raw.Color;
+pub type Rectangle = raw.Rectangle;
+pub type Image = raw.Image;
+pub type Texture = raw.Texture;
+pub type RenderTexture = raw.RenderTexture;
+pub type NPatchInfo = raw.NPatchInfo;
+pub type GlyphInfo = raw.GlyphInfo;
+pub type Font = raw.Font;
+pub type Camera3D = raw.Camera3D;
+pub type Camera2D = raw.Camera2D;
+pub type Mesh = raw.Mesh;
+pub type Shader = raw.Shader;
+pub type MaterialMap = raw.MaterialMap;
+pub type Material = raw.Material;
+pub type Transform = raw.Transform;
+pub type BoneInfo = raw.BoneInfo;
+pub type ModelSkeleton = raw.ModelSkeleton;
+pub type Model = raw.Model;
+pub type ModelAnimation = raw.ModelAnimation;
+pub type Ray = raw.Ray;
+pub type RayCollision = raw.RayCollision;
+pub type BoundingBox = raw.BoundingBox;
+pub type Wave = raw.Wave;
+pub type AudioStream = raw.AudioStream;
+pub type Sound = raw.Sound;
+pub type Music = raw.Music;
+pub type VrDeviceInfo = raw.VrDeviceInfo;
+pub type VrStereoConfig = raw.VrStereoConfig;
+pub type FilePathList = raw.FilePathList;
+pub type AutomationEvent = raw.AutomationEvent;
+pub type AutomationEventList = raw.AutomationEventList;
+
+pub type Quaternion = raw.Vector4;
+pub type Texture2D = raw.Texture;
+pub type TextureCubemap = raw.Texture;
+pub type RenderTexture2D = raw.RenderTexture;
+pub type Camera = raw.Camera3D;
+pub type ModelAnimPose = *mut raw.Transform;
+
+pub type TraceLogLevel = raw.TraceLogLevel;
+pub type KeyboardKey = raw.KeyboardKey;
+pub type Key = raw.KeyboardKey;
+pub type MouseButton = raw.MouseButton;
+pub type MouseCursor = raw.MouseCursor;
+pub type GamepadButton = raw.GamepadButton;
+pub type GamepadAxis = raw.GamepadAxis;
+pub type MaterialMapIndex = raw.MaterialMapIndex;
+pub type ShaderLocationIndex = raw.ShaderLocationIndex;
+pub type ShaderUniformDataType = raw.ShaderUniformDataType;
+pub type ShaderAttributeDataType = raw.ShaderAttributeDataType;
+pub type PixelFormat = raw.PixelFormat;
+pub type TextureFilter = raw.TextureFilter;
+pub type TextureWrap = raw.TextureWrap;
+pub type CubemapLayout = raw.CubemapLayout;
+pub type FontType = raw.FontType;
+pub type BlendMode = raw.BlendMode;
+pub type CameraMode = raw.CameraMode;
+pub type CameraProjection = raw.CameraProjection;
+pub type NPatchLayout = raw.NPatchLayout;
+
+impl Color {
+    pub const fn rgba(r: u8, g: u8, b: u8, a: u8) Color {
+        return .{ r: r, g: g, b: b, a: a };
+    }
+}
+
+impl Vector2 {
+    pub const fn xy(x: f32, y: f32) Vector2 {
+        return .{ x: x, y: y };
+    }
+}
+
+impl Vector3 {
+    pub const fn xyz(x: f32, y: f32, z: f32) Vector3 {
+        return .{ x: x, y: y, z: z };
+    }
+}
+
+impl Rectangle {
+    pub const fn xywh(x: f32, y: f32, width: f32, height: f32) Rectangle {
+        return .{ x: x, y: y, width: width, height: height };
+    }
+}
+
+pub const fn vector2(x: f32, y: f32) Vector2 {
+    return .{ x: x, y: y };
+}
+
+pub const fn vector3(x: f32, y: f32, z: f32) Vector3 {
+    return .{ x: x, y: y, z: z };
+}
+
+pub const fn rectangle(x: f32, y: f32, width: f32, height: f32) Rectangle {
+    return .{ x: x, y: y, width: width, height: height };
+}

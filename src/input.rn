@@ -1,0 +1,42 @@
+use ..raw;
+use ..types.{Key, MouseButton, Vector2};
+
+pub fn is_key_pressed(key: Key) bool {
+    return raw.IsKeyPressed(key);
+}
+
+pub fn is_key_down(key: Key) bool {
+    return raw.IsKeyDown(key);
+}
+
+pub fn is_key_released(key: Key) bool {
+    return raw.IsKeyReleased(key);
+}
+
+pub fn is_key_up(key: Key) bool {
+    return raw.IsKeyUp(key);
+}
+
+pub fn is_mouse_button_pressed(button: MouseButton) bool {
+    return raw.IsMouseButtonPressed(button);
+}
+
+pub fn is_mouse_button_down(button: MouseButton) bool {
+    return raw.IsMouseButtonDown(button);
+}
+
+pub fn is_mouse_button_released(button: MouseButton) bool {
+    return raw.IsMouseButtonReleased(button);
+}
+
+pub fn is_mouse_button_up(button: MouseButton) bool {
+    return raw.IsMouseButtonUp(button);
+}
+
+pub fn get_mouse_position() Vector2 {
+    return raw.GetMousePosition();
+}
+
+pub fn get_mouse_delta() Vector2 {
+    return raw.GetMouseDelta();
+}
