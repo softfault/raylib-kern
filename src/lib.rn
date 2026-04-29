@@ -3,6 +3,11 @@
 //! `raw.rn` is generated from raylib's C ABI. This module tree is hand-written
 //! so Kern users get stable snake_case functions, slice-based strings, and
 //! small impl helpers without depending on the raw C-shaped module.
+//!
+//! Most examples follow the same raylib pattern.
+//! initialize the window, update state until `window_should_close()`, draw one
+//! complete frame between `begin_drawing()` and `end_drawing()`, then release
+//! any GPU or audio resources before closing the window.
 
 pub/ mod raw;
 mod internal;

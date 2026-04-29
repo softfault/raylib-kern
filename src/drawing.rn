@@ -1,18 +1,25 @@
 use ..raw;
 use ..types.{Color, Rectangle, Vector2};
 
+// Starts drawing into the current frame buffer. A normal frame has exactly one
+// begin/end pair, with all draw calls placed between them.
 pub fn begin_drawing() void {
     raw.BeginDrawing();
 }
 
+// Finishes the frame, swaps the back buffer to the screen, applies target-FPS
+// timing, and lets raylib poll window/input events for the next loop iteration.
 pub fn end_drawing() void {
     raw.EndDrawing();
 }
 
+// Clear early in the draw phase so the previous frame is not left behind.
 pub fn clear_background(color: Color) void {
     raw.ClearBackground(color);
 }
 
+// The FPS counter is a debug overlay. Draw it after `clear_background()` so it
+// remains visible on top of the scene.
 pub fn draw_fps(x: i32, y: i32) void {
     raw.DrawFPS(x, y);
 }

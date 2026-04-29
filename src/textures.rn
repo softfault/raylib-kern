@@ -2,18 +2,24 @@ use ..raw;
 use ..internal.z_ptr;
 use ..types.{Color, Image, Rectangle, Texture2D, Vector2};
 
+// Loads image data into GPU memory. raylib requires an initialized window first
+// because texture creation needs the OpenGL context from `init_window()`.
 pub fn load_texture(path_z: []u8) Texture2D {
     return raw.LoadTexture(z_ptr(path_z));
 }
 
+// Converts an already loaded CPU-side Image into a GPU-side Texture2D.
 pub fn load_texture_from_image(image: Image) Texture2D {
     return raw.LoadTextureFromImage(image);
 }
 
+// Release GPU memory when the texture is no longer needed. In the usual raylib
+// lifecycle this happens before `close_window()`.
 pub fn unload_texture(texture: Texture2D) void {
     raw.UnloadTexture(texture);
 }
 
+// Draw the complete texture with no rotation or scaling.
 pub fn draw_texture(texture: Texture2D, x: i32, y: i32, tint: Color) void {
     raw.DrawTexture(texture, x, y, tint);
 }
@@ -26,6 +32,8 @@ pub fn draw_texture_ex(texture: Texture2D, position: Vector2, rotation: f32, sca
     raw.DrawTextureEx(texture, position, rotation, scale, tint);
 }
 
+// Draw a source rectangle from the texture. This is the basic building block for
+// spritesheets and texture atlases.
 pub fn draw_texture_rec(texture: Texture2D, source: Rectangle, position: Vector2, tint: Color) void {
     raw.DrawTextureRec(texture, source, position, tint);
 }

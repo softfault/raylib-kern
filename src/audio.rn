@@ -1,9 +1,13 @@
 use ..raw;
 
+// Initializes raylib's audio device and context. Call this before loading or
+// playing sounds/music, then pair it with `close_audio_device()`.
 pub fn init_audio_device() void {
     raw.InitAudioDevice();
 }
 
+// Closes the audio backend. Release long-lived audio resources before this once
+// the higher-level sound/music wrappers are added.
 pub fn close_audio_device() void {
     raw.CloseAudioDevice();
 }

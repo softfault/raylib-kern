@@ -1,5 +1,8 @@
 use ..raw;
 
+// These aliases intentionally mirror raylib's C structs and enums so values can
+// cross the generated ABI layer without conversion. Ergonomic constructors live
+// below and are re-exported from `raylib`.
 pub type Vector2 = raw.Vector2;
 pub type Vector3 = raw.Vector3;
 pub type Vector4 = raw.Vector4;
@@ -64,6 +67,8 @@ pub type CameraMode = raw.CameraMode;
 pub type CameraProjection = raw.CameraProjection;
 pub type NPatchLayout = raw.NPatchLayout;
 
+// `impl` constructors keep common value creation readable when the concrete
+// type is already in scope, for example `Vector2.xy(10.0, 20.0)`.
 impl Color {
     pub const fn rgba(r: u8, g: u8, b: u8, a: u8) Color {
         return .{ r: r, g: g, b: b, a: a };
@@ -88,6 +93,8 @@ impl Rectangle {
     }
 }
 
+// Free constructors provide stable, discoverable paths from `raylib` without
+// requiring users to import the underlying type name first.
 pub const fn vector2(x: f32, y: f32) Vector2 {
     return .{ x: x, y: y };
 }
