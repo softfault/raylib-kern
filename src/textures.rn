@@ -4,7 +4,7 @@ use ..types.{Color, Image, Rectangle, Texture2D, Vector2};
 
 // Loads image data into GPU memory. raylib requires an initialized window first
 // because texture creation needs the OpenGL context from `init_window()`.
-pub fn load_texture(path_z: []u8) Texture2D {
+pub fn load_texture(path_z: &[u8]) Texture2D {
     return raw.LoadTexture(z_ptr(path_z));
 }
 

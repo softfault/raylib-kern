@@ -1,4 +1,4 @@
-pub fn is_public_define_name(name: []u8) bool {
+pub fn is_public_define_name(name: &[u8]) bool {
     if (name.len() == 0) {
         return false;
     }
@@ -13,25 +13,25 @@ pub fn is_public_define_name(name: []u8) bool {
     return true;
 }
 
-pub fn sanitize_name(name: []u8) []u8 {
+pub fn sanitize_name(name: &[u8]) &[u8] {
     if (name == "type") {
         return "kind";
     }
     return name;
 }
 
-pub fn enum_backing_type(name: []u8) []u8 {
+pub fn enum_backing_type(name: &[u8]) &[u8] {
     if (name == "ConfigFlags" or name == "Gesture") {
         return "u32";
     }
     return "i32";
 }
 
-pub fn enum_is_flags(name: []u8) bool {
+pub fn enum_is_flags(name: &[u8]) bool {
     return name == "ConfigFlags" or name == "Gesture";
 }
 
-fn enum_value_prefix(name: []u8) []u8 {
+fn enum_value_prefix(name: &[u8]) &[u8] {
     if (name == "ConfigFlags") return "FLAG_";
     if (name == "TraceLogLevel") return "LOG_";
     if (name == "KeyboardKey") return "KEY_";
@@ -56,7 +56,7 @@ fn enum_value_prefix(name: []u8) []u8 {
     return "";
 }
 
-pub fn enum_variant_name(enum_name: []u8, value_name: []u8) []u8 {
+pub fn enum_variant_name(enum_name: &[u8], value_name: &[u8]) &[u8] {
     let prefix = enum_value_prefix(enum_name);
     if (prefix.len() == 0) {
         return value_name;
@@ -67,12 +67,12 @@ pub fn enum_variant_name(enum_name: []u8, value_name: []u8) []u8 {
     };
 }
 
-pub fn public_enum_alias(name: []u8) []u8 {
+pub fn public_enum_alias(name: &[u8]) &[u8] {
     if (name == "KeyboardKey") return "Key";
     return name;
 }
 
-fn enum_name_for_value(value_name: []u8) []u8 {
+fn enum_name_for_value(value_name: &[u8]) &[u8] {
     if (value_name.starts_with("LOG_")) return "TraceLogLevel";
     if (value_name.starts_with("KEY_")) return "KeyboardKey";
     if (value_name.starts_with("MOUSE_BUTTON_")) return "MouseButton";
@@ -94,7 +94,7 @@ fn enum_name_for_value(value_name: []u8) []u8 {
     return "";
 }
 
-pub fn skip_public_enum_define_alias(value: []u8) bool {
+pub fn skip_public_enum_define_alias(value: &[u8]) bool {
     let enum_name = enum_name_for_value(value);
     if (enum_name.len() == 0 or enum_is_flags(enum_name)) {
         return false;
@@ -103,7 +103,7 @@ pub fn skip_public_enum_define_alias(value: []u8) bool {
     return true;
 }
 
-pub fn mapped_enum_param_type(function_name: []u8, param_name: []u8, c_type: []u8) []u8 {
+pub fn mapped_enum_param_type(function_name: &[u8], param_name: &[u8], c_type: &[u8]) &[u8] {
     if (c_type == "int") {
         if (param_name == "key") return "KeyboardKey";
         if (param_name == "button" and function_name.starts_with("IsMouseButton")) return "MouseButton";

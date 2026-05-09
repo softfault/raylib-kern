@@ -1,45 +1,47 @@
 use base.test;
+use std.io;
 use raylib;
 
-fn check_color_constants() void {
+fn check_color_constants(t: &mut test.Report[io.File]) void {
     let white = raylib.WHITE;
-    test.eq(white.r, 255);
-    test.eq(white.g, 255);
-    test.eq(white.b, 255);
-    test.eq(white.a, 255);
-    test.eq(raylib.BLANK.a, 0);
+    (white.r == 255).should().sum(@loc(), t);
+    (white.g == 255).should().sum(@loc(), t);
+    (white.b == 255).should().sum(@loc(), t);
+    (white.a == 255).should().sum(@loc(), t);
+    (raylib.BLANK.a == 0).should().sum(@loc(), t);
 }
 
-fn check_constructors() void {
+fn check_constructors(t: &mut test.Report[io.File]) void {
     let v = raylib.vector2(3.0, 4.0);
-    test.eq(v.x, 3.0);
-    test.eq(v.y, 4.0);
+    (v.x == 3.0).should().sum(@loc(), t);
+    (v.y == 4.0).should().sum(@loc(), t);
 
     let c = raylib.color(1, 2, 3, 4);
-    test.eq(c.r, 1);
-    test.eq(c.g, 2);
-    test.eq(c.b, 3);
-    test.eq(c.a, 4);
+    (c.r == 1).should().sum(@loc(), t);
+    (c.g == 2).should().sum(@loc(), t);
+    (c.b == 3).should().sum(@loc(), t);
+    (c.a == 4).should().sum(@loc(), t);
 }
 
-fn check_input_constants() void {
-    test.eq(match (raylib.Key.A) {
+fn check_input_constants(t: &mut test.Report[io.File]) void {
+    ((match (raylib.Key.A) {
         .A => 65,
         _ => 0,
-    }, 65);
-    test.eq(match (raylib.Key.ESCAPE) {
+    }) == 65).should().sum(@loc(), t);
+    ((match (raylib.Key.ESCAPE) {
         .ESCAPE => 256,
         _ => 0,
-    }, 256);
-    test.eq(match (raylib.MouseButton.LEFT) {
+    }) == 256).should().sum(@loc(), t);
+    ((match (raylib.MouseButton.LEFT) {
         .LEFT => 1,
         _ => 0,
-    }, 1);
+    }) == 1).should().sum(@loc(), t);
 }
 
 fn main() i32 {
-    check_color_constants();
-    check_constructors();
-    check_input_constants();
+    let t = test.report(io.stderr())..&;
+    check_color_constants(t);
+    check_constructors(t);
+    check_input_constants(t);
     return 0;
 }

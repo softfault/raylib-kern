@@ -3,12 +3,12 @@
 //! The input format is line-oriented rather than a structured format. Keeping
 //! cursor movement here makes the generator passes read like section parsers.
 
-pub type Line = struct {
-    pub text: []u8,
+pub struct Line {
+    pub text: &[u8],
     pub next: usize,
 };
 
-pub fn next_line(text: []u8, start: usize) ?Line {
+pub fn next_line(text: &[u8], start: usize) ?Line {
     if (start >= text.len()) {
         return .None;
     }
@@ -24,17 +24,17 @@ pub fn next_line(text: []u8, start: usize) ?Line {
     }
 
     let next = if (end < text.len()) end + 1 else end;
-    return .{ Some: Line.{ text: text.[start .. line_end], next: next } };
+    return .{ Some: Line.{ text: text.&[start .. line_end], next: next } };
 }
 
-pub fn strip_prefix_or_empty(text: []u8, prefix: []u8) []u8 {
+pub fn strip_prefix_or_empty(text: &[u8], prefix: &[u8]) &[u8] {
     return match (text.strip_prefix(prefix)) {
         .{ Some: rest } => rest,
         .None => "",
     };
 }
 
-pub fn last_space(text: []u8) ?usize {
+pub fn last_space(text: &[u8]) ?usize {
     let mut i = text.len();
     while (i > 0) {
         i -= 1;

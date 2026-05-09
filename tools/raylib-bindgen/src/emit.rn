@@ -1,21 +1,20 @@
 //! Thin output wrapper used by the generator.
 //!
 //! The generator writes many small fragments. A tiny wrapper keeps formatting
-//! calls uniform and avoids passing `*mut Writer` through every helper.
+//! calls uniform and avoids passing `&mut Writer` through every helper.
 
-use base.io.{Printable, Writer, format_to};
+use base.io.{Formatable, Write};
 
-pub type Emitter = struct {
-    out: *mut Writer,
+pub struct Emitter {
+    out: &mut Write,
 };
 
-impl *mut Emitter {
-    pub fn write(text: []u8) void {
+impl &mut Emitter {
+    pub fn write(text: &[u8]) void {
         let _ = self.out.write(text);
     }
 
-    pub fn fmt(pattern: []u8, args: []*Printable) void {
-        format_to(self.out, pattern, args);
+    pub fn fmt(pattern: &[u8], args: &[&Formatable]) void {
+        pattern.fmt(args).write_to(self.out);
     }
 }
-

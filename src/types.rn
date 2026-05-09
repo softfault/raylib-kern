@@ -44,7 +44,7 @@ pub type Texture2D = raw.Texture;
 pub type TextureCubemap = raw.Texture;
 pub type RenderTexture2D = raw.RenderTexture;
 pub type Camera = raw.Camera3D;
-pub type ModelAnimPose = *mut raw.Transform;
+pub type ModelAnimPose = &mut raw.Transform;
 
 pub type TraceLogLevel = raw.TraceLogLevel;
 pub type KeyboardKey = raw.KeyboardKey;

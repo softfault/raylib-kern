@@ -1,6 +1,6 @@
 use craft.builder;
 
-fn compile_raylib_module(b: *mut builder.Builder, source: []u8) void {
+fn compile_raylib_module(b: &mut builder.Builder, source: &[u8]) void {
     let obj = b.cc_resource_config("raylib", source, .{
         include_dirs: .{
             "src",
@@ -22,7 +22,7 @@ fn compile_raylib_module(b: *mut builder.Builder, source: []u8) void {
     let _ = obj;
 }
 
-fn compile_raylib_audio_module(b: *mut builder.Builder) void {
+fn compile_raylib_audio_module(b: &mut builder.Builder) void {
     let obj = b.cc_resource_config("raylib", "src/raudio.c", .{
         include_dirs: .{
             "src",
@@ -45,7 +45,7 @@ fn compile_raylib_audio_module(b: *mut builder.Builder) void {
     let _ = obj;
 }
 
-pub fn build(b: *mut builder.Builder) void {
+pub fn build(b: &mut builder.Builder) void {
     if (b.unit.domain != .target) {
         return;
     }

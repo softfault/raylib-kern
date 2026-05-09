@@ -3,7 +3,7 @@ use ..internal.z_ptr;
 
 // Opens the OS window and creates raylib's OpenGL context. Call this before
 // drawing, loading textures, or using helpers that depend on the default font.
-pub fn init_window(width: i32, height: i32, title_z: []u8) void {
+pub fn init_window(width: i32, height: i32, title_z: &[u8]) void {
     raw.InitWindow(width, height, z_ptr(title_z));
 }
 
@@ -43,6 +43,6 @@ pub fn get_time() f64 {
     return raw.GetTime();
 }
 
-pub fn set_window_title(title_z: []u8) void {
+pub fn set_window_title(title_z: &[u8]) void {
     raw.SetWindowTitle(z_ptr(title_z));
 }
