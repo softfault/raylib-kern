@@ -1,0 +1,263 @@
+//! Keyboard, mouse, gamepad, touch, and gesture polling helpers.
+//!
+//! raylib input is frame-polled. Read input during your update phase; the next
+//! `end_drawing()` refreshes keyboard, mouse, gamepad, and gesture state for the
+//! following frame.
+//!
+//! Use `_pressed` and `_released` for one-frame edges. Use `_down` and `_up` for
+//! continuous state such as movement while a key is held.
+
+use ..raw;
+use ..internal.z_ptr;
+use ..types.{
+    GamepadAxis,
+    Key,
+    MouseButton,
+    MouseCursor,
+    Vector2,
+};
+
+/// Returns true for one frame when the key transitions from up to down.
+pub fn is_key_pressed(key: Key) bool {
+    return raw.IsKeyPressed(key);
+}
+
+/// Returns true for repeated key presses according to OS repeat behavior.
+pub fn is_key_pressed_repeat(key: Key) bool {
+    return raw.IsKeyPressedRepeat(key);
+}
+
+/// Returns true every frame while the key is held.
+pub fn is_key_down(key: Key) bool {
+    return raw.IsKeyDown(key);
+}
+
+/// Returns true for one frame when the key transitions from down to up.
+pub fn is_key_released(key: Key) bool {
+    return raw.IsKeyReleased(key);
+}
+
+/// Returns true every frame while the key is not held.
+pub fn is_key_up(key: Key) bool {
+    return raw.IsKeyUp(key);
+}
+
+/// Returns the last pressed key code from raylib's input queue.
+pub fn get_key_pressed() i32 {
+    return raw.GetKeyPressed();
+}
+
+/// Returns the last typed Unicode codepoint from raylib's input queue.
+pub fn get_char_pressed() i32 {
+    return raw.GetCharPressed();
+}
+
+/// Returns a pointer to raylib-owned text for a key name.
+pub fn get_key_name(key: Key) &u8 {
+    return raw.GetKeyName(key);
+}
+
+/// Sets the key that makes `window_should_close()` become true.
+pub fn set_exit_key(key: Key) void {
+    raw.SetExitKey(key);
+}
+
+/// Returns true when the gamepad index is connected.
+pub fn is_gamepad_available(gamepad: i32) bool {
+    return raw.IsGamepadAvailable(gamepad);
+}
+
+/// Returns a pointer to raylib-owned gamepad name text.
+pub fn get_gamepad_name(gamepad: i32) &u8 {
+    return raw.GetGamepadName(gamepad);
+}
+
+/// Returns true for one frame when a gamepad button is pressed.
+pub fn is_gamepad_button_pressed(gamepad: i32, button: i32) bool {
+    return raw.IsGamepadButtonPressed(gamepad, button);
+}
+
+/// Returns true while a gamepad button is held.
+pub fn is_gamepad_button_down(gamepad: i32, button: i32) bool {
+    return raw.IsGamepadButtonDown(gamepad, button);
+}
+
+/// Returns true for one frame when a gamepad button is released.
+pub fn is_gamepad_button_released(gamepad: i32, button: i32) bool {
+    return raw.IsGamepadButtonReleased(gamepad, button);
+}
+
+/// Returns true while a gamepad button is not held.
+pub fn is_gamepad_button_up(gamepad: i32, button: i32) bool {
+    return raw.IsGamepadButtonUp(gamepad, button);
+}
+
+/// Returns the last pressed gamepad button.
+pub fn get_gamepad_button_pressed() i32 {
+    return raw.GetGamepadButtonPressed();
+}
+
+/// Returns the number of axes exposed by a gamepad.
+pub fn get_gamepad_axis_count(gamepad: i32) i32 {
+    return raw.GetGamepadAxisCount(gamepad);
+}
+
+/// Returns movement for a gamepad axis in raylib's normalized range.
+pub fn get_gamepad_axis_movement(gamepad: i32, axis: GamepadAxis) f32 {
+    return raw.GetGamepadAxisMovement(gamepad, axis);
+}
+
+/// Loads SDL-style gamepad mappings from zero-terminated text.
+pub fn set_gamepad_mappings(mappings: &[u8]) i32 {
+    return raw.SetGamepadMappings(z_ptr(mappings));
+}
+
+/// Starts gamepad vibration on platforms that support it.
+pub fn set_gamepad_vibration(
+    gamepad: i32,
+    left_motor: f32,
+    right_motor: f32,
+    duration: f32,
+) void {
+    raw.SetGamepadVibration(
+        gamepad,
+        left_motor,
+        right_motor,
+        duration,
+    );
+}
+
+/// Returns true for one frame when the mouse button is pressed.
+pub fn is_mouse_button_pressed(button: MouseButton) bool {
+    return raw.IsMouseButtonPressed(button);
+}
+
+/// Returns true every frame while the mouse button is held.
+pub fn is_mouse_button_down(button: MouseButton) bool {
+    return raw.IsMouseButtonDown(button);
+}
+
+/// Returns true for one frame when the mouse button is released.
+pub fn is_mouse_button_released(button: MouseButton) bool {
+    return raw.IsMouseButtonReleased(button);
+}
+
+/// Returns true every frame while the mouse button is not held.
+pub fn is_mouse_button_up(button: MouseButton) bool {
+    return raw.IsMouseButtonUp(button);
+}
+
+/// Returns the current mouse x coordinate.
+pub fn get_mouse_x() i32 {
+    return raw.GetMouseX();
+}
+
+/// Returns the current mouse y coordinate.
+pub fn get_mouse_y() i32 {
+    return raw.GetMouseY();
+}
+
+/// Returns the current mouse position in screen coordinates.
+pub fn get_mouse_position() Vector2 {
+    return raw.GetMousePosition();
+}
+
+/// Returns the mouse movement delta for the current frame.
+pub fn get_mouse_delta() Vector2 {
+    return raw.GetMouseDelta();
+}
+
+/// Sets the mouse position in screen coordinates.
+pub fn set_mouse_position(x: i32, y: i32) void {
+    raw.SetMousePosition(x, y);
+}
+
+/// Sets the mouse coordinate offset applied by raylib.
+pub fn set_mouse_offset(offset_x: i32, offset_y: i32) void {
+    raw.SetMouseOffset(offset_x, offset_y);
+}
+
+/// Sets the mouse coordinate scale applied by raylib.
+pub fn set_mouse_scale(scale_x: f32, scale_y: f32) void {
+    raw.SetMouseScale(scale_x, scale_y);
+}
+
+/// Returns vertical mouse-wheel movement.
+pub fn get_mouse_wheel_move() f32 {
+    return raw.GetMouseWheelMove();
+}
+
+/// Returns mouse-wheel movement as a vector for devices with two axes.
+pub fn get_mouse_wheel_move_v() Vector2 {
+    return raw.GetMouseWheelMoveV();
+}
+
+/// Sets the OS cursor shape shown over the window.
+pub fn set_mouse_cursor(cursor: MouseCursor) void {
+    raw.SetMouseCursor(cursor);
+}
+
+/// Returns the x coordinate for the first active touch point.
+pub fn get_touch_x() i32 {
+    return raw.GetTouchX();
+}
+
+/// Returns the y coordinate for the first active touch point.
+pub fn get_touch_y() i32 {
+    return raw.GetTouchY();
+}
+
+/// Returns the screen position for a touch point index.
+pub fn get_touch_position(index: i32) Vector2 {
+    return raw.GetTouchPosition(index);
+}
+
+/// Returns the platform id for a touch point index.
+pub fn get_touch_point_id(index: i32) i32 {
+    return raw.GetTouchPointId(index);
+}
+
+/// Returns the number of active touch points.
+pub fn get_touch_point_count() i32 {
+    return raw.GetTouchPointCount();
+}
+
+/// Enables a gesture mask made from `GESTURE_*` flags.
+pub fn set_gestures_enabled(flags: u32) void {
+    raw.SetGesturesEnabled(flags);
+}
+
+/// Returns true when a gesture flag was detected this frame.
+pub fn is_gesture_detected(gesture: u32) bool {
+    return raw.IsGestureDetected(gesture);
+}
+
+/// Returns the last detected gesture id.
+pub fn get_gesture_detected() i32 {
+    return raw.GetGestureDetected();
+}
+
+/// Returns the current hold gesture duration in seconds.
+pub fn get_gesture_hold_duration() f32 {
+    return raw.GetGestureHoldDuration();
+}
+
+/// Returns the current drag gesture vector.
+pub fn get_gesture_drag_vector() Vector2 {
+    return raw.GetGestureDragVector();
+}
+
+/// Returns the current drag gesture angle.
+pub fn get_gesture_drag_angle() f32 {
+    return raw.GetGestureDragAngle();
+}
+
+/// Returns the current pinch gesture vector.
+pub fn get_gesture_pinch_vector() Vector2 {
+    return raw.GetGesturePinchVector();
+}
+
+/// Returns the current pinch gesture angle.
+pub fn get_gesture_pinch_angle() f32 {
+    return raw.GetGesturePinchAngle();
+}

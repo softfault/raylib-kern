@@ -1,0 +1,182 @@
+//! GPU texture loading, updating, render targets, and sprite drawing helpers.
+//!
+//! Textures live in GPU memory, so load or create them after `init_window()`
+//! and unload them before `close_window()`. CPU-side image loading and image
+//! editing live in the images module; this module starts where pixels become GPU
+//! resources.
+
+use ..raw;
+use ..internal.z_ptr;
+use ..types.{
+    Color,
+    Image,
+    NPatchInfo,
+    Rectangle,
+    RenderTexture2D,
+    TextureCubemap,
+    Texture2D,
+    TextureFilter,
+    TextureWrap,
+    Vector2,
+};
+
+/// Loads image data into GPU memory.
+///
+/// raylib requires an initialized window first because texture creation needs
+/// the OpenGL context from `init_window()`.
+pub fn load_texture(path_z: &[u8]) Texture2D {
+    return raw.LoadTexture(z_ptr(path_z));
+}
+
+/// Converts an already loaded CPU-side Image into a GPU-side Texture2D.
+pub fn load_texture_from_image(image: Image) Texture2D {
+    return raw.LoadTextureFromImage(image);
+}
+
+/// Loads a cubemap texture from an image laid out with a raylib cubemap layout.
+pub fn load_texture_cubemap(image: Image, layout: i32) TextureCubemap {
+    return raw.LoadTextureCubemap(image, layout);
+}
+
+/// Creates a render texture for drawing into an off-screen framebuffer.
+pub fn load_render_texture(width: i32, height: i32) RenderTexture2D {
+    return raw.LoadRenderTexture(width, height);
+}
+
+/// Returns true when the texture is backed by a loaded GPU resource.
+pub fn is_texture_valid(texture: Texture2D) bool {
+    return raw.IsTextureValid(texture);
+}
+
+/// Releases GPU memory when the texture is no longer needed.
+///
+/// In the usual raylib lifecycle this happens before `close_window()`.
+pub fn unload_texture(texture: Texture2D) void {
+    raw.UnloadTexture(texture);
+}
+
+/// Returns true when the render texture is backed by loaded GPU resources.
+pub fn is_render_texture_valid(target: RenderTexture2D) bool {
+    return raw.IsRenderTextureValid(target);
+}
+
+/// Releases a render texture and its framebuffer resources.
+pub fn unload_render_texture(target: RenderTexture2D) void {
+    raw.UnloadRenderTexture(target);
+}
+
+/// Uploads a full replacement pixel buffer into an existing texture.
+///
+/// The buffer must match the texture dimensions and pixel format expected by
+/// raylib.
+pub fn update_texture(texture: Texture2D, pixels: &mut void) void {
+    raw.UpdateTexture(texture, pixels);
+}
+
+/// Uploads replacement pixels into a sub-rectangle of an existing texture.
+pub fn update_texture_rec(texture: Texture2D, rec: Rectangle, pixels: &mut void) void {
+    raw.UpdateTextureRec(texture, rec, pixels);
+}
+
+/// Generates mipmaps for a texture in place.
+pub fn gen_texture_mipmaps(texture: &mut Texture2D) void {
+    raw.GenTextureMipmaps(texture);
+}
+
+/// Sets texture filtering used when scaling.
+pub fn set_texture_filter(texture: Texture2D, filter: TextureFilter) void {
+    raw.SetTextureFilter(texture, filter);
+}
+
+/// Sets texture coordinate wrapping mode.
+pub fn set_texture_wrap(texture: Texture2D, wrap: TextureWrap) void {
+    raw.SetTextureWrap(texture, wrap);
+}
+
+/// Draws the complete texture with no rotation or scaling.
+pub fn draw_texture(texture: Texture2D, x: i32, y: i32, tint: Color) void {
+    raw.DrawTexture(
+        texture,
+        x,
+        y,
+        tint,
+    );
+}
+
+/// Draws a source rectangle into a destination rectangle with origin and
+/// rotation. Use this for scaled sprites and sprite pivots.
+pub fn draw_texture_pro(
+    texture: Texture2D,
+    source: Rectangle,
+    dest: Rectangle,
+    origin: Vector2,
+    rotation: f32,
+    tint: Color,
+) void {
+    raw.DrawTexturePro(
+        texture,
+        source,
+        dest,
+        origin,
+        rotation,
+        tint,
+    );
+}
+
+/// Draws a texture using raylib's nine-patch scaling description.
+pub fn draw_texture_n_patch(
+    texture: Texture2D,
+    n_patch_info: NPatchInfo,
+    dest: Rectangle,
+    origin: Vector2,
+    rotation: f32,
+    tint: Color,
+) void {
+    raw.DrawTextureNPatch(
+        texture,
+        n_patch_info,
+        dest,
+        origin,
+        rotation,
+        tint,
+    );
+}
+
+/// Draws the complete texture at a vector position.
+pub fn draw_texture_v(texture: Texture2D, position: Vector2, tint: Color) void {
+    raw.DrawTextureV(texture, position, tint);
+}
+
+/// Draws the complete texture with rotation and scaling.
+pub fn draw_texture_ex(
+    texture: Texture2D,
+    position: Vector2,
+    rotation: f32,
+    scale: f32,
+    tint: Color,
+) void {
+    raw.DrawTextureEx(
+        texture,
+        position,
+        rotation,
+        scale,
+        tint,
+    );
+}
+
+/// Draws a source rectangle from the texture.
+///
+/// This is the basic building block for spritesheets and texture atlases.
+pub fn draw_texture_rec(
+    texture: Texture2D,
+    source: Rectangle,
+    position: Vector2,
+    tint: Color,
+) void {
+    raw.DrawTextureRec(
+        texture,
+        source,
+        position,
+        tint,
+    );
+}

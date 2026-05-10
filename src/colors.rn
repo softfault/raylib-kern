@@ -1,0 +1,123 @@
+//! raylib's built-in color palette, constructors, and color conversion helpers.
+
+use ..raw;
+use ..types.{Color, Vector3, Vector4};
+
+/// raylib's built-in palette, exposed as compile-time constants instead of
+/// global storage. Use `color()` or `Color.rgba()` for project-specific colors.
+pub const LIGHTGRAY = Color.{ r: 200, g: 200, b: 200, a: 255 };
+pub const GRAY = Color.{ r: 130, g: 130, b: 130, a: 255 };
+pub const DARKGRAY = Color.{ r: 80, g: 80, b: 80, a: 255 };
+pub const YELLOW = Color.{ r: 253, g: 249, b: 0, a: 255 };
+pub const GOLD = Color.{ r: 255, g: 203, b: 0, a: 255 };
+pub const ORANGE = Color.{ r: 255, g: 161, b: 0, a: 255 };
+pub const PINK = Color.{ r: 255, g: 109, b: 194, a: 255 };
+pub const RED = Color.{ r: 230, g: 41, b: 55, a: 255 };
+pub const MAROON = Color.{ r: 190, g: 33, b: 55, a: 255 };
+pub const GREEN = Color.{ r: 0, g: 228, b: 48, a: 255 };
+pub const LIME = Color.{ r: 0, g: 158, b: 47, a: 255 };
+pub const DARKGREEN = Color.{ r: 0, g: 117, b: 44, a: 255 };
+pub const SKYBLUE = Color.{ r: 102, g: 191, b: 255, a: 255 };
+pub const BLUE = Color.{ r: 0, g: 121, b: 241, a: 255 };
+pub const DARKBLUE = Color.{ r: 0, g: 82, b: 172, a: 255 };
+pub const PURPLE = Color.{ r: 200, g: 122, b: 255, a: 255 };
+pub const VIOLET = Color.{ r: 135, g: 60, b: 190, a: 255 };
+pub const DARKPURPLE = Color.{ r: 112, g: 31, b: 126, a: 255 };
+pub const BEIGE = Color.{ r: 211, g: 176, b: 131, a: 255 };
+pub const BROWN = Color.{ r: 127, g: 106, b: 79, a: 255 };
+pub const DARKBROWN = Color.{ r: 76, g: 63, b: 47, a: 255 };
+pub const WHITE = Color.{ r: 255, g: 255, b: 255, a: 255 };
+pub const BLACK = Color.{ r: 0, g: 0, b: 0, a: 255 };
+pub const BLANK = Color.{ r: 0, g: 0, b: 0, a: 0 };
+pub const MAGENTA = Color.{ r: 255, g: 0, b: 255, a: 255 };
+pub const RAYWHITE = Color.{ r: 245, g: 245, b: 245, a: 255 };
+
+/// Creates a `Color` from red, green, blue, and alpha channels.
+pub const fn color(r: u8, g: u8, b: u8, a: u8) Color {
+    return .{ r: r, g: g, b: b, a: a };
+}
+
+/// Returns true when two colors have identical channels.
+pub fn color_is_equal(col1: Color, col2: Color) bool {
+    return raw.ColorIsEqual(col1, col2);
+}
+
+/// Applies alpha to a color.
+pub fn fade(color: Color, alpha: f32) Color {
+    return raw.Fade(color, alpha);
+}
+
+/// Packs a color into raylib's integer representation.
+pub fn color_to_int(color: Color) i32 {
+    return raw.ColorToInt(color);
+}
+
+/// Converts color channels to normalized floats.
+pub fn color_normalize(color: Color) Vector4 {
+    return raw.ColorNormalize(color);
+}
+
+/// Converts normalized float channels to a color.
+pub fn color_from_normalized(normalized: Vector4) Color {
+    return raw.ColorFromNormalized(normalized);
+}
+
+/// Converts RGB color to HSV.
+pub fn color_to_hsv(color: Color) Vector3 {
+    return raw.ColorToHSV(color);
+}
+
+/// Converts HSV values to RGB color.
+pub fn color_from_hsv(hue: f32, saturation: f32, value: f32) Color {
+    return raw.ColorFromHSV(hue, saturation, value);
+}
+
+/// Tints a color with another color.
+pub fn color_tint(color: Color, tint: Color) Color {
+    return raw.ColorTint(color, tint);
+}
+
+/// Adjusts color brightness.
+pub fn color_brightness(color: Color, factor: f32) Color {
+    return raw.ColorBrightness(color, factor);
+}
+
+/// Adjusts color contrast.
+pub fn color_contrast(color: Color, contrast: f32) Color {
+    return raw.ColorContrast(color, contrast);
+}
+
+/// Replaces a color's alpha channel.
+pub fn color_alpha(color: Color, alpha: f32) Color {
+    return raw.ColorAlpha(color, alpha);
+}
+
+/// Alpha-blends two colors and applies a tint.
+pub fn color_alpha_blend(dst: Color, src: Color, tint: Color) Color {
+    return raw.ColorAlphaBlend(dst, src, tint);
+}
+
+/// Linearly interpolates between two colors.
+pub fn color_lerp(color1: Color, color2: Color, factor: f32) Color {
+    return raw.ColorLerp(color1, color2, factor);
+}
+
+/// Builds a color from a hexadecimal `0xRRGGBBAA` style value.
+pub fn get_color(hex_value: u32) Color {
+    return raw.GetColor(hex_value);
+}
+
+/// Reads a pixel color from raw pixel memory.
+pub fn get_pixel_color(src_ptr: &mut void, format: i32) Color {
+    return raw.GetPixelColor(src_ptr, format);
+}
+
+/// Writes a pixel color into raw pixel memory.
+pub fn set_pixel_color(dst_ptr: &mut void, color: Color, format: i32) void {
+    raw.SetPixelColor(dst_ptr, color, format);
+}
+
+/// Returns the byte size for a pixel buffer with the given dimensions and format.
+pub fn get_pixel_data_size(width: i32, height: i32, format: i32) i32 {
+    return raw.GetPixelDataSize(width, height, format);
+}

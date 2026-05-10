@@ -1,0 +1,49 @@
+//! raylib automation event recording and playback helpers.
+//!
+//! Automation events are raylib's way to record input-like events and replay
+//! them frame by frame. Set an event list before recording, record during the
+//! frame loop, then export or replay the collected events.
+
+use ..raw;
+use ..internal.z_ptr;
+use ..types.{AutomationEvent, AutomationEventList};
+
+/// Loads an automation event list from a zero-terminated file path.
+pub fn load_automation_event_list(file_name: &[u8]) AutomationEventList {
+    return raw.LoadAutomationEventList(z_ptr(file_name));
+}
+
+/// Releases an automation event list.
+pub fn unload_automation_event_list(list: AutomationEventList) void {
+    raw.UnloadAutomationEventList(list);
+}
+
+/// Exports an automation event list to a text file.
+pub fn export_automation_event_list(list: AutomationEventList, file_name: &[u8]) bool {
+    return raw.ExportAutomationEventList(list, z_ptr(file_name));
+}
+
+/// Sets the list that receives newly recorded automation events.
+pub fn set_automation_event_list(list: &mut AutomationEventList) void {
+    raw.SetAutomationEventList(list);
+}
+
+/// Sets the base frame used when recording automation events.
+pub fn set_automation_event_base_frame(frame: i32) void {
+    raw.SetAutomationEventBaseFrame(frame);
+}
+
+/// Starts recording automation events.
+pub fn start_automation_event_recording() void {
+    raw.StartAutomationEventRecording();
+}
+
+/// Stops recording automation events.
+pub fn stop_automation_event_recording() void {
+    raw.StopAutomationEventRecording();
+}
+
+/// Replays one recorded automation event.
+pub fn play_automation_event(event: AutomationEvent) void {
+    raw.PlayAutomationEvent(event);
+}

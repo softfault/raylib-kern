@@ -1,0 +1,713 @@
+//! CPU-side image loading, generation, transformation, and drawing helpers.
+//!
+//! `Image` values live in system memory. They are useful for loading files,
+//! generating pixels, editing pixels, or preparing data before uploading to a
+//! GPU texture with `load_texture_from_image()`. Release owned image data with
+//! `unload_image()` when the CPU copy is no longer needed.
+
+use ..raw;
+use ..internal.z_ptr;
+use ..types.{
+    Color,
+    Font,
+    Image,
+    Rectangle,
+    Texture2D,
+    Vector2,
+};
+
+/// Loads an image from a zero-terminated file path into CPU memory.
+pub fn load_image(file_name: &[u8]) Image {
+    return raw.LoadImage(z_ptr(file_name));
+}
+
+/// Loads image data from a raw file.
+pub fn load_image_raw(
+    file_name: &[u8],
+    width: i32,
+    height: i32,
+    format: i32,
+    header_size: i32,
+) Image {
+    return raw.LoadImageRaw(
+        z_ptr(file_name),
+        width,
+        height,
+        format,
+        header_size,
+    );
+}
+
+/// Loads an image sequence from a file and writes the frame count.
+pub fn load_image_anim(file_name: &[u8], frames: &mut i32) Image {
+    return raw.LoadImageAnim(z_ptr(file_name), frames);
+}
+
+/// Loads an image sequence from memory.
+pub fn load_image_anim_from_memory(
+    file_type: &[u8],
+    file_data: &u8,
+    data_size: i32,
+    frames: &mut i32,
+) Image {
+    return raw.LoadImageAnimFromMemory(
+        z_ptr(file_type),
+        file_data,
+        data_size,
+        frames,
+    );
+}
+
+/// Loads an image from memory. `file_type` is an extension such as `".png\0"`.
+pub fn load_image_from_memory(file_type: &[u8], file_data: &u8, data_size: i32) Image {
+    return raw.LoadImageFromMemory(z_ptr(file_type), file_data, data_size);
+}
+
+/// Copies GPU texture pixels back into a CPU-side image.
+pub fn load_image_from_texture(texture: Texture2D) Image {
+    return raw.LoadImageFromTexture(texture);
+}
+
+/// Captures the current screen buffer as a CPU-side image.
+pub fn load_image_from_screen() Image {
+    return raw.LoadImageFromScreen();
+}
+
+/// Returns true when the image has valid data and dimensions.
+pub fn is_image_valid(image: Image) bool {
+    return raw.IsImageValid(image);
+}
+
+/// Releases CPU-side image data.
+pub fn unload_image(image: Image) void {
+    raw.UnloadImage(image);
+}
+
+/// Writes an image to a zero-terminated file path.
+pub fn export_image(image: Image, file_name: &[u8]) bool {
+    return raw.ExportImage(image, z_ptr(file_name));
+}
+
+/// Encodes an image into a raylib-owned memory buffer.
+///
+/// Release the returned memory with `mem_free()` from the files module.
+pub fn export_image_to_memory(image: Image, file_type: &[u8], file_size: &mut i32) &u8 {
+    return raw.ExportImageToMemory(image, z_ptr(file_type), file_size);
+}
+
+/// Writes image data as generated C code.
+pub fn export_image_as_code(image: Image, file_name: &[u8]) bool {
+    return raw.ExportImageAsCode(image, z_ptr(file_name));
+}
+
+/// Generates a solid-color image.
+pub fn gen_image_color(width: i32, height: i32, color: Color) Image {
+    return raw.GenImageColor(width, height, color);
+}
+
+/// Generates a linear gradient image. `direction` is in degrees.
+pub fn gen_image_gradient_linear(
+    width: i32,
+    height: i32,
+    direction: i32,
+    start: Color,
+    end: Color,
+) Image {
+    return raw.GenImageGradientLinear(
+        width,
+        height,
+        direction,
+        start,
+        end,
+    );
+}
+
+/// Generates a radial gradient image.
+pub fn gen_image_gradient_radial(
+    width: i32,
+    height: i32,
+    density: f32,
+    inner: Color,
+    outer: Color,
+) Image {
+    return raw.GenImageGradientRadial(
+        width,
+        height,
+        density,
+        inner,
+        outer,
+    );
+}
+
+/// Generates a square gradient image.
+pub fn gen_image_gradient_square(
+    width: i32,
+    height: i32,
+    density: f32,
+    inner: Color,
+    outer: Color,
+) Image {
+    return raw.GenImageGradientSquare(
+        width,
+        height,
+        density,
+        inner,
+        outer,
+    );
+}
+
+/// Generates a checkerboard image.
+pub fn gen_image_checked(
+    width: i32,
+    height: i32,
+    checks_x: i32,
+    checks_y: i32,
+    col1: Color,
+    col2: Color,
+) Image {
+    return raw.GenImageChecked(
+        width,
+        height,
+        checks_x,
+        checks_y,
+        col1,
+        col2,
+    );
+}
+
+/// Generates a white-noise image.
+pub fn gen_image_white_noise(width: i32, height: i32, factor: f32) Image {
+    return raw.GenImageWhiteNoise(width, height, factor);
+}
+
+/// Generates a Perlin-noise image.
+pub fn gen_image_perlin_noise(
+    width: i32,
+    height: i32,
+    offset_x: i32,
+    offset_y: i32,
+    scale: f32,
+) Image {
+    return raw.GenImagePerlinNoise(
+        width,
+        height,
+        offset_x,
+        offset_y,
+        scale,
+    );
+}
+
+/// Generates a cellular-noise image.
+pub fn gen_image_cellular(width: i32, height: i32, tile_size: i32) Image {
+    return raw.GenImageCellular(width, height, tile_size);
+}
+
+/// Generates a grayscale image from text bytes.
+pub fn gen_image_text(width: i32, height: i32, text: &[u8]) Image {
+    return raw.GenImageText(width, height, z_ptr(text));
+}
+
+/// Duplicates an image into newly owned CPU-side data.
+pub fn image_copy(image: Image) Image {
+    return raw.ImageCopy(image);
+}
+
+/// Copies a rectangle from an image into a new image.
+pub fn image_from_image(image: Image, rect: Rectangle) Image {
+    return raw.ImageFromImage(image, rect);
+}
+
+/// Extracts one channel from an image as a grayscale image.
+pub fn image_from_channel(image: Image, selected_channel: i32) Image {
+    return raw.ImageFromChannel(image, selected_channel);
+}
+
+/// Creates an image containing text drawn with raylib's default font.
+pub fn image_text(text: &[u8], font_size: i32, color: Color) Image {
+    return raw.ImageText(z_ptr(text), font_size, color);
+}
+
+/// Creates an image containing text drawn with a custom font.
+pub fn image_text_ex(font: Font, text: &[u8], font_size: f32, spacing: f32, tint: Color) Image {
+    return raw.ImageTextEx(
+        font,
+        z_ptr(text),
+        font_size,
+        spacing,
+        tint,
+    );
+}
+
+/// Converts an image in place to a pixel format.
+pub fn image_format(image: &mut Image, new_format: i32) void {
+    raw.ImageFormat(image, new_format);
+}
+
+/// Resizes an image to power-of-two dimensions, filling new pixels with `fill`.
+pub fn image_to_pot(image: &mut Image, fill: Color) void {
+    raw.ImageToPOT(image, fill);
+}
+
+/// Crops an image in place.
+pub fn image_crop(image: &mut Image, crop: Rectangle) void {
+    raw.ImageCrop(image, crop);
+}
+
+/// Crops transparent edges using an alpha threshold.
+pub fn image_alpha_crop(image: &mut Image, threshold: f32) void {
+    raw.ImageAlphaCrop(image, threshold);
+}
+
+/// Clears alpha below a threshold to a color.
+pub fn image_alpha_clear(image: &mut Image, color: Color, threshold: f32) void {
+    raw.ImageAlphaClear(image, color, threshold);
+}
+
+/// Applies an alpha mask image.
+pub fn image_alpha_mask(image: &mut Image, alpha_mask: Image) void {
+    raw.ImageAlphaMask(image, alpha_mask);
+}
+
+/// Premultiplies an image alpha channel.
+pub fn image_alpha_premultiply(image: &mut Image) void {
+    raw.ImageAlphaPremultiply(image);
+}
+
+/// Applies a Gaussian blur approximation.
+pub fn image_blur_gaussian(image: &mut Image, blur_size: i32) void {
+    raw.ImageBlurGaussian(image, blur_size);
+}
+
+/// Applies a custom square convolution kernel.
+pub fn image_kernel_convolution(image: &mut Image, kernel: &mut f32, kernel_size: i32) void {
+    raw.ImageKernelConvolution(image, kernel, kernel_size);
+}
+
+/// Resizes an image with bicubic filtering.
+pub fn image_resize(image: &mut Image, new_width: i32, new_height: i32) void {
+    raw.ImageResize(image, new_width, new_height);
+}
+
+/// Resizes an image with nearest-neighbor filtering.
+pub fn image_resize_nn(image: &mut Image, new_width: i32, new_height: i32) void {
+    raw.ImageResizeNN(image, new_width, new_height);
+}
+
+/// Resizes the image canvas and fills exposed pixels.
+pub fn image_resize_canvas(
+    image: &mut Image,
+    new_width: i32,
+    new_height: i32,
+    offset_x: i32,
+    offset_y: i32,
+    fill: Color,
+) void {
+    raw.ImageResizeCanvas(
+        image,
+        new_width,
+        new_height,
+        offset_x,
+        offset_y,
+        fill,
+    );
+}
+
+/// Computes mipmap levels for an image.
+pub fn image_mipmaps(image: &mut Image) void {
+    raw.ImageMipmaps(image);
+}
+
+/// Dithers image data to lower channel bit depth.
+pub fn image_dither(image: &mut Image, r_bpp: i32, g_bpp: i32, b_bpp: i32, a_bpp: i32) void {
+    raw.ImageDither(
+        image,
+        r_bpp,
+        g_bpp,
+        b_bpp,
+        a_bpp,
+    );
+}
+
+/// Flips an image vertically.
+pub fn image_flip_vertical(image: &mut Image) void {
+    raw.ImageFlipVertical(image);
+}
+
+/// Flips an image horizontally.
+pub fn image_flip_horizontal(image: &mut Image) void {
+    raw.ImageFlipHorizontal(image);
+}
+
+/// Rotates an image by degrees.
+pub fn image_rotate(image: &mut Image, degrees: i32) void {
+    raw.ImageRotate(image, degrees);
+}
+
+/// Rotates an image clockwise by 90 degrees.
+pub fn image_rotate_cw(image: &mut Image) void {
+    raw.ImageRotateCW(image);
+}
+
+/// Rotates an image counter-clockwise by 90 degrees.
+pub fn image_rotate_ccw(image: &mut Image) void {
+    raw.ImageRotateCCW(image);
+}
+
+/// Tints an image in place.
+pub fn image_color_tint(image: &mut Image, color: Color) void {
+    raw.ImageColorTint(image, color);
+}
+
+/// Inverts image colors in place.
+pub fn image_color_invert(image: &mut Image) void {
+    raw.ImageColorInvert(image);
+}
+
+/// Converts an image to grayscale in place.
+pub fn image_color_grayscale(image: &mut Image) void {
+    raw.ImageColorGrayscale(image);
+}
+
+/// Adjusts image contrast in place.
+pub fn image_color_contrast(image: &mut Image, contrast: f32) void {
+    raw.ImageColorContrast(image, contrast);
+}
+
+/// Adjusts image brightness in place.
+pub fn image_color_brightness(image: &mut Image, brightness: i32) void {
+    raw.ImageColorBrightness(image, brightness);
+}
+
+/// Replaces one color in an image.
+pub fn image_color_replace(image: &mut Image, color: Color, replace: Color) void {
+    raw.ImageColorReplace(image, color, replace);
+}
+
+/// Loads image pixels as a `Color` array.
+pub fn load_image_colors(image: Image) &mut Color {
+    return raw.LoadImageColors(image);
+}
+
+/// Loads a palette from image pixels.
+pub fn load_image_palette(image: Image, max_palette_size: i32, color_count: &mut i32) &mut Color {
+    return raw.LoadImagePalette(image, max_palette_size, color_count);
+}
+
+/// Releases colors returned by `load_image_colors()`.
+pub fn unload_image_colors(colors: &mut Color) void {
+    raw.UnloadImageColors(colors);
+}
+
+/// Releases colors returned by `load_image_palette()`.
+pub fn unload_image_palette(colors: &mut Color) void {
+    raw.UnloadImagePalette(colors);
+}
+
+/// Returns the bounding rectangle of pixels above an alpha threshold.
+pub fn get_image_alpha_border(image: Image, threshold: f32) Rectangle {
+    return raw.GetImageAlphaBorder(image, threshold);
+}
+
+/// Returns one pixel color from an image.
+pub fn get_image_color(image: Image, x: i32, y: i32) Color {
+    return raw.GetImageColor(image, x, y);
+}
+
+/// Clears an image with a color.
+pub fn image_clear_background(dst: &mut Image, color: Color) void {
+    raw.ImageClearBackground(dst, color);
+}
+
+/// Draws a pixel inside an image.
+pub fn image_draw_pixel(dst: &mut Image, x: i32, y: i32, color: Color) void {
+    raw.ImageDrawPixel(
+        dst,
+        x,
+        y,
+        color,
+    );
+}
+
+/// Draws a pixel inside an image at a vector position.
+pub fn image_draw_pixel_v(dst: &mut Image, position: Vector2, color: Color) void {
+    raw.ImageDrawPixelV(dst, position, color);
+}
+
+/// Draws a line inside an image.
+pub fn image_draw_line(
+    dst: &mut Image,
+    start_x: i32,
+    start_y: i32,
+    end_x: i32,
+    end_y: i32,
+    color: Color,
+) void {
+    raw.ImageDrawLine(
+        dst,
+        start_x,
+        start_y,
+        end_x,
+        end_y,
+        color,
+    );
+}
+
+/// Draws a line inside an image from vector positions.
+pub fn image_draw_line_v(dst: &mut Image, start: Vector2, end: Vector2, color: Color) void {
+    raw.ImageDrawLineV(
+        dst,
+        start,
+        end,
+        color,
+    );
+}
+
+/// Draws a thick line inside an image.
+pub fn image_draw_line_ex(
+    dst: &mut Image,
+    start: Vector2,
+    end: Vector2,
+    thick: i32,
+    color: Color,
+) void {
+    raw.ImageDrawLineEx(
+        dst,
+        start,
+        end,
+        thick,
+        color,
+    );
+}
+
+/// Draws a filled circle inside an image.
+pub fn image_draw_circle(dst: &mut Image, x: i32, y: i32, radius: i32, color: Color) void {
+    raw.ImageDrawCircle(
+        dst,
+        x,
+        y,
+        radius,
+        color,
+    );
+}
+
+/// Draws a filled circle inside an image from a vector center.
+pub fn image_draw_circle_v(dst: &mut Image, center: Vector2, radius: i32, color: Color) void {
+    raw.ImageDrawCircleV(
+        dst,
+        center,
+        radius,
+        color,
+    );
+}
+
+/// Draws a circle outline inside an image.
+pub fn image_draw_circle_lines(dst: &mut Image, x: i32, y: i32, radius: i32, color: Color) void {
+    raw.ImageDrawCircleLines(
+        dst,
+        x,
+        y,
+        radius,
+        color,
+    );
+}
+
+/// Draws a circle outline inside an image from a vector center.
+pub fn image_draw_circle_lines_v(dst: &mut Image, center: Vector2, radius: i32, color: Color) void {
+    raw.ImageDrawCircleLinesV(
+        dst,
+        center,
+        radius,
+        color,
+    );
+}
+
+/// Draws a rectangle inside an image.
+pub fn image_draw_rectangle(
+    dst: &mut Image,
+    x: i32,
+    y: i32,
+    width: i32,
+    height: i32,
+    color: Color,
+) void {
+    raw.ImageDrawRectangle(
+        dst,
+        x,
+        y,
+        width,
+        height,
+        color,
+    );
+}
+
+/// Draws a rectangle inside an image from vector position and size.
+pub fn image_draw_rectangle_v(
+    dst: &mut Image,
+    position: Vector2,
+    size: Vector2,
+    color: Color,
+) void {
+    raw.ImageDrawRectangleV(
+        dst,
+        position,
+        size,
+        color,
+    );
+}
+
+/// Draws a rectangle inside an image.
+pub fn image_draw_rectangle_rec(dst: &mut Image, rect: Rectangle, color: Color) void {
+    raw.ImageDrawRectangleRec(dst, rect, color);
+}
+
+/// Draws a rectangle outline inside an image.
+pub fn image_draw_rectangle_lines(dst: &mut Image, rect: Rectangle, thick: i32, color: Color) void {
+    raw.ImageDrawRectangleLines(
+        dst,
+        rect,
+        thick,
+        color,
+    );
+}
+
+/// Draws a filled triangle inside an image.
+pub fn image_draw_triangle(
+    dst: &mut Image,
+    v1: Vector2,
+    v2: Vector2,
+    v3: Vector2,
+    color: Color,
+) void {
+    raw.ImageDrawTriangle(
+        dst,
+        v1,
+        v2,
+        v3,
+        color,
+    );
+}
+
+/// Draws a triangle with interpolated vertex colors inside an image.
+pub fn image_draw_triangle_ex(
+    dst: &mut Image,
+    v1: Vector2,
+    v2: Vector2,
+    v3: Vector2,
+    c1: Color,
+    c2: Color,
+    c3: Color,
+) void {
+    raw.ImageDrawTriangleEx(
+        dst,
+        v1,
+        v2,
+        v3,
+        c1,
+        c2,
+        c3,
+    );
+}
+
+/// Draws a triangle outline inside an image.
+pub fn image_draw_triangle_lines(
+    dst: &mut Image,
+    v1: Vector2,
+    v2: Vector2,
+    v3: Vector2,
+    color: Color,
+) void {
+    raw.ImageDrawTriangleLines(
+        dst,
+        v1,
+        v2,
+        v3,
+        color,
+    );
+}
+
+/// Draws a triangle fan inside an image.
+pub fn image_draw_triangle_fan(
+    dst: &mut Image,
+    points: &mut Vector2,
+    point_count: i32,
+    color: Color,
+) void {
+    raw.ImageDrawTriangleFan(
+        dst,
+        points,
+        point_count,
+        color,
+    );
+}
+
+/// Draws a triangle strip inside an image.
+pub fn image_draw_triangle_strip(
+    dst: &mut Image,
+    points: &mut Vector2,
+    point_count: i32,
+    color: Color,
+) void {
+    raw.ImageDrawTriangleStrip(
+        dst,
+        points,
+        point_count,
+        color,
+    );
+}
+
+/// Draws a source image into a destination image.
+pub fn image_draw(
+    dst: &mut Image,
+    src: Image,
+    src_rect: Rectangle,
+    dst_rect: Rectangle,
+    tint: Color,
+) void {
+    raw.ImageDraw(
+        dst,
+        src,
+        src_rect,
+        dst_rect,
+        tint,
+    );
+}
+
+/// Draws text into an image using the default font.
+pub fn image_draw_text(
+    dst: &mut Image,
+    text: &[u8],
+    x: i32,
+    y: i32,
+    font_size: i32,
+    color: Color,
+) void {
+    raw.ImageDrawText(
+        dst,
+        z_ptr(text),
+        x,
+        y,
+        font_size,
+        color,
+    );
+}
+
+/// Draws text into an image using a custom font.
+pub fn image_draw_text_ex(
+    dst: &mut Image,
+    font: Font,
+    text: &[u8],
+    position: Vector2,
+    font_size: f32,
+    spacing: f32,
+    tint: Color,
+) void {
+    raw.ImageDrawTextEx(
+        dst,
+        font,
+        z_ptr(text),
+        position,
+        font_size,
+        spacing,
+        tint,
+    );
+}

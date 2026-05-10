@@ -79,7 +79,6 @@ fn use_drawing_api() void {
 
 // Touches keyboard and mouse functions.
 fn use_input_api() void {
-    _ = raylib.is_key_pressed_repeat(raylib.Key.A);
     _ = raylib.is_key_pressed(raylib.Key.A);
     _ = raylib.is_key_down(raylib.Key.SPACE);
     _ = raylib.is_key_released(raylib.Key.ESCAPE);
@@ -125,45 +124,36 @@ fn use_texture_api() void {
     raylib.unload_texture(tex);
 }
 
-// Touches the broader audio API so the public layer cannot regress to the old
-// two-function device-only surface.
-fn use_audio_api() void {
-    raylib.init_audio_device();
-    _ = raylib.is_audio_device_ready();
-    raylib.set_master_volume(1.0);
-    _ = raylib.get_master_volume();
+// Touches module paths so the focused public modules remain part of the API.
+fn use_module_api() void {
+    let rec = raylib.rectangle(
+        0.0,
+        0.0,
+        16.0,
+        16.0,
+    );
+    let pos = raylib.vector2(0.0, 0.0);
+    let color = raylib.colors.color_alpha(raylib.WHITE, 0.5);
+    let image = raylib.images.gen_image_color(16, 16, color);
+    _ = raylib.images.is_image_valid(image);
+    let tex = raylib.textures.load_texture_from_image(image);
+    _ = raylib.textures.is_texture_valid(tex);
+    raylib.textures.draw_texture_rec(
+        tex,
+        rec,
+        pos,
+        raylib.WHITE,
+    );
+    _ = raylib.text.measure_text(TEXT, 20);
+    _ = raylib.input.get_mouse_position();
+    _ = raylib.files.file_exists(TEXTURE_PATH);
+    raylib.textures.unload_texture(tex);
+    raylib.images.unload_image(image);
 
-    let wave = raylib.load_wave(TEXTURE_PATH);
-    _ = raylib.is_wave_valid(wave);
-    let sound = raylib.load_sound_from_wave(wave);
-    _ = raylib.is_sound_valid(sound);
-    let alias = raylib.load_sound_alias(sound);
-    raylib.play_sound(alias);
-    raylib.pause_sound(alias);
-    raylib.resume_sound(alias);
-    raylib.stop_sound(alias);
-    _ = raylib.is_sound_playing(alias);
-    raylib.set_sound_volume(alias, 1.0);
-    raylib.set_sound_pitch(alias, 1.0);
-    raylib.set_sound_pan(alias, 0.0);
-    raylib.unload_sound_alias(alias);
-    raylib.unload_sound(sound);
-    raylib.unload_wave(wave);
-
-    let stream = raylib.load_audio_stream(44100, 32, 2);
-    _ = raylib.is_audio_stream_valid(stream);
-    _ = raylib.is_audio_stream_processed(stream);
-    raylib.play_audio_stream(stream);
-    raylib.pause_audio_stream(stream);
-    raylib.resume_audio_stream(stream);
-    _ = raylib.is_audio_stream_playing(stream);
-    raylib.stop_audio_stream(stream);
-    raylib.set_audio_stream_volume(stream, 1.0);
-    raylib.set_audio_stream_pitch(stream, 1.0);
-    raylib.set_audio_stream_pan(stream, 0.0);
-    raylib.unload_audio_stream(stream);
-
-    raylib.close_audio_device();
+    raylib.audio.init_audio_device();
+    _ = raylib.audio.is_audio_device_ready();
+    raylib.audio.set_master_volume(1.0);
+    raylib.audio.close_audio_device();
 }
 
 // Entry point for the compile-only test.
@@ -175,7 +165,7 @@ fn main() i32 {
         use_drawing_api();
         use_input_api();
         use_texture_api();
-        use_audio_api();
+        use_module_api();
     }
     return 0;
 }

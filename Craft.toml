@@ -22,13 +22,11 @@ roots = [
 
 [craft.fmt]
 exclude = [
-    "src/lib.rn",
     "src/raw.rn",
 ]
 
 [craft.style]
 exclude = [
-    "src/lib.rn",
     "src/raw.rn",
 ]
 

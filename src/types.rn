@@ -1,0 +1,147 @@
+//! Public raylib value types and Kern-style constructors.
+
+use ..raw;
+
+pub const RAYLIB_VERSION_MAJOR = 6;
+pub const RAYLIB_VERSION_MINOR = 0;
+pub const RAYLIB_VERSION_PATCH = 0;
+
+/// raylib-compatible value types.
+///
+/// These aliases intentionally mirror raylib's C structs and enums so values
+/// can cross the generated ABI layer without conversion.
+pub type Vector2 = raw.Vector2;
+pub type Vector3 = raw.Vector3;
+pub type Vector4 = raw.Vector4;
+pub type Matrix = raw.Matrix;
+pub type Color = raw.Color;
+pub type Rectangle = raw.Rectangle;
+pub type Image = raw.Image;
+pub type Texture = raw.Texture;
+pub type RenderTexture = raw.RenderTexture;
+pub type NPatchInfo = raw.NPatchInfo;
+pub type GlyphInfo = raw.GlyphInfo;
+pub type Font = raw.Font;
+pub type Camera3D = raw.Camera3D;
+pub type Camera2D = raw.Camera2D;
+pub type Mesh = raw.Mesh;
+pub type Shader = raw.Shader;
+pub type MaterialMap = raw.MaterialMap;
+pub type Material = raw.Material;
+pub type Transform = raw.Transform;
+pub type BoneInfo = raw.BoneInfo;
+pub type ModelSkeleton = raw.ModelSkeleton;
+pub type Model = raw.Model;
+pub type ModelAnimation = raw.ModelAnimation;
+pub type Ray = raw.Ray;
+pub type RayCollision = raw.RayCollision;
+pub type BoundingBox = raw.BoundingBox;
+pub type Wave = raw.Wave;
+pub type AudioStream = raw.AudioStream;
+pub type Sound = raw.Sound;
+pub type Music = raw.Music;
+pub type VrDeviceInfo = raw.VrDeviceInfo;
+pub type VrStereoConfig = raw.VrStereoConfig;
+pub type FilePathList = raw.FilePathList;
+pub type AutomationEvent = raw.AutomationEvent;
+pub type AutomationEventList = raw.AutomationEventList;
+
+pub type Quaternion = raw.Vector4;
+pub type Texture2D = raw.Texture;
+pub type TextureCubemap = raw.Texture;
+pub type RenderTexture2D = raw.RenderTexture;
+pub type Camera = raw.Camera3D;
+pub type ModelAnimPose = &mut raw.Transform;
+
+pub type TraceLogLevel = raw.TraceLogLevel;
+pub type KeyboardKey = raw.KeyboardKey;
+pub type Key = raw.KeyboardKey;
+pub type MouseButton = raw.MouseButton;
+pub type MouseCursor = raw.MouseCursor;
+pub type GamepadButton = raw.GamepadButton;
+pub type GamepadAxis = raw.GamepadAxis;
+pub type MaterialMapIndex = raw.MaterialMapIndex;
+pub type ShaderLocationIndex = raw.ShaderLocationIndex;
+pub type ShaderUniformDataType = raw.ShaderUniformDataType;
+pub type ShaderAttributeDataType = raw.ShaderAttributeDataType;
+pub type PixelFormat = raw.PixelFormat;
+pub type TextureFilter = raw.TextureFilter;
+pub type TextureWrap = raw.TextureWrap;
+pub type CubemapLayout = raw.CubemapLayout;
+pub type FontType = raw.FontType;
+pub type BlendMode = raw.BlendMode;
+pub type CameraMode = raw.CameraMode;
+pub type CameraProjection = raw.CameraProjection;
+pub type NPatchLayout = raw.NPatchLayout;
+
+pub const FLAG_VSYNC_HINT = u32.{64};
+pub const FLAG_FULLSCREEN_MODE = u32.{2};
+pub const FLAG_WINDOW_RESIZABLE = u32.{4};
+pub const FLAG_WINDOW_UNDECORATED = u32.{8};
+pub const FLAG_WINDOW_HIDDEN = u32.{128};
+pub const FLAG_WINDOW_MINIMIZED = u32.{512};
+pub const FLAG_WINDOW_MAXIMIZED = u32.{1024};
+pub const FLAG_WINDOW_UNFOCUSED = u32.{2048};
+pub const FLAG_WINDOW_TOPMOST = u32.{4096};
+pub const FLAG_WINDOW_ALWAYS_RUN = u32.{256};
+pub const FLAG_WINDOW_TRANSPARENT = u32.{16};
+pub const FLAG_WINDOW_HIGHDPI = u32.{8192};
+pub const FLAG_WINDOW_MOUSE_PASSTHROUGH = u32.{16384};
+pub const FLAG_BORDERLESS_WINDOWED_MODE = u32.{32768};
+pub const FLAG_MSAA_4X_HINT = u32.{32};
+pub const FLAG_INTERLACED_HINT = u32.{65536};
+
+pub const GESTURE_NONE = u32.{0};
+pub const GESTURE_TAP = u32.{1};
+pub const GESTURE_DOUBLETAP = u32.{2};
+pub const GESTURE_HOLD = u32.{4};
+pub const GESTURE_DRAG = u32.{8};
+pub const GESTURE_SWIPE_RIGHT = u32.{16};
+pub const GESTURE_SWIPE_LEFT = u32.{32};
+pub const GESTURE_SWIPE_UP = u32.{64};
+pub const GESTURE_SWIPE_DOWN = u32.{128};
+pub const GESTURE_PINCH_IN = u32.{256};
+pub const GESTURE_PINCH_OUT = u32.{512};
+
+impl Color {
+    /// Creates a `Color` from red, green, blue, and alpha channels.
+    pub const fn rgba(r: u8, g: u8, b: u8, a: u8) Color {
+        return .{ r: r, g: g, b: b, a: a };
+    }
+}
+
+impl Vector2 {
+    /// Creates a `Vector2` from x and y coordinates.
+    pub const fn xy(x: f32, y: f32) Vector2 {
+        return .{ x: x, y: y };
+    }
+}
+
+impl Vector3 {
+    /// Creates a `Vector3` from x, y, and z coordinates.
+    pub const fn xyz(x: f32, y: f32, z: f32) Vector3 {
+        return .{ x: x, y: y, z: z };
+    }
+}
+
+impl Rectangle {
+    /// Creates a `Rectangle` from position and size.
+    pub const fn xywh(x: f32, y: f32, width: f32, height: f32) Rectangle {
+        return .{ x: x, y: y, width: width, height: height };
+    }
+}
+
+/// Creates a `Vector2` from x and y coordinates.
+pub const fn vector2(x: f32, y: f32) Vector2 {
+    return .{ x: x, y: y };
+}
+
+/// Creates a `Vector3` from x, y, and z coordinates.
+pub const fn vector3(x: f32, y: f32, z: f32) Vector3 {
+    return .{ x: x, y: y, z: z };
+}
+
+/// Creates a `Rectangle` from position and size.
+pub const fn rectangle(x: f32, y: f32, width: f32, height: f32) Rectangle {
+    return .{ x: x, y: y, width: width, height: height };
+}

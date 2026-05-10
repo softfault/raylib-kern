@@ -1,0 +1,80 @@
+//! Shader loading and uniform helpers.
+//!
+//! Shaders are GPU resources. Load them after `init_window()`, use the returned
+//! locations for uniform updates, and release them before closing the window.
+
+use ..raw;
+use ..internal.z_ptr;
+use ..types.{Matrix, Shader, ShaderUniformDataType, Texture2D};
+
+/// Loads a shader from vertex and fragment shader file paths.
+pub fn load_shader(vs_file_name: &[u8], fs_file_name: &[u8]) Shader {
+    return raw.LoadShader(z_ptr(vs_file_name), z_ptr(fs_file_name));
+}
+
+/// Loads a shader from source strings in memory.
+pub fn load_shader_from_memory(vs_code: &[u8], fs_code: &[u8]) Shader {
+    return raw.LoadShaderFromMemory(z_ptr(vs_code), z_ptr(fs_code));
+}
+
+/// Returns true when the shader is loaded and valid.
+pub fn is_shader_valid(shader: Shader) bool {
+    return raw.IsShaderValid(shader);
+}
+
+/// Returns a uniform location by name.
+pub fn get_shader_location(shader: Shader, uniform_name: &[u8]) i32 {
+    return raw.GetShaderLocation(shader, z_ptr(uniform_name));
+}
+
+/// Returns an attribute location by name.
+pub fn get_shader_location_attrib(shader: Shader, attrib_name: &[u8]) i32 {
+    return raw.GetShaderLocationAttrib(shader, z_ptr(attrib_name));
+}
+
+/// Sets one uniform value.
+pub fn set_shader_value(
+    shader: Shader,
+    loc_index: i32,
+    value: &mut void,
+    uniform_type: ShaderUniformDataType,
+) void {
+    raw.SetShaderValue(
+        shader,
+        loc_index,
+        value,
+        uniform_type,
+    );
+}
+
+/// Sets multiple uniform values.
+pub fn set_shader_value_v(
+    shader: Shader,
+    loc_index: i32,
+    value: &mut void,
+    uniform_type: ShaderUniformDataType,
+    count: i32,
+) void {
+    raw.SetShaderValueV(
+        shader,
+        loc_index,
+        value,
+        uniform_type,
+        count,
+    );
+}
+
+/// Sets a matrix uniform.
+pub fn set_shader_value_matrix(shader: Shader, loc_index: i32, mat: Matrix) void {
+    raw.SetShaderValueMatrix(shader, loc_index, mat);
+}
+
+/// Sets a texture uniform.
+pub fn set_shader_value_texture(shader: Shader, loc_index: i32, texture: Texture2D) void {
+    raw.SetShaderValueTexture(shader, loc_index, texture);
+}
+
+/// Releases a shader from GPU memory.
+pub fn unload_shader(shader: Shader) void {
+    raw.UnloadShader(shader);
+}

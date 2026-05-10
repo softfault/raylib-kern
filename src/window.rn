@@ -1,0 +1,378 @@
+//! Window lifecycle, monitor, cursor, clipboard, and frame timing helpers.
+//!
+//! `init_window()` is the usual first raylib call in graphical programs. It
+//! creates the OS window, OpenGL context, default font, and the event loop state
+//! used by input helpers. Most programs then run:
+//!
+//! `while (!window_should_close()) { update; begin_drawing(); draw; end_drawing(); }`
+//!
+//! `end_drawing()` swaps buffers, applies `set_target_fps()`, and polls events
+//! for the next frame unless event waiting is enabled.
+
+use ..raw;
+use ..internal.z_ptr;
+use ..types.{Image, TraceLogLevel, Vector2};
+
+/// Opens the OS window and creates raylib's OpenGL context.
+///
+/// Call this before drawing, loading textures, or using helpers that depend on
+/// the default font.
+pub fn init_window(width: i32, height: i32, title_z: &[u8]) void {
+    raw.InitWindow(width, height, z_ptr(title_z));
+}
+
+/// Releases the window and OpenGL context.
+///
+/// In normal applications this should be the final graphics call, after
+/// unloading textures and other GPU resources.
+pub fn close_window() void {
+    raw.CloseWindow();
+}
+
+/// Returns true when the user presses ESC or the window close button.
+pub fn window_should_close() bool {
+    return raw.WindowShouldClose();
+}
+
+/// Returns true once the window has been initialized successfully.
+pub fn is_window_ready() bool {
+    return raw.IsWindowReady();
+}
+
+/// Returns true when the window is currently fullscreen.
+pub fn is_window_fullscreen() bool {
+    return raw.IsWindowFullscreen();
+}
+
+/// Returns true when the window is hidden.
+pub fn is_window_hidden() bool {
+    return raw.IsWindowHidden();
+}
+
+/// Returns true when the window is minimized.
+pub fn is_window_minimized() bool {
+    return raw.IsWindowMinimized();
+}
+
+/// Returns true when the window is maximized.
+pub fn is_window_maximized() bool {
+    return raw.IsWindowMaximized();
+}
+
+/// Returns true when the OS reports this window as focused.
+pub fn is_window_focused() bool {
+    return raw.IsWindowFocused();
+}
+
+/// Returns true during the frame after the window size changes.
+pub fn is_window_resized() bool {
+    return raw.IsWindowResized();
+}
+
+/// Tests one window configuration flag.
+pub fn is_window_state(flag: u32) bool {
+    return raw.IsWindowState(flag);
+}
+
+/// Enables window configuration flags.
+pub fn set_window_state(flags: u32) void {
+    raw.SetWindowState(flags);
+}
+
+/// Disables window configuration flags.
+pub fn clear_window_state(flags: u32) void {
+    raw.ClearWindowState(flags);
+}
+
+/// Toggles fullscreen mode.
+pub fn toggle_fullscreen() void {
+    raw.ToggleFullscreen();
+}
+
+/// Toggles borderless fullscreen windowed mode.
+pub fn toggle_borderless_windowed() void {
+    raw.ToggleBorderlessWindowed();
+}
+
+/// Maximizes the window when the platform and flags allow it.
+pub fn maximize_window() void {
+    raw.MaximizeWindow();
+}
+
+/// Minimizes the window.
+pub fn minimize_window() void {
+    raw.MinimizeWindow();
+}
+
+/// Restores a minimized or maximized window.
+pub fn restore_window() void {
+    raw.RestoreWindow();
+}
+
+/// Sets a single RGBA window icon image.
+pub fn set_window_icon(image: Image) void {
+    raw.SetWindowIcon(image);
+}
+
+/// Sets multiple RGBA window icon images.
+pub fn set_window_icons(images: &mut Image, count: i32) void {
+    raw.SetWindowIcons(images, count);
+}
+
+/// Caps the frame loop to the requested FPS.
+///
+/// raylib enforces the timing from `end_drawing()`, where it also swaps buffers
+/// and polls input events.
+pub fn set_target_fps(fps: i32) void {
+    raw.SetTargetFPS(fps);
+}
+
+/// Returns the currently measured frames per second.
+pub fn get_fps() i32 {
+    return raw.GetFPS();
+}
+
+/// Returns the elapsed time for the previous frame in seconds.
+pub fn get_frame_time() f32 {
+    return raw.GetFrameTime();
+}
+
+/// Returns seconds elapsed since `init_window()`.
+pub fn get_time() f64 {
+    return raw.GetTime();
+}
+
+/// Sets the OS window title from a zero-terminated byte string.
+pub fn set_window_title(title_z: &[u8]) void {
+    raw.SetWindowTitle(z_ptr(title_z));
+}
+
+/// Moves the window to an OS screen position.
+pub fn set_window_position(x: i32, y: i32) void {
+    raw.SetWindowPosition(x, y);
+}
+
+/// Moves the window to a monitor by index.
+pub fn set_window_monitor(monitor: i32) void {
+    raw.SetWindowMonitor(monitor);
+}
+
+/// Sets the minimum window size used by resizable windows.
+pub fn set_window_min_size(width: i32, height: i32) void {
+    raw.SetWindowMinSize(width, height);
+}
+
+/// Sets the maximum window size used by resizable windows.
+pub fn set_window_max_size(width: i32, height: i32) void {
+    raw.SetWindowMaxSize(width, height);
+}
+
+/// Resizes the window.
+pub fn set_window_size(width: i32, height: i32) void {
+    raw.SetWindowSize(width, height);
+}
+
+/// Sets window opacity in the range `0.0..1.0`.
+pub fn set_window_opacity(opacity: f32) void {
+    raw.SetWindowOpacity(opacity);
+}
+
+/// Requests OS focus for the window.
+pub fn set_window_focused() void {
+    raw.SetWindowFocused();
+}
+
+/// Returns raylib's native window handle.
+pub fn get_window_handle() &mut void {
+    return raw.GetWindowHandle();
+}
+
+/// Returns the logical screen width.
+pub fn get_screen_width() i32 {
+    return raw.GetScreenWidth();
+}
+
+/// Returns the logical screen height.
+pub fn get_screen_height() i32 {
+    return raw.GetScreenHeight();
+}
+
+/// Returns the framebuffer width, including HiDPI scaling.
+pub fn get_render_width() i32 {
+    return raw.GetRenderWidth();
+}
+
+/// Returns the framebuffer height, including HiDPI scaling.
+pub fn get_render_height() i32 {
+    return raw.GetRenderHeight();
+}
+
+/// Returns the number of connected monitors.
+pub fn get_monitor_count() i32 {
+    return raw.GetMonitorCount();
+}
+
+/// Returns the monitor that currently contains the window.
+pub fn get_current_monitor() i32 {
+    return raw.GetCurrentMonitor();
+}
+
+/// Returns a monitor's top-left OS position.
+pub fn get_monitor_position(monitor: i32) Vector2 {
+    return raw.GetMonitorPosition(monitor);
+}
+
+/// Returns a monitor's current video-mode width.
+pub fn get_monitor_width(monitor: i32) i32 {
+    return raw.GetMonitorWidth(monitor);
+}
+
+/// Returns a monitor's current video-mode height.
+pub fn get_monitor_height(monitor: i32) i32 {
+    return raw.GetMonitorHeight(monitor);
+}
+
+/// Returns a monitor's physical width in millimetres.
+pub fn get_monitor_physical_width(monitor: i32) i32 {
+    return raw.GetMonitorPhysicalWidth(monitor);
+}
+
+/// Returns a monitor's physical height in millimetres.
+pub fn get_monitor_physical_height(monitor: i32) i32 {
+    return raw.GetMonitorPhysicalHeight(monitor);
+}
+
+/// Returns a monitor's refresh rate.
+pub fn get_monitor_refresh_rate(monitor: i32) i32 {
+    return raw.GetMonitorRefreshRate(monitor);
+}
+
+/// Returns the current window position.
+pub fn get_window_position() Vector2 {
+    return raw.GetWindowPosition();
+}
+
+/// Returns the OS DPI scale used for the window.
+pub fn get_window_scale_dpi() Vector2 {
+    return raw.GetWindowScaleDPI();
+}
+
+/// Returns a pointer to raylib-owned monitor name text.
+pub fn get_monitor_name(monitor: i32) &u8 {
+    return raw.GetMonitorName(monitor);
+}
+
+/// Replaces the OS clipboard text with a zero-terminated string.
+pub fn set_clipboard_text(text: &[u8]) void {
+    raw.SetClipboardText(z_ptr(text));
+}
+
+/// Returns a pointer to raylib-owned clipboard text.
+pub fn get_clipboard_text() &u8 {
+    return raw.GetClipboardText();
+}
+
+/// Returns clipboard image content when the platform supports it.
+pub fn get_clipboard_image() Image {
+    return raw.GetClipboardImage();
+}
+
+/// Makes `end_drawing()` wait for events instead of polling continuously.
+pub fn enable_event_waiting() void {
+    raw.EnableEventWaiting();
+}
+
+/// Restores normal event polling in `end_drawing()`.
+pub fn disable_event_waiting() void {
+    raw.DisableEventWaiting();
+}
+
+/// Shows the OS cursor.
+pub fn show_cursor() void {
+    raw.ShowCursor();
+}
+
+/// Hides the OS cursor.
+pub fn hide_cursor() void {
+    raw.HideCursor();
+}
+
+/// Returns true when the cursor is hidden.
+pub fn is_cursor_hidden() bool {
+    return raw.IsCursorHidden();
+}
+
+/// Unlocks and shows the cursor.
+pub fn enable_cursor() void {
+    raw.EnableCursor();
+}
+
+/// Locks and hides the cursor for relative mouse movement.
+pub fn disable_cursor() void {
+    raw.DisableCursor();
+}
+
+/// Returns true when the cursor is over the window client area.
+pub fn is_cursor_on_screen() bool {
+    return raw.IsCursorOnScreen();
+}
+
+/// Swaps the back buffer with the screen front buffer.
+///
+/// Most applications should use `end_drawing()` instead; this exists for custom
+/// frame control.
+pub fn swap_screen_buffer() void {
+    raw.SwapScreenBuffer();
+}
+
+/// Polls OS input events.
+///
+/// Most applications get this through `end_drawing()` automatically.
+pub fn poll_input_events() void {
+    raw.PollInputEvents();
+}
+
+/// Blocks execution for `seconds`.
+pub fn wait_time(seconds: f64) void {
+    raw.WaitTime(seconds);
+}
+
+/// Seeds raylib's random number generator.
+pub fn set_random_seed(seed: u32) void {
+    raw.SetRandomSeed(seed);
+}
+
+/// Returns a random integer in the inclusive range `min..max`.
+pub fn get_random_value(min: i32, max: i32) i32 {
+    return raw.GetRandomValue(min, max);
+}
+
+/// Loads a random sequence with no repeated values.
+pub fn load_random_sequence(count: u32, min: i32, max: i32) &mut i32 {
+    return raw.LoadRandomSequence(count, min, max);
+}
+
+/// Releases a sequence returned by `load_random_sequence()`.
+pub fn unload_random_sequence(sequence: &mut i32) void {
+    raw.UnloadRandomSequence(sequence);
+}
+
+/// Saves the current framebuffer to a zero-terminated file path.
+pub fn take_screenshot(file_name: &[u8]) void {
+    raw.TakeScreenshot(z_ptr(file_name));
+}
+
+/// Sets configuration flags before `init_window()` when raylib requires them.
+pub fn set_config_flags(flags: u32) void {
+    raw.SetConfigFlags(flags);
+}
+
+/// Opens a URL with the platform default browser.
+pub fn open_url(url: &[u8]) void {
+    raw.OpenURL(z_ptr(url));
+}
+
+/// Sets raylib's minimum trace-log level.
+pub fn set_trace_log_level(log_level: TraceLogLevel) void {
+    raw.SetTraceLogLevel(log_level);
+}
