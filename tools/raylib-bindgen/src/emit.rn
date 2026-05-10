@@ -9,6 +9,11 @@ pub struct Emitter {
     out: &mut Write,
 };
 
+/// Creates an emitter around an existing writer.
+pub fn emitter(out: &mut Write) Emitter {
+    return .{ out: out };
+}
+
 impl &mut Emitter {
     pub fn write(text: &[u8]) void {
         let _ = self.out.write(text);

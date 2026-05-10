@@ -8,6 +8,8 @@ pub struct Line {
     pub next: usize,
 };
 
+static EMPTY = "";
+
 pub fn next_line(text: &[u8], start: usize) ?Line {
     if (start >= text.len()) {
         return .None;
@@ -30,7 +32,7 @@ pub fn next_line(text: &[u8], start: usize) ?Line {
 pub fn strip_prefix_or_empty(text: &[u8], prefix: &[u8]) &[u8] {
     return match (text.strip_prefix(prefix)) {
         .{ Some: rest } => rest,
-        .None => "",
+        .None => EMPTY,
     };
 }
 

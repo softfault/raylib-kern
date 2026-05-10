@@ -1,3 +1,52 @@
+//! Naming and enum-mapping rules for raylib's generated ABI.
+
+static EMPTY = "";
+static KIND = "kind";
+static U32 = "u32";
+static I32 = "i32";
+
+static FLAG_PREFIX = "FLAG_";
+static LOG_PREFIX = "LOG_";
+static KEY_PREFIX = "KEY_";
+static MOUSE_BUTTON_PREFIX = "MOUSE_BUTTON_";
+static MOUSE_CURSOR_PREFIX = "MOUSE_CURSOR_";
+static GAMEPAD_BUTTON_PREFIX = "GAMEPAD_BUTTON_";
+static GAMEPAD_AXIS_PREFIX = "GAMEPAD_AXIS_";
+static MATERIAL_MAP_PREFIX = "MATERIAL_MAP_";
+static SHADER_LOC_PREFIX = "SHADER_LOC_";
+static SHADER_UNIFORM_PREFIX = "SHADER_UNIFORM_";
+static SHADER_ATTRIB_PREFIX = "SHADER_ATTRIB_";
+static PIXELFORMAT_PREFIX = "PIXELFORMAT_";
+static TEXTURE_FILTER_PREFIX = "TEXTURE_FILTER_";
+static TEXTURE_WRAP_PREFIX = "TEXTURE_WRAP_";
+static CUBEMAP_LAYOUT_PREFIX = "CUBEMAP_LAYOUT_";
+static FONT_PREFIX = "FONT_";
+static BLEND_PREFIX = "BLEND_";
+static GESTURE_PREFIX = "GESTURE_";
+static CAMERA_PREFIX = "CAMERA_";
+static NPATCH_PREFIX = "NPATCH_";
+
+static TRACE_LOG_LEVEL = "TraceLogLevel";
+static KEYBOARD_KEY = "KeyboardKey";
+static KEY_ALIAS = "Key";
+static MOUSE_BUTTON = "MouseButton";
+static MOUSE_CURSOR = "MouseCursor";
+static GAMEPAD_BUTTON = "GamepadButton";
+static GAMEPAD_AXIS = "GamepadAxis";
+static MATERIAL_MAP_INDEX = "MaterialMapIndex";
+static SHADER_LOCATION_INDEX = "ShaderLocationIndex";
+static SHADER_UNIFORM_DATA_TYPE = "ShaderUniformDataType";
+static SHADER_ATTRIBUTE_DATA_TYPE = "ShaderAttributeDataType";
+static PIXEL_FORMAT = "PixelFormat";
+static TEXTURE_FILTER = "TextureFilter";
+static TEXTURE_WRAP = "TextureWrap";
+static CUBEMAP_LAYOUT = "CubemapLayout";
+static FONT_TYPE = "FontType";
+static BLEND_MODE = "BlendMode";
+static CAMERA_MODE = "CameraMode";
+static NPATCH_LAYOUT = "NPatchLayout";
+
+/// Returns true when a C define name is suitable to expose as a public constant.
 pub fn is_public_define_name(name: &[u8]) bool {
     if (name.len() == 0) {
         return false;
@@ -13,49 +62,54 @@ pub fn is_public_define_name(name: &[u8]) bool {
     return true;
 }
 
+/// Renames C identifiers that would conflict with Kern syntax.
 pub fn sanitize_name(name: &[u8]) &[u8] {
     if (name == "type") {
-        return "kind";
+        return KIND;
     }
     return name;
 }
 
+/// Returns the ABI integer type used for an enum declaration.
 pub fn enum_backing_type(name: &[u8]) &[u8] {
     if (name == "ConfigFlags" or name == "Gesture") {
-        return "u32";
+        return U32;
     }
-    return "i32";
+    return I32;
 }
 
+/// Returns true when an enum should be emitted as flags constants.
 pub fn enum_is_flags(name: &[u8]) bool {
     return name == "ConfigFlags" or name == "Gesture";
 }
 
+// Maps raylib enum types to the C prefix used by their values.
 fn enum_value_prefix(name: &[u8]) &[u8] {
-    if (name == "ConfigFlags") return "FLAG_";
-    if (name == "TraceLogLevel") return "LOG_";
-    if (name == "KeyboardKey") return "KEY_";
-    if (name == "MouseButton") return "MOUSE_BUTTON_";
-    if (name == "MouseCursor") return "MOUSE_CURSOR_";
-    if (name == "GamepadButton") return "GAMEPAD_BUTTON_";
-    if (name == "GamepadAxis") return "GAMEPAD_AXIS_";
-    if (name == "MaterialMapIndex") return "MATERIAL_MAP_";
-    if (name == "ShaderLocationIndex") return "SHADER_LOC_";
-    if (name == "ShaderUniformDataType") return "SHADER_UNIFORM_";
-    if (name == "ShaderAttributeDataType") return "SHADER_ATTRIB_";
-    if (name == "PixelFormat") return "PIXELFORMAT_";
-    if (name == "TextureFilter") return "TEXTURE_FILTER_";
-    if (name == "TextureWrap") return "TEXTURE_WRAP_";
-    if (name == "CubemapLayout") return "CUBEMAP_LAYOUT_";
-    if (name == "FontType") return "FONT_";
-    if (name == "BlendMode") return "BLEND_";
-    if (name == "Gesture") return "GESTURE_";
-    if (name == "CameraMode") return "CAMERA_";
-    if (name == "CameraProjection") return "CAMERA_";
-    if (name == "NPatchLayout") return "NPATCH_";
-    return "";
+    if (name == "ConfigFlags") return FLAG_PREFIX;
+    if (name == "TraceLogLevel") return LOG_PREFIX;
+    if (name == "KeyboardKey") return KEY_PREFIX;
+    if (name == "MouseButton") return MOUSE_BUTTON_PREFIX;
+    if (name == "MouseCursor") return MOUSE_CURSOR_PREFIX;
+    if (name == "GamepadButton") return GAMEPAD_BUTTON_PREFIX;
+    if (name == "GamepadAxis") return GAMEPAD_AXIS_PREFIX;
+    if (name == "MaterialMapIndex") return MATERIAL_MAP_PREFIX;
+    if (name == "ShaderLocationIndex") return SHADER_LOC_PREFIX;
+    if (name == "ShaderUniformDataType") return SHADER_UNIFORM_PREFIX;
+    if (name == "ShaderAttributeDataType") return SHADER_ATTRIB_PREFIX;
+    if (name == "PixelFormat") return PIXELFORMAT_PREFIX;
+    if (name == "TextureFilter") return TEXTURE_FILTER_PREFIX;
+    if (name == "TextureWrap") return TEXTURE_WRAP_PREFIX;
+    if (name == "CubemapLayout") return CUBEMAP_LAYOUT_PREFIX;
+    if (name == "FontType") return FONT_PREFIX;
+    if (name == "BlendMode") return BLEND_PREFIX;
+    if (name == "Gesture") return GESTURE_PREFIX;
+    if (name == "CameraMode") return CAMERA_PREFIX;
+    if (name == "CameraProjection") return CAMERA_PREFIX;
+    if (name == "NPatchLayout") return NPATCH_PREFIX;
+    return EMPTY;
 }
 
+/// Strips the conventional C enum prefix from one enum value.
 pub fn enum_variant_name(enum_name: &[u8], value_name: &[u8]) &[u8] {
     let prefix = enum_value_prefix(enum_name);
     if (prefix.len() == 0) {
@@ -67,33 +121,36 @@ pub fn enum_variant_name(enum_name: &[u8], value_name: &[u8]) &[u8] {
     };
 }
 
+/// Returns the public wrapper alias for a generated enum type.
 pub fn public_enum_alias(name: &[u8]) &[u8] {
-    if (name == "KeyboardKey") return "Key";
+    if (name == "KeyboardKey") return KEY_ALIAS;
     return name;
 }
 
+// Infers the enum type represented by a public integer define.
 fn enum_name_for_value(value_name: &[u8]) &[u8] {
-    if (value_name.starts_with("LOG_")) return "TraceLogLevel";
-    if (value_name.starts_with("KEY_")) return "KeyboardKey";
-    if (value_name.starts_with("MOUSE_BUTTON_")) return "MouseButton";
-    if (value_name.starts_with("MOUSE_CURSOR_")) return "MouseCursor";
-    if (value_name.starts_with("GAMEPAD_BUTTON_")) return "GamepadButton";
-    if (value_name.starts_with("GAMEPAD_AXIS_")) return "GamepadAxis";
-    if (value_name.starts_with("MATERIAL_MAP_")) return "MaterialMapIndex";
-    if (value_name.starts_with("SHADER_LOC_")) return "ShaderLocationIndex";
-    if (value_name.starts_with("SHADER_UNIFORM_")) return "ShaderUniformDataType";
-    if (value_name.starts_with("SHADER_ATTRIB_")) return "ShaderAttributeDataType";
-    if (value_name.starts_with("PIXELFORMAT_")) return "PixelFormat";
-    if (value_name.starts_with("TEXTURE_FILTER_")) return "TextureFilter";
-    if (value_name.starts_with("TEXTURE_WRAP_")) return "TextureWrap";
-    if (value_name.starts_with("CUBEMAP_LAYOUT_")) return "CubemapLayout";
-    if (value_name.starts_with("FONT_")) return "FontType";
-    if (value_name.starts_with("BLEND_")) return "BlendMode";
-    if (value_name.starts_with("CAMERA_")) return "CameraMode";
-    if (value_name.starts_with("NPATCH_")) return "NPatchLayout";
-    return "";
+    if (value_name.starts_with(LOG_PREFIX)) return TRACE_LOG_LEVEL;
+    if (value_name.starts_with(KEY_PREFIX)) return KEYBOARD_KEY;
+    if (value_name.starts_with(MOUSE_BUTTON_PREFIX)) return MOUSE_BUTTON;
+    if (value_name.starts_with(MOUSE_CURSOR_PREFIX)) return MOUSE_CURSOR;
+    if (value_name.starts_with(GAMEPAD_BUTTON_PREFIX)) return GAMEPAD_BUTTON;
+    if (value_name.starts_with(GAMEPAD_AXIS_PREFIX)) return GAMEPAD_AXIS;
+    if (value_name.starts_with(MATERIAL_MAP_PREFIX)) return MATERIAL_MAP_INDEX;
+    if (value_name.starts_with(SHADER_LOC_PREFIX)) return SHADER_LOCATION_INDEX;
+    if (value_name.starts_with(SHADER_UNIFORM_PREFIX)) return SHADER_UNIFORM_DATA_TYPE;
+    if (value_name.starts_with(SHADER_ATTRIB_PREFIX)) return SHADER_ATTRIBUTE_DATA_TYPE;
+    if (value_name.starts_with(PIXELFORMAT_PREFIX)) return PIXEL_FORMAT;
+    if (value_name.starts_with(TEXTURE_FILTER_PREFIX)) return TEXTURE_FILTER;
+    if (value_name.starts_with(TEXTURE_WRAP_PREFIX)) return TEXTURE_WRAP;
+    if (value_name.starts_with(CUBEMAP_LAYOUT_PREFIX)) return CUBEMAP_LAYOUT;
+    if (value_name.starts_with(FONT_PREFIX)) return FONT_TYPE;
+    if (value_name.starts_with(BLEND_PREFIX)) return BLEND_MODE;
+    if (value_name.starts_with(CAMERA_PREFIX)) return CAMERA_MODE;
+    if (value_name.starts_with(NPATCH_PREFIX)) return NPATCH_LAYOUT;
+    return EMPTY;
 }
 
+/// Returns true when a public define would duplicate a non-flag enum value.
 pub fn skip_public_enum_define_alias(value: &[u8]) bool {
     let enum_name = enum_name_for_value(value);
     if (enum_name.len() == 0 or enum_is_flags(enum_name)) {
@@ -103,18 +160,26 @@ pub fn skip_public_enum_define_alias(value: &[u8]) bool {
     return true;
 }
 
+/// Maps integer parameters to stronger generated enum types where raylib's C
+/// API uses plain `int`.
 pub fn mapped_enum_param_type(function_name: &[u8], param_name: &[u8], c_type: &[u8]) &[u8] {
     if (c_type == "int") {
-        if (param_name == "key") return "KeyboardKey";
-        if (param_name == "button" and function_name.starts_with("IsMouseButton")) return "MouseButton";
-        if (param_name == "button" and function_name.starts_with("GetGamepadButton")) return "GamepadButton";
-        if (param_name == "axis") return "GamepadAxis";
-        if (param_name == "cursor") return "MouseCursor";
-        if (param_name == "logLevel") return "TraceLogLevel";
-        if (param_name == "mode" and function_name == "BeginBlendMode") return "BlendMode";
-        if (param_name == "uniformType") return "ShaderUniformDataType";
-        if (param_name == "filter") return "TextureFilter";
-        if (param_name == "wrap") return "TextureWrap";
+        if (param_name == "key") return KEYBOARD_KEY;
+        if (
+            param_name == "button"
+            and function_name.starts_with("IsMouseButton")
+        ) return MOUSE_BUTTON;
+        if (
+            param_name == "button"
+            and function_name.starts_with("GetGamepadButton")
+        ) return GAMEPAD_BUTTON;
+        if (param_name == "axis") return GAMEPAD_AXIS;
+        if (param_name == "cursor") return MOUSE_CURSOR;
+        if (param_name == "logLevel") return TRACE_LOG_LEVEL;
+        if (param_name == "mode" and function_name == "BeginBlendMode") return BLEND_MODE;
+        if (param_name == "uniformType") return SHADER_UNIFORM_DATA_TYPE;
+        if (param_name == "filter") return TEXTURE_FILTER;
+        if (param_name == "wrap") return TEXTURE_WRAP;
     }
-    return "";
+    return EMPTY;
 }

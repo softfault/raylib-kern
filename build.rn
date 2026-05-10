@@ -1,5 +1,9 @@
+//! Builds the bundled raylib C sources for examples, tests, and binaries.
+
 use craft.builder;
 
+// Compiles one graphics/core raylib C translation unit with the platform
+// defines that match raylib's desktop OpenGL build.
 fn compile_raylib_module(b: &mut builder.Builder, source: &[u8]) void {
     let obj = b.cc_resource_config("raylib", source, .{
         include_dirs: .{
@@ -22,6 +26,8 @@ fn compile_raylib_module(b: &mut builder.Builder, source: &[u8]) void {
     let _ = obj;
 }
 
+// Compiles raylib's audio implementation with the warning flags it needs on
+// current C toolchains.
 fn compile_raylib_audio_module(b: &mut builder.Builder) void {
     let obj = b.cc_resource_config("raylib", "src/raudio.c", .{
         include_dirs: .{

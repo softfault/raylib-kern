@@ -1,9 +1,12 @@
+//! Compile-time coverage for the public wrapper API surface.
+
 use raylib;
 
 const TITLE = "compile-only\0";
 const TEXT = "hello\0";
 const TEXTURE_PATH = "missing.png\0";
 
+// Touches window functions without relying on a real interactive window.
 fn use_window_api() void {
     raylib.init_window(640, 480, TITLE);
     raylib.set_target_fps(60);
@@ -16,29 +19,65 @@ fn use_window_api() void {
     raylib.close_window();
 }
 
+// Touches drawing functions so signature drift breaks compilation early.
 fn use_drawing_api() void {
     let p = raylib.vector2(10.0, 20.0);
     let q = raylib.vector2(30.0, 40.0);
     let size = raylib.vector2(50.0, 60.0);
-    let rec = raylib.rectangle(1.0, 2.0, 3.0, 4.0);
+    let rec = raylib.rectangle(
+        1.0,
+        2.0,
+        3.0,
+        4.0,
+    );
 
     raylib.begin_drawing();
     raylib.clear_background(raylib.RAYWHITE);
     raylib.draw_pixel(1, 2, raylib.RED);
-    raylib.draw_line(0, 0, 10, 10, raylib.BLUE);
+    raylib.draw_line(
+        0,
+        0,
+        10,
+        10,
+        raylib.BLUE,
+    );
     raylib.draw_line_v(p, q, raylib.GREEN);
-    raylib.draw_circle(20, 20, 10.0, raylib.ORANGE);
+    raylib.draw_circle(
+        20,
+        20,
+        10.0,
+        raylib.ORANGE,
+    );
     raylib.draw_circle_v(p, 8.0, raylib.PURPLE);
-    raylib.draw_rectangle(1, 2, 3, 4, raylib.GRAY);
+    raylib.draw_rectangle(
+        1,
+        2,
+        3,
+        4,
+        raylib.GRAY,
+    );
     raylib.draw_rectangle_v(p, size, raylib.DARKGRAY);
     raylib.draw_rectangle_rec(rec, raylib.BLACK);
-    raylib.draw_rectangle_lines(1, 2, 3, 4, raylib.WHITE);
+    raylib.draw_rectangle_lines(
+        1,
+        2,
+        3,
+        4,
+        raylib.WHITE,
+    );
     raylib.draw_fps(10, 10);
-    raylib.draw_text(TEXT, 10, 40, 20, raylib.DARKGRAY);
+    raylib.draw_text(
+        TEXT,
+        10,
+        40,
+        20,
+        raylib.DARKGRAY,
+    );
     let _ = raylib.measure_text(TEXT, 20);
     raylib.end_drawing();
 }
 
+// Touches keyboard and mouse functions.
 fn use_input_api() void {
     _ = raylib.is_key_pressed(raylib.Key.A);
     _ = raylib.is_key_down(raylib.Key.SPACE);
@@ -52,17 +91,40 @@ fn use_input_api() void {
     _ = raylib.get_mouse_delta();
 }
 
+// Touches texture functions without requiring the test to load a real asset.
 fn use_texture_api() void {
     let tex = raylib.load_texture(TEXTURE_PATH);
     let pos = raylib.vector2(0.0, 0.0);
-    let src = raylib.rectangle(0.0, 0.0, 16.0, 16.0);
-    raylib.draw_texture(tex, 0, 0, raylib.WHITE);
+    let src = raylib.rectangle(
+        0.0,
+        0.0,
+        16.0,
+        16.0,
+    );
+    raylib.draw_texture(
+        tex,
+        0,
+        0,
+        raylib.WHITE,
+    );
     raylib.draw_texture_v(tex, pos, raylib.WHITE);
-    raylib.draw_texture_ex(tex, pos, 0.0, 1.0, raylib.WHITE);
-    raylib.draw_texture_rec(tex, src, pos, raylib.WHITE);
+    raylib.draw_texture_ex(
+        tex,
+        pos,
+        0.0,
+        1.0,
+        raylib.WHITE,
+    );
+    raylib.draw_texture_rec(
+        tex,
+        src,
+        pos,
+        raylib.WHITE,
+    );
     raylib.unload_texture(tex);
 }
 
+// Entry point for the compile-only test.
 fn main() i32 {
     // Keep these calls behind an impossible branch so the test locks API shape
     // without opening a real window in CI or headless development shells.

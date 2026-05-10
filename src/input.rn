@@ -1,52 +1,57 @@
+//! Keyboard and mouse polling helpers.
+
 use ..raw;
 use ..types.{Key, MouseButton, Vector2};
 
 // Input is frame-polled. Read it during the update phase before drawing the
 // next frame; `end_drawing()` refreshes the state for the following iteration.
 
-// True for one frame when the key transitions from up to down.
+/// Returns true for one frame when the key transitions from up to down.
 pub fn is_key_pressed(key: Key) bool {
     return raw.IsKeyPressed(key);
 }
 
-// True every frame while the key is held. This is the right choice for
-// continuous movement, as shown in raylib's input-keys example.
+/// Returns true every frame while the key is held.
 pub fn is_key_down(key: Key) bool {
     return raw.IsKeyDown(key);
 }
 
-// True for one frame when the key transitions from down to up.
+/// Returns true for one frame when the key transitions from down to up.
 pub fn is_key_released(key: Key) bool {
     return raw.IsKeyReleased(key);
 }
 
+/// Returns true every frame while the key is not held.
 pub fn is_key_up(key: Key) bool {
     return raw.IsKeyUp(key);
 }
 
-// Mouse button helpers follow the same edge-vs-held split as keyboard input.
+/// Returns true for one frame when the mouse button is pressed.
 pub fn is_mouse_button_pressed(button: MouseButton) bool {
     return raw.IsMouseButtonPressed(button);
 }
 
+/// Returns true every frame while the mouse button is held.
 pub fn is_mouse_button_down(button: MouseButton) bool {
     return raw.IsMouseButtonDown(button);
 }
 
+/// Returns true for one frame when the mouse button is released.
 pub fn is_mouse_button_released(button: MouseButton) bool {
     return raw.IsMouseButtonReleased(button);
 }
 
+/// Returns true every frame while the mouse button is not held.
 pub fn is_mouse_button_up(button: MouseButton) bool {
     return raw.IsMouseButtonUp(button);
 }
 
-// Current mouse position in screen coordinates, matching the Vector2 style used
-// by raylib's mouse examples.
+/// Returns the current mouse position in screen coordinates.
 pub fn get_mouse_position() Vector2 {
     return raw.GetMousePosition();
 }
 
+/// Returns the mouse movement delta for the current frame.
 pub fn get_mouse_delta() Vector2 {
     return raw.GetMouseDelta();
 }

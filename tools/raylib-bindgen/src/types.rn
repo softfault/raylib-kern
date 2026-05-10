@@ -1,8 +1,11 @@
-use base.mem.alloc.GPA;
+//! C-to-Kern type emission rules for generated raylib bindings.
+
+use base.mem.alloc.gpa;
 use sys.mem.Page;
 use ..emit.Emitter;
 use ..names.{enum_backing_type, enum_variant_name, mapped_enum_param_type};
 
+// Removes C qualifiers that do not affect the emitted Kern type name.
 fn remove_words(text: &[u8]) &[u8] {
     let mut out = text.trim_ascii();
     if (out.starts_with("const ")) {
@@ -17,6 +20,7 @@ fn remove_words(text: &[u8]) &[u8] {
     return out;
 }
 
+// Emits the scalar Kern type for a normalized C type spelling.
 fn emit_base_type(out: &mut Emitter, c_type: &[u8]) void {
     let base = remove_words(c_type);
     if (base == "void") out.write("void")
@@ -39,6 +43,7 @@ fn emit_base_type(out: &mut Emitter, c_type: &[u8]) void {
     else out.fmt("{}", .{ base });
 }
 
+/// Emits a Kern type expression for a C type spelling from rlparser.
 pub fn emit_kern_type(out: &mut Emitter, c_type: &[u8]) void {
     let clean = remove_words(c_type);
     if (clean == "..." or clean == "va_list") {
@@ -57,7 +62,7 @@ pub fn emit_kern_type(out: &mut Emitter, c_type: &[u8]) void {
 
     let mut no_ptr = base.coll.String.{};
     let page = Page.{}..&;
-    let gpa = GPA.{ backing: page }..&;
+    let gpa = gpa().on(page)..&;
     defer no_ptr..&.deinit(gpa);
     i = 0;
     while (i < clean.len()) {
@@ -87,7 +92,8 @@ pub fn emit_kern_type(out: &mut Emitter, c_type: &[u8]) void {
         out.fmt("[{}]", .{ array_size });
     }
 
-    let pointer_base_is_char = remove_words(array_base) == "char" or remove_words(array_base) == "unsigned char";
+    let pointer_base_is_char = remove_words(array_base) == "char"
+        or remove_words(array_base) == "unsigned char";
     while (stars > 0) {
         if (stars == 1 and pointer_base_is_char) {
             // raylib text APIs expect C strings; keep a single char pointer as `&u8`.
@@ -100,7 +106,13 @@ pub fn emit_kern_type(out: &mut Emitter, c_type: &[u8]) void {
     emit_base_type(out, array_base);
 }
 
-pub fn emit_param_type(out: &mut Emitter, function_name: &[u8], param_name: &[u8], c_type: &[u8]) void {
+/// Emits a Kern parameter type, including hand-mapped enum parameters.
+pub fn emit_param_type(
+    out: &mut Emitter,
+    function_name: &[u8],
+    param_name: &[u8],
+    c_type: &[u8],
+) void {
     let enum_type = mapped_enum_param_type(function_name, param_name, c_type);
     if (enum_type.len() != 0) {
         out.write(enum_type);
@@ -109,14 +121,17 @@ pub fn emit_param_type(out: &mut Emitter, function_name: &[u8], param_name: &[u8
     emit_kern_type(out, c_type);
 }
 
+/// Starts a generated enum declaration.
 pub fn emit_enum_start(out: &mut Emitter, name: &[u8]) void {
     out.fmt("pub enum {}: {} {{\n", .{ name, enum_backing_type(name) });
 }
 
+/// Emits one generated non-flag enum value.
 pub fn emit_enum_value(out: &mut Emitter, enum_name: &[u8], value_name: &[u8], value: &[u8]) void {
     out.fmt("    {} = {},\n", .{ enum_variant_name(enum_name, value_name), value });
 }
 
+/// Emits one generated flag constant.
 pub fn emit_flag_value(out: &mut Emitter, enum_name: &[u8], value_name: &[u8], value: &[u8]) void {
     out.fmt("pub const {} = {}.{{{}}};\n", .{ value_name, enum_backing_type(enum_name), value });
 }

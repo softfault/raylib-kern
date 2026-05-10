@@ -1,19 +1,43 @@
+//! Text drawing and measurement helpers.
+
 use ..raw;
 use ..internal.z_ptr;
 use ..types.{Color, Font, Vector2};
 
-// Draw text with raylib's default font. The default font is prepared by
-// `init_window()`, and the string must be zero-terminated for the C API.
+/// Draws text with raylib's default font.
+///
+/// The default font is prepared by `init_window()`, and the string must be
+/// zero-terminated for the C API.
 pub fn draw_text(text_z: &[u8], x: i32, y: i32, font_size: i32, color: Color) void {
-    raw.DrawText(z_ptr(text_z), x, y, font_size, color);
+    raw.DrawText(
+        z_ptr(text_z),
+        x,
+        y,
+        font_size,
+        color,
+    );
 }
 
-// Draw text with an explicit font, fractional position, and custom spacing.
-pub fn draw_text_ex(font: Font, text_z: &[u8], position: Vector2, font_size: f32, spacing: f32, tint: Color) void {
-    raw.DrawTextEx(font, z_ptr(text_z), position, font_size, spacing, tint);
+/// Draws text with an explicit font, fractional position, and custom spacing.
+pub fn draw_text_ex(
+    font: Font,
+    text_z: &[u8],
+    position: Vector2,
+    font_size: f32,
+    spacing: f32,
+    tint: Color,
+) void {
+    raw.DrawTextEx(
+        font,
+        z_ptr(text_z),
+        position,
+        font_size,
+        spacing,
+        tint,
+    );
 }
 
-// Returns the width in pixels for layout with the default font.
+/// Returns the width in pixels for layout with the default font.
 pub fn measure_text(text_z: &[u8], font_size: i32) i32 {
     return raw.MeasureText(z_ptr(text_z), font_size);
 }

@@ -1,8 +1,11 @@
+//! Public raylib value types and Kern-style constructors.
+
 use ..raw;
 
-// These aliases intentionally mirror raylib's C structs and enums so values can
-// cross the generated ABI layer without conversion. Ergonomic constructors live
-// below and are re-exported from `raylib`.
+/// raylib-compatible value types.
+///
+/// These aliases intentionally mirror raylib's C structs and enums so values
+/// can cross the generated ABI layer without conversion.
 pub type Vector2 = raw.Vector2;
 pub type Vector3 = raw.Vector3;
 pub type Vector4 = raw.Vector4;
@@ -67,42 +70,45 @@ pub type CameraMode = raw.CameraMode;
 pub type CameraProjection = raw.CameraProjection;
 pub type NPatchLayout = raw.NPatchLayout;
 
-// `impl` constructors keep common value creation readable when the concrete
-// type is already in scope, for example `Vector2.xy(10.0, 20.0)`.
 impl Color {
+    /// Creates a `Color` from red, green, blue, and alpha channels.
     pub const fn rgba(r: u8, g: u8, b: u8, a: u8) Color {
         return .{ r: r, g: g, b: b, a: a };
     }
 }
 
 impl Vector2 {
+    /// Creates a `Vector2` from x and y coordinates.
     pub const fn xy(x: f32, y: f32) Vector2 {
         return .{ x: x, y: y };
     }
 }
 
 impl Vector3 {
+    /// Creates a `Vector3` from x, y, and z coordinates.
     pub const fn xyz(x: f32, y: f32, z: f32) Vector3 {
         return .{ x: x, y: y, z: z };
     }
 }
 
 impl Rectangle {
+    /// Creates a `Rectangle` from position and size.
     pub const fn xywh(x: f32, y: f32, width: f32, height: f32) Rectangle {
         return .{ x: x, y: y, width: width, height: height };
     }
 }
 
-// Free constructors provide stable, discoverable paths from `raylib` without
-// requiring users to import the underlying type name first.
+/// Creates a `Vector2` from x and y coordinates.
 pub const fn vector2(x: f32, y: f32) Vector2 {
     return .{ x: x, y: y };
 }
 
+/// Creates a `Vector3` from x, y, and z coordinates.
 pub const fn vector3(x: f32, y: f32, z: f32) Vector3 {
     return .{ x: x, y: y, z: z };
 }
 
+/// Creates a `Rectangle` from position and size.
 pub const fn rectangle(x: f32, y: f32, width: f32, height: f32) Rectangle {
     return .{ x: x, y: y, width: width, height: height };
 }

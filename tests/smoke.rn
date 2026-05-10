@@ -1,7 +1,10 @@
+//! Smoke tests for constants and pure constructors.
+
 use base.test;
 use std.io;
 use raylib;
 
+// Verifies representative color constants against raylib's palette values.
 fn check_color_constants(t: &mut test.Report[io.File]) void {
     let white = raylib.WHITE;
     (white.r == 255).should().sum(@loc(), t);
@@ -11,18 +14,25 @@ fn check_color_constants(t: &mut test.Report[io.File]) void {
     (raylib.BLANK.a == 0).should().sum(@loc(), t);
 }
 
+// Verifies pure value constructors without opening a window.
 fn check_constructors(t: &mut test.Report[io.File]) void {
     let v = raylib.vector2(3.0, 4.0);
     (v.x == 3.0).should().sum(@loc(), t);
     (v.y == 4.0).should().sum(@loc(), t);
 
-    let c = raylib.color(1, 2, 3, 4);
+    let c = raylib.color(
+        1,
+        2,
+        3,
+        4,
+    );
     (c.r == 1).should().sum(@loc(), t);
     (c.g == 2).should().sum(@loc(), t);
     (c.b == 3).should().sum(@loc(), t);
     (c.a == 4).should().sum(@loc(), t);
 }
 
+// Verifies selected generated enum constants keep their expected values.
 fn check_input_constants(t: &mut test.Report[io.File]) void {
     ((match (raylib.Key.A) {
         .A => 65,
@@ -38,6 +48,7 @@ fn check_input_constants(t: &mut test.Report[io.File]) void {
     }) == 1).should().sum(@loc(), t);
 }
 
+// Entry point for the smoke test binary.
 fn main() i32 {
     let t = test.report(io.stderr())..&;
     check_color_constants(t);
