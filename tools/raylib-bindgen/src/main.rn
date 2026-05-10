@@ -3,6 +3,7 @@
 mod emit;
 mod names;
 mod parser;
+mod public_gen;
 mod raw_gen;
 mod types;
 
@@ -11,6 +12,7 @@ use std.fs;
 use std.io;
 use std.proc;
 use sys.mem.Page;
+use .public_gen.emit_public;
 use .raw_gen.emit_raw;
 
 // Reports a generator error in a consistent, script-friendly format.
@@ -25,7 +27,7 @@ fn main(argc: i32, argv: &&u8) i32 {
     let gpa = gpa().on(page)..&;
     let args = proc.args(argc, argv);
     if (args.len() != 3) {
-        return fail("usage: raylib-bindgen raw <raylib_api.txt>");
+        return fail("usage: raylib-bindgen <raw|public> <raylib_api.txt>");
     }
     let .{ Some: mode } = args.get(1) else return fail("missing mode");
     let .{ Some: path } = args.get(2) else return fail("missing input path");
@@ -36,6 +38,9 @@ fn main(argc: i32, argv: &&u8) i32 {
 
     if (mode == "raw") {
         return emit_raw(source.&.as_str());
+    }
+    if (mode == "public") {
+        return emit_public(source.&.as_str());
     }
     return fail("unknown mode");
 }

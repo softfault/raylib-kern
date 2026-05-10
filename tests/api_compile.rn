@@ -79,6 +79,7 @@ fn use_drawing_api() void {
 
 // Touches keyboard and mouse functions.
 fn use_input_api() void {
+    _ = raylib.is_key_pressed_repeat(raylib.Key.A);
     _ = raylib.is_key_pressed(raylib.Key.A);
     _ = raylib.is_key_down(raylib.Key.SPACE);
     _ = raylib.is_key_released(raylib.Key.ESCAPE);
@@ -124,6 +125,47 @@ fn use_texture_api() void {
     raylib.unload_texture(tex);
 }
 
+// Touches the broader audio API so the public layer cannot regress to the old
+// two-function device-only surface.
+fn use_audio_api() void {
+    raylib.init_audio_device();
+    _ = raylib.is_audio_device_ready();
+    raylib.set_master_volume(1.0);
+    _ = raylib.get_master_volume();
+
+    let wave = raylib.load_wave(TEXTURE_PATH);
+    _ = raylib.is_wave_valid(wave);
+    let sound = raylib.load_sound_from_wave(wave);
+    _ = raylib.is_sound_valid(sound);
+    let alias = raylib.load_sound_alias(sound);
+    raylib.play_sound(alias);
+    raylib.pause_sound(alias);
+    raylib.resume_sound(alias);
+    raylib.stop_sound(alias);
+    _ = raylib.is_sound_playing(alias);
+    raylib.set_sound_volume(alias, 1.0);
+    raylib.set_sound_pitch(alias, 1.0);
+    raylib.set_sound_pan(alias, 0.0);
+    raylib.unload_sound_alias(alias);
+    raylib.unload_sound(sound);
+    raylib.unload_wave(wave);
+
+    let stream = raylib.load_audio_stream(44100, 32, 2);
+    _ = raylib.is_audio_stream_valid(stream);
+    _ = raylib.is_audio_stream_processed(stream);
+    raylib.play_audio_stream(stream);
+    raylib.pause_audio_stream(stream);
+    raylib.resume_audio_stream(stream);
+    _ = raylib.is_audio_stream_playing(stream);
+    raylib.stop_audio_stream(stream);
+    raylib.set_audio_stream_volume(stream, 1.0);
+    raylib.set_audio_stream_pitch(stream, 1.0);
+    raylib.set_audio_stream_pan(stream, 0.0);
+    raylib.unload_audio_stream(stream);
+
+    raylib.close_audio_device();
+}
+
 // Entry point for the compile-only test.
 fn main() i32 {
     // Keep these calls behind an impossible branch so the test locks API shape
@@ -133,8 +175,7 @@ fn main() i32 {
         use_drawing_api();
         use_input_api();
         use_texture_api();
-        raylib.init_audio_device();
-        raylib.close_audio_device();
+        use_audio_api();
     }
     return 0;
 }

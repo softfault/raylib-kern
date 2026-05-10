@@ -1,180 +1,3144 @@
-//! Kern-first raylib wrapper.
+//! Kern-style raylib API.
 //!
-//! `raw.rn` is generated from raylib's C ABI. This module tree is hand-written
-//! so Kern users get stable snake_case functions, slice-based strings, and
-//! small impl helpers without depending on the raw C-shaped module.
-//!
-//! Most examples follow the same raylib pattern.
-//! initialize the window, update state until `window_should_close()`, draw one
-//! complete frame between `begin_drawing()` and `end_drawing()`, then release
-//! any GPU or audio resources before closing the window.
+//! This module is generated from raylib's rlparser metadata and wraps
+//! the private `raw` ABI module with snake_case functions and slice-based
+//! C string inputs.
 
-pub/ mod raw;
+mod raw;
 mod internal;
-mod types;
-mod colors;
-mod window;
-mod drawing;
-mod input;
-mod textures;
-mod text;
-mod audio;
 
-pub use .types.{
-    Vector2,
-    Vector3,
-    Vector4,
-    Matrix,
-    Color,
-    Rectangle,
-    Image,
-    Texture,
-    RenderTexture,
-    NPatchInfo,
-    GlyphInfo,
-    Font,
-    Camera3D,
-    Camera2D,
-    Mesh,
-    Shader,
-    MaterialMap,
-    Material,
-    Transform,
-    BoneInfo,
-    ModelSkeleton,
-    Model,
-    ModelAnimation,
-    Ray,
-    RayCollision,
-    BoundingBox,
-    Wave,
-    AudioStream,
-    Sound,
-    Music,
-    VrDeviceInfo,
-    VrStereoConfig,
-    FilePathList,
-    AutomationEvent,
-    AutomationEventList,
-    Quaternion,
-    Texture2D,
-    TextureCubemap,
-    RenderTexture2D,
-    Camera,
-    ModelAnimPose,
-    TraceLogLevel,
-    KeyboardKey,
-    Key,
-    MouseButton,
-    MouseCursor,
-    GamepadButton,
-    GamepadAxis,
-    MaterialMapIndex,
-    ShaderLocationIndex,
-    ShaderUniformDataType,
-    ShaderAttributeDataType,
-    PixelFormat,
-    TextureFilter,
-    TextureWrap,
-    CubemapLayout,
-    FontType,
-    BlendMode,
-    CameraMode,
-    CameraProjection,
-    NPatchLayout,
-    vector2,
-    vector3,
-    rectangle,
-};
+use .internal.z_ptr;
 
-pub use .colors.{
-    LIGHTGRAY,
-    GRAY,
-    DARKGRAY,
-    YELLOW,
-    GOLD,
-    ORANGE,
-    PINK,
-    RED,
-    MAROON,
-    GREEN,
-    LIME,
-    DARKGREEN,
-    SKYBLUE,
-    BLUE,
-    DARKBLUE,
-    PURPLE,
-    VIOLET,
-    DARKPURPLE,
-    BEIGE,
-    BROWN,
-    DARKBROWN,
-    WHITE,
-    BLACK,
-    BLANK,
-    MAGENTA,
-    RAYWHITE,
-    color,
-};
+pub const RAYLIB_VERSION_MAJOR = 6;
+pub const RAYLIB_VERSION_MINOR = 0;
+pub const RAYLIB_VERSION_PATCH = 0;
+/// Light Gray
+pub const LIGHTGRAY = Color.{ r: 200, g: 200, b: 200, a: 255 };
+/// Gray
+pub const GRAY = Color.{ r: 130, g: 130, b: 130, a: 255 };
+/// Dark Gray
+pub const DARKGRAY = Color.{ r: 80, g: 80, b: 80, a: 255 };
+/// Yellow
+pub const YELLOW = Color.{ r: 253, g: 249, b: 0, a: 255 };
+/// Gold
+pub const GOLD = Color.{ r: 255, g: 203, b: 0, a: 255 };
+/// Orange
+pub const ORANGE = Color.{ r: 255, g: 161, b: 0, a: 255 };
+/// Pink
+pub const PINK = Color.{ r: 255, g: 109, b: 194, a: 255 };
+/// Red
+pub const RED = Color.{ r: 230, g: 41, b: 55, a: 255 };
+/// Maroon
+pub const MAROON = Color.{ r: 190, g: 33, b: 55, a: 255 };
+/// Green
+pub const GREEN = Color.{ r: 0, g: 228, b: 48, a: 255 };
+/// Lime
+pub const LIME = Color.{ r: 0, g: 158, b: 47, a: 255 };
+/// Dark Green
+pub const DARKGREEN = Color.{ r: 0, g: 117, b: 44, a: 255 };
+/// Sky Blue
+pub const SKYBLUE = Color.{ r: 102, g: 191, b: 255, a: 255 };
+/// Blue
+pub const BLUE = Color.{ r: 0, g: 121, b: 241, a: 255 };
+/// Dark Blue
+pub const DARKBLUE = Color.{ r: 0, g: 82, b: 172, a: 255 };
+/// Purple
+pub const PURPLE = Color.{ r: 200, g: 122, b: 255, a: 255 };
+/// Violet
+pub const VIOLET = Color.{ r: 135, g: 60, b: 190, a: 255 };
+/// Dark Purple
+pub const DARKPURPLE = Color.{ r: 112, g: 31, b: 126, a: 255 };
+/// Beige
+pub const BEIGE = Color.{ r: 211, g: 176, b: 131, a: 255 };
+/// Brown
+pub const BROWN = Color.{ r: 127, g: 106, b: 79, a: 255 };
+/// Dark Brown
+pub const DARKBROWN = Color.{ r: 76, g: 63, b: 47, a: 255 };
+/// White
+pub const WHITE = Color.{ r: 255, g: 255, b: 255, a: 255 };
+/// Black
+pub const BLACK = Color.{ r: 0, g: 0, b: 0, a: 255 };
+/// Blank (Transparent)
+pub const BLANK = Color.{ r: 0, g: 0, b: 0, a: 0 };
+/// Magenta
+pub const MAGENTA = Color.{ r: 255, g: 0, b: 255, a: 255 };
+/// My own White (raylib logo)
+pub const RAYWHITE = Color.{ r: 245, g: 245, b: 245, a: 255 };
+pub type Vector2 = raw.Vector2;
+pub type Vector3 = raw.Vector3;
+pub type Vector4 = raw.Vector4;
+pub type Matrix = raw.Matrix;
+pub type Color = raw.Color;
+pub type Rectangle = raw.Rectangle;
+pub type Image = raw.Image;
+pub type Texture = raw.Texture;
+pub type RenderTexture = raw.RenderTexture;
+pub type NPatchInfo = raw.NPatchInfo;
+pub type GlyphInfo = raw.GlyphInfo;
+pub type Font = raw.Font;
+pub type Camera3D = raw.Camera3D;
+pub type Camera2D = raw.Camera2D;
+pub type Mesh = raw.Mesh;
+pub type Shader = raw.Shader;
+pub type MaterialMap = raw.MaterialMap;
+pub type Material = raw.Material;
+pub type Transform = raw.Transform;
+pub type BoneInfo = raw.BoneInfo;
+pub type ModelSkeleton = raw.ModelSkeleton;
+pub type Model = raw.Model;
+pub type ModelAnimation = raw.ModelAnimation;
+pub type Ray = raw.Ray;
+pub type RayCollision = raw.RayCollision;
+pub type BoundingBox = raw.BoundingBox;
+pub type Wave = raw.Wave;
+pub type AudioStream = raw.AudioStream;
+pub type Sound = raw.Sound;
+pub type Music = raw.Music;
+pub type VrDeviceInfo = raw.VrDeviceInfo;
+pub type VrStereoConfig = raw.VrStereoConfig;
+pub type FilePathList = raw.FilePathList;
+pub type AutomationEvent = raw.AutomationEvent;
+pub type AutomationEventList = raw.AutomationEventList;
+pub type Quaternion = raw.Vector4;
+pub type Texture2D = raw.Texture;
+pub type TextureCubemap = raw.Texture;
+pub type RenderTexture2D = raw.RenderTexture;
+pub type Camera = raw.Camera3D;
+pub type ModelAnimPose = &mut raw.Transform;
 
-pub use .window.{
-    init_window,
-    close_window,
-    window_should_close,
-    is_window_ready,
-    set_target_fps,
-    get_fps,
-    get_frame_time,
-    get_time,
-    set_window_title,
-};
+pub const FLAG_VSYNC_HINT = u32.{64};
+pub const FLAG_FULLSCREEN_MODE = u32.{2};
+pub const FLAG_WINDOW_RESIZABLE = u32.{4};
+pub const FLAG_WINDOW_UNDECORATED = u32.{8};
+pub const FLAG_WINDOW_HIDDEN = u32.{128};
+pub const FLAG_WINDOW_MINIMIZED = u32.{512};
+pub const FLAG_WINDOW_MAXIMIZED = u32.{1024};
+pub const FLAG_WINDOW_UNFOCUSED = u32.{2048};
+pub const FLAG_WINDOW_TOPMOST = u32.{4096};
+pub const FLAG_WINDOW_ALWAYS_RUN = u32.{256};
+pub const FLAG_WINDOW_TRANSPARENT = u32.{16};
+pub const FLAG_WINDOW_HIGHDPI = u32.{8192};
+pub const FLAG_WINDOW_MOUSE_PASSTHROUGH = u32.{16384};
+pub const FLAG_BORDERLESS_WINDOWED_MODE = u32.{32768};
+pub const FLAG_MSAA_4X_HINT = u32.{32};
+pub const FLAG_INTERLACED_HINT = u32.{65536};
+pub type TraceLogLevel = raw.TraceLogLevel;
+pub type KeyboardKey = raw.KeyboardKey;
+pub type Key = raw.KeyboardKey;
+pub type MouseButton = raw.MouseButton;
+pub type MouseCursor = raw.MouseCursor;
+pub type GamepadButton = raw.GamepadButton;
+pub type GamepadAxis = raw.GamepadAxis;
+pub type MaterialMapIndex = raw.MaterialMapIndex;
+pub type ShaderLocationIndex = raw.ShaderLocationIndex;
+pub type ShaderUniformDataType = raw.ShaderUniformDataType;
+pub type ShaderAttributeDataType = raw.ShaderAttributeDataType;
+pub type PixelFormat = raw.PixelFormat;
+pub type TextureFilter = raw.TextureFilter;
+pub type TextureWrap = raw.TextureWrap;
+pub type CubemapLayout = raw.CubemapLayout;
+pub type FontType = raw.FontType;
+pub type BlendMode = raw.BlendMode;
+pub const GESTURE_NONE = u32.{0};
+pub const GESTURE_TAP = u32.{1};
+pub const GESTURE_DOUBLETAP = u32.{2};
+pub const GESTURE_HOLD = u32.{4};
+pub const GESTURE_DRAG = u32.{8};
+pub const GESTURE_SWIPE_RIGHT = u32.{16};
+pub const GESTURE_SWIPE_LEFT = u32.{32};
+pub const GESTURE_SWIPE_UP = u32.{64};
+pub const GESTURE_SWIPE_DOWN = u32.{128};
+pub const GESTURE_PINCH_IN = u32.{256};
+pub const GESTURE_PINCH_OUT = u32.{512};
+pub type CameraMode = raw.CameraMode;
+pub type CameraProjection = raw.CameraProjection;
+pub type NPatchLayout = raw.NPatchLayout;
 
-pub use .drawing.{
-    begin_drawing,
-    end_drawing,
-    clear_background,
-    draw_fps,
-    draw_pixel,
-    draw_line,
-    draw_line_v,
-    draw_circle,
-    draw_circle_v,
-    draw_rectangle,
-    draw_rectangle_v,
-    draw_rectangle_rec,
-    draw_rectangle_lines,
-};
+impl Color {
+    /// Creates a `Color` from red, green, blue, and alpha channels.
+    pub const fn rgba(r: u8, g: u8, b: u8, a: u8) Color {
+        return .{ r: r, g: g, b: b, a: a };
+    }
+}
 
-pub use .input.{
-    is_key_pressed,
-    is_key_down,
-    is_key_released,
-    is_key_up,
-    is_mouse_button_pressed,
-    is_mouse_button_down,
-    is_mouse_button_released,
-    is_mouse_button_up,
-    get_mouse_position,
-    get_mouse_delta,
-};
+impl Vector2 {
+    /// Creates a `Vector2` from x and y coordinates.
+    pub const fn xy(x: f32, y: f32) Vector2 {
+        return .{ x: x, y: y };
+    }
+}
 
-pub use .textures.{
-    load_texture,
-    load_texture_from_image,
-    unload_texture,
-    draw_texture,
-    draw_texture_v,
-    draw_texture_ex,
-    draw_texture_rec,
-};
+impl Vector3 {
+    /// Creates a `Vector3` from x, y, and z coordinates.
+    pub const fn xyz(x: f32, y: f32, z: f32) Vector3 {
+        return .{ x: x, y: y, z: z };
+    }
+}
 
-pub use .text.{
-    draw_text,
-    draw_text_ex,
-    measure_text,
-};
+impl Rectangle {
+    /// Creates a `Rectangle` from position and size.
+    pub const fn xywh(x: f32, y: f32, width: f32, height: f32) Rectangle {
+        return .{ x: x, y: y, width: width, height: height };
+    }
+}
 
-pub use .audio.{
-    init_audio_device,
-    close_audio_device,
-};
+/// Creates a `Color` from red, green, blue, and alpha channels.
+pub const fn color(r: u8, g: u8, b: u8, a: u8) Color {
+    return .{ r: r, g: g, b: b, a: a };
+}
+
+/// Creates a `Vector2` from x and y coordinates.
+pub const fn vector2(x: f32, y: f32) Vector2 {
+    return .{ x: x, y: y };
+}
+
+/// Creates a `Vector3` from x, y, and z coordinates.
+pub const fn vector3(x: f32, y: f32, z: f32) Vector3 {
+    return .{ x: x, y: y, z: z };
+}
+
+/// Creates a `Rectangle` from position and size.
+pub const fn rectangle(x: f32, y: f32, width: f32, height: f32) Rectangle {
+    return .{ x: x, y: y, width: width, height: height };
+}
+
+/// Initialize window and OpenGL context
+pub fn init_window(width: i32, height: i32, title: &[u8]) void {
+    raw.InitWindow(width, height, z_ptr(title));
+}
+
+/// Close window and unload OpenGL context
+pub fn close_window() void {
+    raw.CloseWindow();
+}
+
+/// Check if application should close (KEY_ESCAPE pressed or windows close icon clicked)
+pub fn window_should_close() bool {
+    return raw.WindowShouldClose();
+}
+
+/// Check if window has been initialized successfully
+pub fn is_window_ready() bool {
+    return raw.IsWindowReady();
+}
+
+/// Check if window is currently fullscreen
+pub fn is_window_fullscreen() bool {
+    return raw.IsWindowFullscreen();
+}
+
+/// Check if window is currently hidden
+pub fn is_window_hidden() bool {
+    return raw.IsWindowHidden();
+}
+
+/// Check if window is currently minimized
+pub fn is_window_minimized() bool {
+    return raw.IsWindowMinimized();
+}
+
+/// Check if window is currently maximized
+pub fn is_window_maximized() bool {
+    return raw.IsWindowMaximized();
+}
+
+/// Check if window is currently focused
+pub fn is_window_focused() bool {
+    return raw.IsWindowFocused();
+}
+
+/// Check if window has been resized last frame
+pub fn is_window_resized() bool {
+    return raw.IsWindowResized();
+}
+
+/// Check if one specific window flag is enabled
+pub fn is_window_state(flag: u32) bool {
+    return raw.IsWindowState(flag);
+}
+
+/// Set window configuration state using flags
+pub fn set_window_state(flags: u32) void {
+    raw.SetWindowState(flags);
+}
+
+/// Clear window configuration state flags
+pub fn clear_window_state(flags: u32) void {
+    raw.ClearWindowState(flags);
+}
+
+/// Toggle window state: fullscreen/windowed, resizes monitor to match window resolution
+pub fn toggle_fullscreen() void {
+    raw.ToggleFullscreen();
+}
+
+/// Toggle window state: borderless windowed, resizes window to match monitor resolution
+pub fn toggle_borderless_windowed() void {
+    raw.ToggleBorderlessWindowed();
+}
+
+/// Set window state: maximized, if resizable
+pub fn maximize_window() void {
+    raw.MaximizeWindow();
+}
+
+/// Set window state: minimized, if resizable
+pub fn minimize_window() void {
+    raw.MinimizeWindow();
+}
+
+/// Restore window from being minimized/maximized
+pub fn restore_window() void {
+    raw.RestoreWindow();
+}
+
+/// Set icon for window (single image, RGBA 32bit)
+pub fn set_window_icon(image: Image) void {
+    raw.SetWindowIcon(image);
+}
+
+/// Set icon for window (multiple images, RGBA 32bit)
+pub fn set_window_icons(images: &mut Image, count: i32) void {
+    raw.SetWindowIcons(images, count);
+}
+
+/// Set title for window
+pub fn set_window_title(title: &[u8]) void {
+    raw.SetWindowTitle(z_ptr(title));
+}
+
+/// Set window position on screen
+pub fn set_window_position(x: i32, y: i32) void {
+    raw.SetWindowPosition(x, y);
+}
+
+/// Set monitor for the current window
+pub fn set_window_monitor(monitor: i32) void {
+    raw.SetWindowMonitor(monitor);
+}
+
+/// Set window minimum dimensions (for FLAG_WINDOW_RESIZABLE)
+pub fn set_window_min_size(width: i32, height: i32) void {
+    raw.SetWindowMinSize(width, height);
+}
+
+/// Set window maximum dimensions (for FLAG_WINDOW_RESIZABLE)
+pub fn set_window_max_size(width: i32, height: i32) void {
+    raw.SetWindowMaxSize(width, height);
+}
+
+/// Set window dimensions
+pub fn set_window_size(width: i32, height: i32) void {
+    raw.SetWindowSize(width, height);
+}
+
+/// Set window opacity [0.0f..1.0f]
+pub fn set_window_opacity(opacity: f32) void {
+    raw.SetWindowOpacity(opacity);
+}
+
+/// Set window focused
+pub fn set_window_focused() void {
+    raw.SetWindowFocused();
+}
+
+/// Get native window handle
+pub fn get_window_handle() &mut void {
+    return raw.GetWindowHandle();
+}
+
+/// Get current screen width
+pub fn get_screen_width() i32 {
+    return raw.GetScreenWidth();
+}
+
+/// Get current screen height
+pub fn get_screen_height() i32 {
+    return raw.GetScreenHeight();
+}
+
+/// Get current render width (it considers HiDPI)
+pub fn get_render_width() i32 {
+    return raw.GetRenderWidth();
+}
+
+/// Get current render height (it considers HiDPI)
+pub fn get_render_height() i32 {
+    return raw.GetRenderHeight();
+}
+
+/// Get number of connected monitors
+pub fn get_monitor_count() i32 {
+    return raw.GetMonitorCount();
+}
+
+/// Get current monitor where window is placed
+pub fn get_current_monitor() i32 {
+    return raw.GetCurrentMonitor();
+}
+
+/// Get specified monitor position
+pub fn get_monitor_position(monitor: i32) Vector2 {
+    return raw.GetMonitorPosition(monitor);
+}
+
+/// Get specified monitor width (current video mode used by monitor)
+pub fn get_monitor_width(monitor: i32) i32 {
+    return raw.GetMonitorWidth(monitor);
+}
+
+/// Get specified monitor height (current video mode used by monitor)
+pub fn get_monitor_height(monitor: i32) i32 {
+    return raw.GetMonitorHeight(monitor);
+}
+
+/// Get specified monitor physical width in millimetres
+pub fn get_monitor_physical_width(monitor: i32) i32 {
+    return raw.GetMonitorPhysicalWidth(monitor);
+}
+
+/// Get specified monitor physical height in millimetres
+pub fn get_monitor_physical_height(monitor: i32) i32 {
+    return raw.GetMonitorPhysicalHeight(monitor);
+}
+
+/// Get specified monitor refresh rate
+pub fn get_monitor_refresh_rate(monitor: i32) i32 {
+    return raw.GetMonitorRefreshRate(monitor);
+}
+
+/// Get window position XY on monitor
+pub fn get_window_position() Vector2 {
+    return raw.GetWindowPosition();
+}
+
+/// Get window scale DPI factor
+pub fn get_window_scale_dpi() Vector2 {
+    return raw.GetWindowScaleDPI();
+}
+
+/// Get the human-readable, UTF-8 encoded name of the specified monitor
+pub fn get_monitor_name(monitor: i32) &u8 {
+    return raw.GetMonitorName(monitor);
+}
+
+/// Set clipboard text content
+pub fn set_clipboard_text(text: &[u8]) void {
+    raw.SetClipboardText(z_ptr(text));
+}
+
+/// Get clipboard text content
+pub fn get_clipboard_text() &u8 {
+    return raw.GetClipboardText();
+}
+
+/// Get clipboard image content
+pub fn get_clipboard_image() Image {
+    return raw.GetClipboardImage();
+}
+
+/// Enable waiting for events on EndDrawing(), no automatic event polling
+pub fn enable_event_waiting() void {
+    raw.EnableEventWaiting();
+}
+
+/// Disable waiting for events on EndDrawing(), automatic events polling
+pub fn disable_event_waiting() void {
+    raw.DisableEventWaiting();
+}
+
+/// Shows cursor
+pub fn show_cursor() void {
+    raw.ShowCursor();
+}
+
+/// Hides cursor
+pub fn hide_cursor() void {
+    raw.HideCursor();
+}
+
+/// Check if cursor is not visible
+pub fn is_cursor_hidden() bool {
+    return raw.IsCursorHidden();
+}
+
+/// Enables cursor (unlock cursor)
+pub fn enable_cursor() void {
+    raw.EnableCursor();
+}
+
+/// Disables cursor (lock cursor)
+pub fn disable_cursor() void {
+    raw.DisableCursor();
+}
+
+/// Check if cursor is on the screen
+pub fn is_cursor_on_screen() bool {
+    return raw.IsCursorOnScreen();
+}
+
+/// Set background color (framebuffer clear color)
+pub fn clear_background(color: Color) void {
+    raw.ClearBackground(color);
+}
+
+/// Setup canvas (framebuffer) to start drawing
+pub fn begin_drawing() void {
+    raw.BeginDrawing();
+}
+
+/// End canvas drawing and swap buffers (double buffering)
+pub fn end_drawing() void {
+    raw.EndDrawing();
+}
+
+/// Begin 2D mode with custom camera (2D)
+pub fn begin_mode_2d(camera: Camera2D) void {
+    raw.BeginMode2D(camera);
+}
+
+/// Ends 2D mode with custom camera
+pub fn end_mode_2d() void {
+    raw.EndMode2D();
+}
+
+/// Begin 3D mode with custom camera (3D)
+pub fn begin_mode_3d(camera: Camera3D) void {
+    raw.BeginMode3D(camera);
+}
+
+/// Ends 3D mode and returns to default 2D orthographic mode
+pub fn end_mode_3d() void {
+    raw.EndMode3D();
+}
+
+/// Begin drawing to render texture
+pub fn begin_texture_mode(target: RenderTexture2D) void {
+    raw.BeginTextureMode(target);
+}
+
+/// Ends drawing to render texture
+pub fn end_texture_mode() void {
+    raw.EndTextureMode();
+}
+
+/// Begin custom shader drawing
+pub fn begin_shader_mode(shader: Shader) void {
+    raw.BeginShaderMode(shader);
+}
+
+/// End custom shader drawing (use default shader)
+pub fn end_shader_mode() void {
+    raw.EndShaderMode();
+}
+
+/// Begin blending mode (alpha, additive, multiplied, subtract, custom)
+pub fn begin_blend_mode(mode: BlendMode) void {
+    raw.BeginBlendMode(mode);
+}
+
+/// End blending mode (reset to default: alpha blending)
+pub fn end_blend_mode() void {
+    raw.EndBlendMode();
+}
+
+/// Begin scissor mode (define screen area for following drawing)
+pub fn begin_scissor_mode(x: i32, y: i32, width: i32, height: i32) void {
+    raw.BeginScissorMode(x, y, width, height);
+}
+
+/// End scissor mode
+pub fn end_scissor_mode() void {
+    raw.EndScissorMode();
+}
+
+/// Begin stereo rendering (requires VR simulator)
+pub fn begin_vr_stereo_mode(config: VrStereoConfig) void {
+    raw.BeginVrStereoMode(config);
+}
+
+/// End stereo rendering (requires VR simulator)
+pub fn end_vr_stereo_mode() void {
+    raw.EndVrStereoMode();
+}
+
+/// Load VR stereo config for VR simulator device parameters
+pub fn load_vr_stereo_config(device: VrDeviceInfo) VrStereoConfig {
+    return raw.LoadVrStereoConfig(device);
+}
+
+/// Unload VR stereo config
+pub fn unload_vr_stereo_config(config: VrStereoConfig) void {
+    raw.UnloadVrStereoConfig(config);
+}
+
+/// Load shader from files and bind default locations
+pub fn load_shader(vs_file_name: &[u8], fs_file_name: &[u8]) Shader {
+    return raw.LoadShader(z_ptr(vs_file_name), z_ptr(fs_file_name));
+}
+
+/// Load shader from code strings and bind default locations
+pub fn load_shader_from_memory(vs_code: &[u8], fs_code: &[u8]) Shader {
+    return raw.LoadShaderFromMemory(z_ptr(vs_code), z_ptr(fs_code));
+}
+
+/// Check if a shader is valid (loaded on GPU)
+pub fn is_shader_valid(shader: Shader) bool {
+    return raw.IsShaderValid(shader);
+}
+
+/// Get shader uniform location
+pub fn get_shader_location(shader: Shader, uniform_name: &[u8]) i32 {
+    return raw.GetShaderLocation(shader, z_ptr(uniform_name));
+}
+
+/// Get shader attribute location
+pub fn get_shader_location_attrib(shader: Shader, attrib_name: &[u8]) i32 {
+    return raw.GetShaderLocationAttrib(shader, z_ptr(attrib_name));
+}
+
+/// Set shader uniform value
+pub fn set_shader_value(shader: Shader, loc_index: i32, value: &mut void, uniform_type: ShaderUniformDataType) void {
+    raw.SetShaderValue(shader, loc_index, value, uniform_type);
+}
+
+/// Set shader uniform value vector
+pub fn set_shader_value_v(shader: Shader, loc_index: i32, value: &mut void, uniform_type: ShaderUniformDataType, count: i32) void {
+    raw.SetShaderValueV(shader, loc_index, value, uniform_type, count);
+}
+
+/// Set shader uniform value (matrix 4x4)
+pub fn set_shader_value_matrix(shader: Shader, loc_index: i32, mat: Matrix) void {
+    raw.SetShaderValueMatrix(shader, loc_index, mat);
+}
+
+/// Set shader uniform value and bind the texture (sampler2d)
+pub fn set_shader_value_texture(shader: Shader, loc_index: i32, texture: Texture2D) void {
+    raw.SetShaderValueTexture(shader, loc_index, texture);
+}
+
+/// Unload shader from GPU memory (VRAM)
+pub fn unload_shader(shader: Shader) void {
+    raw.UnloadShader(shader);
+}
+
+/// Get a ray trace from screen position (i.e mouse)
+pub fn get_screen_to_world_ray(position: Vector2, camera: Camera) Ray {
+    return raw.GetScreenToWorldRay(position, camera);
+}
+
+/// Get a ray trace from screen position (i.e mouse) in a viewport
+pub fn get_screen_to_world_ray_ex(position: Vector2, camera: Camera, width: i32, height: i32) Ray {
+    return raw.GetScreenToWorldRayEx(position, camera, width, height);
+}
+
+/// Get the screen space position for a 3d world space position
+pub fn get_world_to_screen(position: Vector3, camera: Camera) Vector2 {
+    return raw.GetWorldToScreen(position, camera);
+}
+
+/// Get size position for a 3d world space position
+pub fn get_world_to_screen_ex(position: Vector3, camera: Camera, width: i32, height: i32) Vector2 {
+    return raw.GetWorldToScreenEx(position, camera, width, height);
+}
+
+/// Get the screen space position for a 2d camera world space position
+pub fn get_world_to_screen_2d(position: Vector2, camera: Camera2D) Vector2 {
+    return raw.GetWorldToScreen2D(position, camera);
+}
+
+/// Get the world space position for a 2d camera screen space position
+pub fn get_screen_to_world_2d(position: Vector2, camera: Camera2D) Vector2 {
+    return raw.GetScreenToWorld2D(position, camera);
+}
+
+/// Get camera transform matrix (view matrix)
+pub fn get_camera_matrix(camera: Camera) Matrix {
+    return raw.GetCameraMatrix(camera);
+}
+
+/// Get camera 2d transform matrix
+pub fn get_camera_matrix_2d(camera: Camera2D) Matrix {
+    return raw.GetCameraMatrix2D(camera);
+}
+
+/// Set target FPS (maximum)
+pub fn set_target_fps(fps: i32) void {
+    raw.SetTargetFPS(fps);
+}
+
+/// Get time in seconds for last frame drawn (delta time)
+pub fn get_frame_time() f32 {
+    return raw.GetFrameTime();
+}
+
+/// Get elapsed time in seconds since InitWindow()
+pub fn get_time() f64 {
+    return raw.GetTime();
+}
+
+/// Get current FPS
+pub fn get_fps() i32 {
+    return raw.GetFPS();
+}
+
+/// Swap back buffer with front buffer (screen drawing)
+pub fn swap_screen_buffer() void {
+    raw.SwapScreenBuffer();
+}
+
+/// Register all input events
+pub fn poll_input_events() void {
+    raw.PollInputEvents();
+}
+
+/// Wait for some time (halt program execution)
+pub fn wait_time(seconds: f64) void {
+    raw.WaitTime(seconds);
+}
+
+/// Set the seed for the random number generator
+pub fn set_random_seed(seed: u32) void {
+    raw.SetRandomSeed(seed);
+}
+
+/// Get a random value between min and max (both included)
+pub fn get_random_value(min: i32, max: i32) i32 {
+    return raw.GetRandomValue(min, max);
+}
+
+/// Load random values sequence, no values repeated
+pub fn load_random_sequence(count: u32, min: i32, max: i32) &mut i32 {
+    return raw.LoadRandomSequence(count, min, max);
+}
+
+/// Unload random values sequence
+pub fn unload_random_sequence(sequence: &mut i32) void {
+    raw.UnloadRandomSequence(sequence);
+}
+
+/// Takes a screenshot of current screen (filename extension defines format)
+pub fn take_screenshot(file_name: &[u8]) void {
+    raw.TakeScreenshot(z_ptr(file_name));
+}
+
+/// Setup init configuration flags (view FLAGS)
+pub fn set_config_flags(flags: u32) void {
+    raw.SetConfigFlags(flags);
+}
+
+/// Open URL with default system browser (if available)
+pub fn open_url(url: &[u8]) void {
+    raw.OpenURL(z_ptr(url));
+}
+
+/// Set the current threshold (minimum) log level
+pub fn set_trace_log_level(log_level: TraceLogLevel) void {
+    raw.SetTraceLogLevel(log_level);
+}
+
+/// Internal memory allocator
+pub fn mem_alloc(size: u32) &mut void {
+    return raw.MemAlloc(size);
+}
+
+/// Internal memory reallocator
+pub fn mem_realloc(ptr: &mut void, size: u32) &mut void {
+    return raw.MemRealloc(ptr, size);
+}
+
+/// Internal memory free
+pub fn mem_free(ptr: &mut void) void {
+    raw.MemFree(ptr);
+}
+
+/// Load file data as byte array (read)
+pub fn load_file_data(file_name: &[u8], data_size: &mut i32) &u8 {
+    return raw.LoadFileData(z_ptr(file_name), data_size);
+}
+
+/// Unload file data allocated by LoadFileData()
+pub fn unload_file_data(data: &u8) void {
+    raw.UnloadFileData(data);
+}
+
+/// Save data to file from byte array (write), returns true on success
+pub fn save_file_data(file_name: &[u8], data: &mut void, data_size: i32) bool {
+    return raw.SaveFileData(z_ptr(file_name), data, data_size);
+}
+
+/// Export data to code (.h), returns true on success
+pub fn export_data_as_code(data: &u8, data_size: i32, file_name: &[u8]) bool {
+    return raw.ExportDataAsCode(data, data_size, z_ptr(file_name));
+}
+
+/// Load text data from file (read), returns a '\0' terminated string
+pub fn load_file_text(file_name: &[u8]) &u8 {
+    return raw.LoadFileText(z_ptr(file_name));
+}
+
+/// Unload file text data allocated by LoadFileText()
+pub fn unload_file_text(text: &[u8]) void {
+    raw.UnloadFileText(z_ptr(text));
+}
+
+/// Save text data to file (write), string must be '\0' terminated, returns true on success
+pub fn save_file_text(file_name: &[u8], text: &[u8]) bool {
+    return raw.SaveFileText(z_ptr(file_name), z_ptr(text));
+}
+
+/// Rename file (if exists)
+pub fn file_rename(file_name: &[u8], file_rename: &[u8]) i32 {
+    return raw.FileRename(z_ptr(file_name), z_ptr(file_rename));
+}
+
+/// Remove file (if exists)
+pub fn file_remove(file_name: &[u8]) i32 {
+    return raw.FileRemove(z_ptr(file_name));
+}
+
+/// Copy file from one path to another, dstPath created if it doesn't exist
+pub fn file_copy(src_path: &[u8], dst_path: &[u8]) i32 {
+    return raw.FileCopy(z_ptr(src_path), z_ptr(dst_path));
+}
+
+/// Move file from one directory to another, dstPath created if it doesn't exist
+pub fn file_move(src_path: &[u8], dst_path: &[u8]) i32 {
+    return raw.FileMove(z_ptr(src_path), z_ptr(dst_path));
+}
+
+/// Replace text in an existing file
+pub fn file_text_replace(file_name: &[u8], search: &[u8], replacement: &[u8]) i32 {
+    return raw.FileTextReplace(z_ptr(file_name), z_ptr(search), z_ptr(replacement));
+}
+
+/// Find text in existing file
+pub fn file_text_find_index(file_name: &[u8], search: &[u8]) i32 {
+    return raw.FileTextFindIndex(z_ptr(file_name), z_ptr(search));
+}
+
+/// Check if file exists
+pub fn file_exists(file_name: &[u8]) bool {
+    return raw.FileExists(z_ptr(file_name));
+}
+
+/// Check if a directory path exists
+pub fn directory_exists(dir_path: &[u8]) bool {
+    return raw.DirectoryExists(z_ptr(dir_path));
+}
+
+/// Check file extension (recommended include point: .png, .wav)
+pub fn is_file_extension(file_name: &[u8], ext: &[u8]) bool {
+    return raw.IsFileExtension(z_ptr(file_name), z_ptr(ext));
+}
+
+/// Get file length in bytes (NOTE: GetFileSize() conflicts with windows.h)
+pub fn get_file_length(file_name: &[u8]) i32 {
+    return raw.GetFileLength(z_ptr(file_name));
+}
+
+/// Get file modification time (last write time)
+pub fn get_file_mod_time(file_name: &[u8]) isize {
+    return raw.GetFileModTime(z_ptr(file_name));
+}
+
+/// Get pointer to extension for a filename string (includes dot: '.png')
+pub fn get_file_extension(file_name: &[u8]) &u8 {
+    return raw.GetFileExtension(z_ptr(file_name));
+}
+
+/// Get pointer to filename for a path string
+pub fn get_file_name(file_path: &[u8]) &u8 {
+    return raw.GetFileName(z_ptr(file_path));
+}
+
+/// Get filename string without extension (uses static string)
+pub fn get_file_name_without_ext(file_path: &[u8]) &u8 {
+    return raw.GetFileNameWithoutExt(z_ptr(file_path));
+}
+
+/// Get full path for a given fileName with path (uses static string)
+pub fn get_directory_path(file_path: &[u8]) &u8 {
+    return raw.GetDirectoryPath(z_ptr(file_path));
+}
+
+/// Get previous directory path for a given path (uses static string)
+pub fn get_prev_directory_path(dir_path: &[u8]) &u8 {
+    return raw.GetPrevDirectoryPath(z_ptr(dir_path));
+}
+
+/// Get current working directory (uses static string)
+pub fn get_working_directory() &u8 {
+    return raw.GetWorkingDirectory();
+}
+
+/// Get the directory of the running application (uses static string)
+pub fn get_application_directory() &u8 {
+    return raw.GetApplicationDirectory();
+}
+
+/// Create directories (including full path requested), returns 0 on success
+pub fn make_directory(dir_path: &[u8]) i32 {
+    return raw.MakeDirectory(z_ptr(dir_path));
+}
+
+/// Change working directory, return true on success
+pub fn change_directory(dir_path: &[u8]) bool {
+    return raw.ChangeDirectory(z_ptr(dir_path));
+}
+
+/// Check if a given path is a file or a directory
+pub fn is_path_file(path: &[u8]) bool {
+    return raw.IsPathFile(z_ptr(path));
+}
+
+/// Check if fileName is valid for the platform/OS
+pub fn is_file_name_valid(file_name: &[u8]) bool {
+    return raw.IsFileNameValid(z_ptr(file_name));
+}
+
+/// Load directory filepaths, files and directories, no subdirs scan
+pub fn load_directory_files(dir_path: &[u8]) FilePathList {
+    return raw.LoadDirectoryFiles(z_ptr(dir_path));
+}
+
+/// Load directory filepaths with extension filtering and subdir scan; some filters available: "*.*", "FILES*", "DIRS*"
+pub fn load_directory_files_ex(base_path: &[u8], filter: &[u8], scan_subdirs: bool) FilePathList {
+    return raw.LoadDirectoryFilesEx(z_ptr(base_path), z_ptr(filter), scan_subdirs);
+}
+
+/// Unload filepaths
+pub fn unload_directory_files(files: FilePathList) void {
+    raw.UnloadDirectoryFiles(files);
+}
+
+/// Check if a file has been dropped into window
+pub fn is_file_dropped() bool {
+    return raw.IsFileDropped();
+}
+
+/// Load dropped filepaths
+pub fn load_dropped_files() FilePathList {
+    return raw.LoadDroppedFiles();
+}
+
+/// Unload dropped filepaths
+pub fn unload_dropped_files(files: FilePathList) void {
+    raw.UnloadDroppedFiles(files);
+}
+
+/// Get the file count in a directory
+pub fn get_directory_file_count(dir_path: &[u8]) u32 {
+    return raw.GetDirectoryFileCount(z_ptr(dir_path));
+}
+
+/// Get the file count in a directory with extension filtering and recursive directory scan. Use 'DIR' in the filter string to include directories in the result
+pub fn get_directory_file_count_ex(base_path: &[u8], filter: &[u8], scan_subdirs: bool) u32 {
+    return raw.GetDirectoryFileCountEx(z_ptr(base_path), z_ptr(filter), scan_subdirs);
+}
+
+/// Compress data (DEFLATE algorithm), memory must be MemFree()
+pub fn compress_data(data: &u8, data_size: i32, comp_data_size: &mut i32) &u8 {
+    return raw.CompressData(data, data_size, comp_data_size);
+}
+
+/// Decompress data (DEFLATE algorithm), memory must be MemFree()
+pub fn decompress_data(comp_data: &u8, comp_data_size: i32, data_size: &mut i32) &u8 {
+    return raw.DecompressData(comp_data, comp_data_size, data_size);
+}
+
+/// Encode data to Base64 string (includes NULL terminator), memory must be MemFree()
+pub fn encode_data_base64(data: &u8, data_size: i32, output_size: &mut i32) &u8 {
+    return raw.EncodeDataBase64(data, data_size, output_size);
+}
+
+/// Decode Base64 string (expected NULL terminated), memory must be MemFree()
+pub fn decode_data_base64(text: &[u8], output_size: &mut i32) &u8 {
+    return raw.DecodeDataBase64(z_ptr(text), output_size);
+}
+
+/// Compute CRC32 hash code
+pub fn compute_crc32(data: &u8, data_size: i32) u32 {
+    return raw.ComputeCRC32(data, data_size);
+}
+
+/// Compute MD5 hash code, returns static int[4] (16 bytes)
+pub fn compute_md5(data: &u8, data_size: i32) &mut u32 {
+    return raw.ComputeMD5(data, data_size);
+}
+
+/// Compute SHA1 hash code, returns static int[5] (20 bytes)
+pub fn compute_sha1(data: &u8, data_size: i32) &mut u32 {
+    return raw.ComputeSHA1(data, data_size);
+}
+
+/// Compute SHA256 hash code, returns static int[8] (32 bytes)
+pub fn compute_sha256(data: &u8, data_size: i32) &mut u32 {
+    return raw.ComputeSHA256(data, data_size);
+}
+
+/// Load automation events list from file, NULL for empty list, capacity = MAX_AUTOMATION_EVENTS
+pub fn load_automation_event_list(file_name: &[u8]) AutomationEventList {
+    return raw.LoadAutomationEventList(z_ptr(file_name));
+}
+
+/// Unload automation events list from file
+pub fn unload_automation_event_list(list: AutomationEventList) void {
+    raw.UnloadAutomationEventList(list);
+}
+
+/// Export automation events list as text file
+pub fn export_automation_event_list(list: AutomationEventList, file_name: &[u8]) bool {
+    return raw.ExportAutomationEventList(list, z_ptr(file_name));
+}
+
+/// Set automation event list to record to
+pub fn set_automation_event_list(list: &mut AutomationEventList) void {
+    raw.SetAutomationEventList(list);
+}
+
+/// Set automation event internal base frame to start recording
+pub fn set_automation_event_base_frame(frame: i32) void {
+    raw.SetAutomationEventBaseFrame(frame);
+}
+
+/// Start recording automation events (AutomationEventList must be set)
+pub fn start_automation_event_recording() void {
+    raw.StartAutomationEventRecording();
+}
+
+/// Stop recording automation events
+pub fn stop_automation_event_recording() void {
+    raw.StopAutomationEventRecording();
+}
+
+/// Play a recorded automation event
+pub fn play_automation_event(event: AutomationEvent) void {
+    raw.PlayAutomationEvent(event);
+}
+
+/// Check if a key has been pressed once
+pub fn is_key_pressed(key: KeyboardKey) bool {
+    return raw.IsKeyPressed(key);
+}
+
+/// Check if a key has been pressed again
+pub fn is_key_pressed_repeat(key: KeyboardKey) bool {
+    return raw.IsKeyPressedRepeat(key);
+}
+
+/// Check if a key is being pressed
+pub fn is_key_down(key: KeyboardKey) bool {
+    return raw.IsKeyDown(key);
+}
+
+/// Check if a key has been released once
+pub fn is_key_released(key: KeyboardKey) bool {
+    return raw.IsKeyReleased(key);
+}
+
+/// Check if a key is NOT being pressed
+pub fn is_key_up(key: KeyboardKey) bool {
+    return raw.IsKeyUp(key);
+}
+
+/// Get key pressed (keycode), call it multiple times for keys queued, returns 0 when the queue is empty
+pub fn get_key_pressed() i32 {
+    return raw.GetKeyPressed();
+}
+
+/// Get char pressed (unicode), call it multiple times for chars queued, returns 0 when the queue is empty
+pub fn get_char_pressed() i32 {
+    return raw.GetCharPressed();
+}
+
+/// Get name of a QWERTY key on the current keyboard layout (eg returns string 'q' for KEY_A on an AZERTY keyboard)
+pub fn get_key_name(key: KeyboardKey) &u8 {
+    return raw.GetKeyName(key);
+}
+
+/// Set a custom key to exit program (default is ESC)
+pub fn set_exit_key(key: KeyboardKey) void {
+    raw.SetExitKey(key);
+}
+
+/// Check if a gamepad is available
+pub fn is_gamepad_available(gamepad: i32) bool {
+    return raw.IsGamepadAvailable(gamepad);
+}
+
+/// Get gamepad internal name id
+pub fn get_gamepad_name(gamepad: i32) &u8 {
+    return raw.GetGamepadName(gamepad);
+}
+
+/// Check if a gamepad button has been pressed once
+pub fn is_gamepad_button_pressed(gamepad: i32, button: i32) bool {
+    return raw.IsGamepadButtonPressed(gamepad, button);
+}
+
+/// Check if a gamepad button is being pressed
+pub fn is_gamepad_button_down(gamepad: i32, button: i32) bool {
+    return raw.IsGamepadButtonDown(gamepad, button);
+}
+
+/// Check if a gamepad button has been released once
+pub fn is_gamepad_button_released(gamepad: i32, button: i32) bool {
+    return raw.IsGamepadButtonReleased(gamepad, button);
+}
+
+/// Check if a gamepad button is NOT being pressed
+pub fn is_gamepad_button_up(gamepad: i32, button: i32) bool {
+    return raw.IsGamepadButtonUp(gamepad, button);
+}
+
+/// Get the last gamepad button pressed
+pub fn get_gamepad_button_pressed() i32 {
+    return raw.GetGamepadButtonPressed();
+}
+
+/// Get axis count for a gamepad
+pub fn get_gamepad_axis_count(gamepad: i32) i32 {
+    return raw.GetGamepadAxisCount(gamepad);
+}
+
+/// Get movement value for a gamepad axis
+pub fn get_gamepad_axis_movement(gamepad: i32, axis: GamepadAxis) f32 {
+    return raw.GetGamepadAxisMovement(gamepad, axis);
+}
+
+/// Set internal gamepad mappings (SDL_GameControllerDB)
+pub fn set_gamepad_mappings(mappings: &[u8]) i32 {
+    return raw.SetGamepadMappings(z_ptr(mappings));
+}
+
+/// Set gamepad vibration for both motors (duration in seconds)
+pub fn set_gamepad_vibration(gamepad: i32, left_motor: f32, right_motor: f32, duration: f32) void {
+    raw.SetGamepadVibration(gamepad, left_motor, right_motor, duration);
+}
+
+/// Check if a mouse button has been pressed once
+pub fn is_mouse_button_pressed(button: MouseButton) bool {
+    return raw.IsMouseButtonPressed(button);
+}
+
+/// Check if a mouse button is being pressed
+pub fn is_mouse_button_down(button: MouseButton) bool {
+    return raw.IsMouseButtonDown(button);
+}
+
+/// Check if a mouse button has been released once
+pub fn is_mouse_button_released(button: MouseButton) bool {
+    return raw.IsMouseButtonReleased(button);
+}
+
+/// Check if a mouse button is NOT being pressed
+pub fn is_mouse_button_up(button: MouseButton) bool {
+    return raw.IsMouseButtonUp(button);
+}
+
+/// Get mouse position X
+pub fn get_mouse_x() i32 {
+    return raw.GetMouseX();
+}
+
+/// Get mouse position Y
+pub fn get_mouse_y() i32 {
+    return raw.GetMouseY();
+}
+
+/// Get mouse position XY
+pub fn get_mouse_position() Vector2 {
+    return raw.GetMousePosition();
+}
+
+/// Get mouse delta between frames
+pub fn get_mouse_delta() Vector2 {
+    return raw.GetMouseDelta();
+}
+
+/// Set mouse position XY
+pub fn set_mouse_position(x: i32, y: i32) void {
+    raw.SetMousePosition(x, y);
+}
+
+/// Set mouse offset
+pub fn set_mouse_offset(offset_x: i32, offset_y: i32) void {
+    raw.SetMouseOffset(offset_x, offset_y);
+}
+
+/// Set mouse scaling
+pub fn set_mouse_scale(scale_x: f32, scale_y: f32) void {
+    raw.SetMouseScale(scale_x, scale_y);
+}
+
+/// Get mouse wheel movement for X or Y, whichever is larger
+pub fn get_mouse_wheel_move() f32 {
+    return raw.GetMouseWheelMove();
+}
+
+/// Get mouse wheel movement for both X and Y
+pub fn get_mouse_wheel_move_v() Vector2 {
+    return raw.GetMouseWheelMoveV();
+}
+
+/// Set mouse cursor
+pub fn set_mouse_cursor(cursor: MouseCursor) void {
+    raw.SetMouseCursor(cursor);
+}
+
+/// Get touch position X for touch point 0 (relative to screen size)
+pub fn get_touch_x() i32 {
+    return raw.GetTouchX();
+}
+
+/// Get touch position Y for touch point 0 (relative to screen size)
+pub fn get_touch_y() i32 {
+    return raw.GetTouchY();
+}
+
+/// Get touch position XY for a touch point index (relative to screen size)
+pub fn get_touch_position(index: i32) Vector2 {
+    return raw.GetTouchPosition(index);
+}
+
+/// Get touch point identifier for given index
+pub fn get_touch_point_id(index: i32) i32 {
+    return raw.GetTouchPointId(index);
+}
+
+/// Get number of touch points
+pub fn get_touch_point_count() i32 {
+    return raw.GetTouchPointCount();
+}
+
+/// Enable a set of gestures using flags
+pub fn set_gestures_enabled(flags: u32) void {
+    raw.SetGesturesEnabled(flags);
+}
+
+/// Check if a gesture have been detected
+pub fn is_gesture_detected(gesture: u32) bool {
+    return raw.IsGestureDetected(gesture);
+}
+
+/// Get latest detected gesture
+pub fn get_gesture_detected() i32 {
+    return raw.GetGestureDetected();
+}
+
+/// Get gesture hold time in seconds
+pub fn get_gesture_hold_duration() f32 {
+    return raw.GetGestureHoldDuration();
+}
+
+/// Get gesture drag vector
+pub fn get_gesture_drag_vector() Vector2 {
+    return raw.GetGestureDragVector();
+}
+
+/// Get gesture drag angle
+pub fn get_gesture_drag_angle() f32 {
+    return raw.GetGestureDragAngle();
+}
+
+/// Get gesture pinch delta
+pub fn get_gesture_pinch_vector() Vector2 {
+    return raw.GetGesturePinchVector();
+}
+
+/// Get gesture pinch angle
+pub fn get_gesture_pinch_angle() f32 {
+    return raw.GetGesturePinchAngle();
+}
+
+/// Update camera position for selected mode
+pub fn update_camera(camera: &mut Camera, mode: i32) void {
+    raw.UpdateCamera(camera, mode);
+}
+
+/// Update camera movement/rotation
+pub fn update_camera_pro(camera: &mut Camera, movement: Vector3, rotation: Vector3, zoom: f32) void {
+    raw.UpdateCameraPro(camera, movement, rotation, zoom);
+}
+
+/// Set texture and rectangle to be used on shapes drawing
+pub fn set_shapes_texture(texture: Texture2D, source: Rectangle) void {
+    raw.SetShapesTexture(texture, source);
+}
+
+/// Get texture that is used for shapes drawing
+pub fn get_shapes_texture() Texture2D {
+    return raw.GetShapesTexture();
+}
+
+/// Get texture source rectangle that is used for shapes drawing
+pub fn get_shapes_texture_rectangle() Rectangle {
+    return raw.GetShapesTextureRectangle();
+}
+
+/// Draw a pixel using geometry [Can be slow, use with care]
+pub fn draw_pixel(pos_x: i32, pos_y: i32, color: Color) void {
+    raw.DrawPixel(pos_x, pos_y, color);
+}
+
+/// Draw a pixel using geometry (Vector version) [Can be slow, use with care]
+pub fn draw_pixel_v(position: Vector2, color: Color) void {
+    raw.DrawPixelV(position, color);
+}
+
+/// Draw a line
+pub fn draw_line(start_pos_x: i32, start_pos_y: i32, end_pos_x: i32, end_pos_y: i32, color: Color) void {
+    raw.DrawLine(start_pos_x, start_pos_y, end_pos_x, end_pos_y, color);
+}
+
+/// Draw a line (using gl lines)
+pub fn draw_line_v(start_pos: Vector2, end_pos: Vector2, color: Color) void {
+    raw.DrawLineV(start_pos, end_pos, color);
+}
+
+/// Draw a line (using triangles/quads)
+pub fn draw_line_ex(start_pos: Vector2, end_pos: Vector2, thick: f32, color: Color) void {
+    raw.DrawLineEx(start_pos, end_pos, thick, color);
+}
+
+/// Draw lines sequence (using gl lines)
+pub fn draw_line_strip(points: &mut Vector2, point_count: i32, color: Color) void {
+    raw.DrawLineStrip(points, point_count, color);
+}
+
+/// Draw line segment cubic-bezier in-out interpolation
+pub fn draw_line_bezier(start_pos: Vector2, end_pos: Vector2, thick: f32, color: Color) void {
+    raw.DrawLineBezier(start_pos, end_pos, thick, color);
+}
+
+/// Draw a dashed line
+pub fn draw_line_dashed(start_pos: Vector2, end_pos: Vector2, dash_size: i32, space_size: i32, color: Color) void {
+    raw.DrawLineDashed(start_pos, end_pos, dash_size, space_size, color);
+}
+
+/// Draw a color-filled circle
+pub fn draw_circle(center_x: i32, center_y: i32, radius: f32, color: Color) void {
+    raw.DrawCircle(center_x, center_y, radius, color);
+}
+
+/// Draw a color-filled circle (Vector version)
+pub fn draw_circle_v(center: Vector2, radius: f32, color: Color) void {
+    raw.DrawCircleV(center, radius, color);
+}
+
+/// Draw a gradient-filled circle
+pub fn draw_circle_gradient(center: Vector2, radius: f32, inner: Color, outer: Color) void {
+    raw.DrawCircleGradient(center, radius, inner, outer);
+}
+
+/// Draw a piece of a circle
+pub fn draw_circle_sector(center: Vector2, radius: f32, start_angle: f32, end_angle: f32, segments: i32, color: Color) void {
+    raw.DrawCircleSector(center, radius, start_angle, end_angle, segments, color);
+}
+
+/// Draw circle sector outline
+pub fn draw_circle_sector_lines(center: Vector2, radius: f32, start_angle: f32, end_angle: f32, segments: i32, color: Color) void {
+    raw.DrawCircleSectorLines(center, radius, start_angle, end_angle, segments, color);
+}
+
+/// Draw circle outline
+pub fn draw_circle_lines(center_x: i32, center_y: i32, radius: f32, color: Color) void {
+    raw.DrawCircleLines(center_x, center_y, radius, color);
+}
+
+/// Draw circle outline (Vector version)
+pub fn draw_circle_lines_v(center: Vector2, radius: f32, color: Color) void {
+    raw.DrawCircleLinesV(center, radius, color);
+}
+
+/// Draw ellipse
+pub fn draw_ellipse(center_x: i32, center_y: i32, radius_h: f32, radius_v: f32, color: Color) void {
+    raw.DrawEllipse(center_x, center_y, radius_h, radius_v, color);
+}
+
+/// Draw ellipse (Vector version)
+pub fn draw_ellipse_v(center: Vector2, radius_h: f32, radius_v: f32, color: Color) void {
+    raw.DrawEllipseV(center, radius_h, radius_v, color);
+}
+
+/// Draw ellipse outline
+pub fn draw_ellipse_lines(center_x: i32, center_y: i32, radius_h: f32, radius_v: f32, color: Color) void {
+    raw.DrawEllipseLines(center_x, center_y, radius_h, radius_v, color);
+}
+
+/// Draw ellipse outline (Vector version)
+pub fn draw_ellipse_lines_v(center: Vector2, radius_h: f32, radius_v: f32, color: Color) void {
+    raw.DrawEllipseLinesV(center, radius_h, radius_v, color);
+}
+
+/// Draw ring
+pub fn draw_ring(center: Vector2, inner_radius: f32, outer_radius: f32, start_angle: f32, end_angle: f32, segments: i32, color: Color) void {
+    raw.DrawRing(center, inner_radius, outer_radius, start_angle, end_angle, segments, color);
+}
+
+/// Draw ring outline
+pub fn draw_ring_lines(center: Vector2, inner_radius: f32, outer_radius: f32, start_angle: f32, end_angle: f32, segments: i32, color: Color) void {
+    raw.DrawRingLines(center, inner_radius, outer_radius, start_angle, end_angle, segments, color);
+}
+
+/// Draw a color-filled rectangle
+pub fn draw_rectangle(pos_x: i32, pos_y: i32, width: i32, height: i32, color: Color) void {
+    raw.DrawRectangle(pos_x, pos_y, width, height, color);
+}
+
+/// Draw a color-filled rectangle (Vector version)
+pub fn draw_rectangle_v(position: Vector2, size: Vector2, color: Color) void {
+    raw.DrawRectangleV(position, size, color);
+}
+
+/// Draw a color-filled rectangle
+pub fn draw_rectangle_rec(rec: Rectangle, color: Color) void {
+    raw.DrawRectangleRec(rec, color);
+}
+
+/// Draw a color-filled rectangle with pro parameters
+pub fn draw_rectangle_pro(rec: Rectangle, origin: Vector2, rotation: f32, color: Color) void {
+    raw.DrawRectanglePro(rec, origin, rotation, color);
+}
+
+/// Draw a vertical-gradient-filled rectangle
+pub fn draw_rectangle_gradient_v(pos_x: i32, pos_y: i32, width: i32, height: i32, top: Color, bottom: Color) void {
+    raw.DrawRectangleGradientV(pos_x, pos_y, width, height, top, bottom);
+}
+
+/// Draw a horizontal-gradient-filled rectangle
+pub fn draw_rectangle_gradient_h(pos_x: i32, pos_y: i32, width: i32, height: i32, left: Color, right: Color) void {
+    raw.DrawRectangleGradientH(pos_x, pos_y, width, height, left, right);
+}
+
+/// Draw a gradient-filled rectangle with custom vertex colors
+pub fn draw_rectangle_gradient_ex(rec: Rectangle, top_left: Color, bottom_left: Color, bottom_right: Color, top_right: Color) void {
+    raw.DrawRectangleGradientEx(rec, top_left, bottom_left, bottom_right, top_right);
+}
+
+/// Draw rectangle outline
+pub fn draw_rectangle_lines(pos_x: i32, pos_y: i32, width: i32, height: i32, color: Color) void {
+    raw.DrawRectangleLines(pos_x, pos_y, width, height, color);
+}
+
+/// Draw rectangle outline with extended parameters
+pub fn draw_rectangle_lines_ex(rec: Rectangle, line_thick: f32, color: Color) void {
+    raw.DrawRectangleLinesEx(rec, line_thick, color);
+}
+
+/// Draw rectangle with rounded edges
+pub fn draw_rectangle_rounded(rec: Rectangle, roundness: f32, segments: i32, color: Color) void {
+    raw.DrawRectangleRounded(rec, roundness, segments, color);
+}
+
+/// Draw rectangle lines with rounded edges
+pub fn draw_rectangle_rounded_lines(rec: Rectangle, roundness: f32, segments: i32, color: Color) void {
+    raw.DrawRectangleRoundedLines(rec, roundness, segments, color);
+}
+
+/// Draw rectangle with rounded edges outline
+pub fn draw_rectangle_rounded_lines_ex(rec: Rectangle, roundness: f32, segments: i32, line_thick: f32, color: Color) void {
+    raw.DrawRectangleRoundedLinesEx(rec, roundness, segments, line_thick, color);
+}
+
+/// Draw a color-filled triangle (vertex in counter-clockwise order!)
+pub fn draw_triangle(v1: Vector2, v2: Vector2, v3: Vector2, color: Color) void {
+    raw.DrawTriangle(v1, v2, v3, color);
+}
+
+/// Draw triangle outline (vertex in counter-clockwise order!)
+pub fn draw_triangle_lines(v1: Vector2, v2: Vector2, v3: Vector2, color: Color) void {
+    raw.DrawTriangleLines(v1, v2, v3, color);
+}
+
+/// Draw a triangle fan defined by points (first vertex is the center)
+pub fn draw_triangle_fan(points: &mut Vector2, point_count: i32, color: Color) void {
+    raw.DrawTriangleFan(points, point_count, color);
+}
+
+/// Draw a triangle strip defined by points
+pub fn draw_triangle_strip(points: &mut Vector2, point_count: i32, color: Color) void {
+    raw.DrawTriangleStrip(points, point_count, color);
+}
+
+/// Draw a regular polygon (Vector version)
+pub fn draw_poly(center: Vector2, sides: i32, radius: f32, rotation: f32, color: Color) void {
+    raw.DrawPoly(center, sides, radius, rotation, color);
+}
+
+/// Draw a polygon outline of n sides
+pub fn draw_poly_lines(center: Vector2, sides: i32, radius: f32, rotation: f32, color: Color) void {
+    raw.DrawPolyLines(center, sides, radius, rotation, color);
+}
+
+/// Draw a polygon outline of n sides with extended parameters
+pub fn draw_poly_lines_ex(center: Vector2, sides: i32, radius: f32, rotation: f32, line_thick: f32, color: Color) void {
+    raw.DrawPolyLinesEx(center, sides, radius, rotation, line_thick, color);
+}
+
+/// Draw spline: Linear, minimum 2 points
+pub fn draw_spline_linear(points: &mut Vector2, point_count: i32, thick: f32, color: Color) void {
+    raw.DrawSplineLinear(points, point_count, thick, color);
+}
+
+/// Draw spline: B-Spline, minimum 4 points
+pub fn draw_spline_basis(points: &mut Vector2, point_count: i32, thick: f32, color: Color) void {
+    raw.DrawSplineBasis(points, point_count, thick, color);
+}
+
+/// Draw spline: Catmull-Rom, minimum 4 points
+pub fn draw_spline_catmull_rom(points: &mut Vector2, point_count: i32, thick: f32, color: Color) void {
+    raw.DrawSplineCatmullRom(points, point_count, thick, color);
+}
+
+/// Draw spline: Quadratic Bezier, minimum 3 points (1 control point): [p1, c2, p3, c4...]
+pub fn draw_spline_bezier_quadratic(points: &mut Vector2, point_count: i32, thick: f32, color: Color) void {
+    raw.DrawSplineBezierQuadratic(points, point_count, thick, color);
+}
+
+/// Draw spline: Cubic Bezier, minimum 4 points (2 control points): [p1, c2, c3, p4, c5, c6...]
+pub fn draw_spline_bezier_cubic(points: &mut Vector2, point_count: i32, thick: f32, color: Color) void {
+    raw.DrawSplineBezierCubic(points, point_count, thick, color);
+}
+
+/// Draw spline segment: Linear, 2 points
+pub fn draw_spline_segment_linear(p1: Vector2, p2: Vector2, thick: f32, color: Color) void {
+    raw.DrawSplineSegmentLinear(p1, p2, thick, color);
+}
+
+/// Draw spline segment: B-Spline, 4 points
+pub fn draw_spline_segment_basis(p1: Vector2, p2: Vector2, p3: Vector2, p4: Vector2, thick: f32, color: Color) void {
+    raw.DrawSplineSegmentBasis(p1, p2, p3, p4, thick, color);
+}
+
+/// Draw spline segment: Catmull-Rom, 4 points
+pub fn draw_spline_segment_catmull_rom(p1: Vector2, p2: Vector2, p3: Vector2, p4: Vector2, thick: f32, color: Color) void {
+    raw.DrawSplineSegmentCatmullRom(p1, p2, p3, p4, thick, color);
+}
+
+/// Draw spline segment: Quadratic Bezier, 2 points, 1 control point
+pub fn draw_spline_segment_bezier_quadratic(p1: Vector2, c2: Vector2, p3: Vector2, thick: f32, color: Color) void {
+    raw.DrawSplineSegmentBezierQuadratic(p1, c2, p3, thick, color);
+}
+
+/// Draw spline segment: Cubic Bezier, 2 points, 2 control points
+pub fn draw_spline_segment_bezier_cubic(p1: Vector2, c2: Vector2, c3: Vector2, p4: Vector2, thick: f32, color: Color) void {
+    raw.DrawSplineSegmentBezierCubic(p1, c2, c3, p4, thick, color);
+}
+
+/// Get (evaluate) spline point: Linear
+pub fn get_spline_point_linear(start_pos: Vector2, end_pos: Vector2, t: f32) Vector2 {
+    return raw.GetSplinePointLinear(start_pos, end_pos, t);
+}
+
+/// Get (evaluate) spline point: B-Spline
+pub fn get_spline_point_basis(p1: Vector2, p2: Vector2, p3: Vector2, p4: Vector2, t: f32) Vector2 {
+    return raw.GetSplinePointBasis(p1, p2, p3, p4, t);
+}
+
+/// Get (evaluate) spline point: Catmull-Rom
+pub fn get_spline_point_catmull_rom(p1: Vector2, p2: Vector2, p3: Vector2, p4: Vector2, t: f32) Vector2 {
+    return raw.GetSplinePointCatmullRom(p1, p2, p3, p4, t);
+}
+
+/// Get (evaluate) spline point: Quadratic Bezier
+pub fn get_spline_point_bezier_quad(p1: Vector2, c2: Vector2, p3: Vector2, t: f32) Vector2 {
+    return raw.GetSplinePointBezierQuad(p1, c2, p3, t);
+}
+
+/// Get (evaluate) spline point: Cubic Bezier
+pub fn get_spline_point_bezier_cubic(p1: Vector2, c2: Vector2, c3: Vector2, p4: Vector2, t: f32) Vector2 {
+    return raw.GetSplinePointBezierCubic(p1, c2, c3, p4, t);
+}
+
+/// Check collision between two rectangles
+pub fn check_collision_recs(rec1: Rectangle, rec2: Rectangle) bool {
+    return raw.CheckCollisionRecs(rec1, rec2);
+}
+
+/// Check collision between two circles
+pub fn check_collision_circles(center1: Vector2, radius1: f32, center2: Vector2, radius2: f32) bool {
+    return raw.CheckCollisionCircles(center1, radius1, center2, radius2);
+}
+
+/// Check collision between circle and rectangle
+pub fn check_collision_circle_rec(center: Vector2, radius: f32, rec: Rectangle) bool {
+    return raw.CheckCollisionCircleRec(center, radius, rec);
+}
+
+/// Check if circle collides with a line created betweeen two points [p1] and [p2]
+pub fn check_collision_circle_line(center: Vector2, radius: f32, p1: Vector2, p2: Vector2) bool {
+    return raw.CheckCollisionCircleLine(center, radius, p1, p2);
+}
+
+/// Check if point is inside rectangle
+pub fn check_collision_point_rec(point: Vector2, rec: Rectangle) bool {
+    return raw.CheckCollisionPointRec(point, rec);
+}
+
+/// Check if point is inside circle
+pub fn check_collision_point_circle(point: Vector2, center: Vector2, radius: f32) bool {
+    return raw.CheckCollisionPointCircle(point, center, radius);
+}
+
+/// Check if point is inside a triangle
+pub fn check_collision_point_triangle(point: Vector2, p1: Vector2, p2: Vector2, p3: Vector2) bool {
+    return raw.CheckCollisionPointTriangle(point, p1, p2, p3);
+}
+
+/// Check if point belongs to line created between two points [p1] and [p2] with defined margin in pixels [threshold]
+pub fn check_collision_point_line(point: Vector2, p1: Vector2, p2: Vector2, threshold: i32) bool {
+    return raw.CheckCollisionPointLine(point, p1, p2, threshold);
+}
+
+/// Check if point is within a polygon described by array of vertices
+pub fn check_collision_point_poly(point: Vector2, points: &mut Vector2, point_count: i32) bool {
+    return raw.CheckCollisionPointPoly(point, points, point_count);
+}
+
+/// Check the collision between two lines defined by two points each, returns collision point by reference
+pub fn check_collision_lines(start_pos1: Vector2, end_pos1: Vector2, start_pos2: Vector2, end_pos2: Vector2, collision_point: &mut Vector2) bool {
+    return raw.CheckCollisionLines(start_pos1, end_pos1, start_pos2, end_pos2, collision_point);
+}
+
+/// Get collision rectangle for two rectangles collision
+pub fn get_collision_rec(rec1: Rectangle, rec2: Rectangle) Rectangle {
+    return raw.GetCollisionRec(rec1, rec2);
+}
+
+/// Load image from file into CPU memory (RAM)
+pub fn load_image(file_name: &[u8]) Image {
+    return raw.LoadImage(z_ptr(file_name));
+}
+
+/// Load image from RAW file data
+pub fn load_image_raw(file_name: &[u8], width: i32, height: i32, format: i32, header_size: i32) Image {
+    return raw.LoadImageRaw(z_ptr(file_name), width, height, format, header_size);
+}
+
+/// Load image sequence from file (frames appended to image.data)
+pub fn load_image_anim(file_name: &[u8], frames: &mut i32) Image {
+    return raw.LoadImageAnim(z_ptr(file_name), frames);
+}
+
+/// Load image sequence from memory buffer
+pub fn load_image_anim_from_memory(file_type: &[u8], file_data: &u8, data_size: i32, frames: &mut i32) Image {
+    return raw.LoadImageAnimFromMemory(z_ptr(file_type), file_data, data_size, frames);
+}
+
+/// Load image from memory buffer, fileType refers to extension: i.e. '.png'
+pub fn load_image_from_memory(file_type: &[u8], file_data: &u8, data_size: i32) Image {
+    return raw.LoadImageFromMemory(z_ptr(file_type), file_data, data_size);
+}
+
+/// Load image from GPU texture data
+pub fn load_image_from_texture(texture: Texture2D) Image {
+    return raw.LoadImageFromTexture(texture);
+}
+
+/// Load image from screen buffer and (screenshot)
+pub fn load_image_from_screen() Image {
+    return raw.LoadImageFromScreen();
+}
+
+/// Check if an image is valid (data and parameters)
+pub fn is_image_valid(image: Image) bool {
+    return raw.IsImageValid(image);
+}
+
+/// Unload image from CPU memory (RAM)
+pub fn unload_image(image: Image) void {
+    raw.UnloadImage(image);
+}
+
+/// Export image data to file, returns true on success
+pub fn export_image(image: Image, file_name: &[u8]) bool {
+    return raw.ExportImage(image, z_ptr(file_name));
+}
+
+/// Export image to memory buffer, memory must be MemFree()
+pub fn export_image_to_memory(image: Image, file_type: &[u8], file_size: &mut i32) &u8 {
+    return raw.ExportImageToMemory(image, z_ptr(file_type), file_size);
+}
+
+/// Export image as code file defining an array of bytes, returns true on success
+pub fn export_image_as_code(image: Image, file_name: &[u8]) bool {
+    return raw.ExportImageAsCode(image, z_ptr(file_name));
+}
+
+/// Generate image: plain color
+pub fn gen_image_color(width: i32, height: i32, color: Color) Image {
+    return raw.GenImageColor(width, height, color);
+}
+
+/// Generate image: linear gradient, direction in degrees [0..360], 0=Vertical gradient
+pub fn gen_image_gradient_linear(width: i32, height: i32, direction: i32, start: Color, end: Color) Image {
+    return raw.GenImageGradientLinear(width, height, direction, start, end);
+}
+
+/// Generate image: radial gradient
+pub fn gen_image_gradient_radial(width: i32, height: i32, density: f32, inner: Color, outer: Color) Image {
+    return raw.GenImageGradientRadial(width, height, density, inner, outer);
+}
+
+/// Generate image: square gradient
+pub fn gen_image_gradient_square(width: i32, height: i32, density: f32, inner: Color, outer: Color) Image {
+    return raw.GenImageGradientSquare(width, height, density, inner, outer);
+}
+
+/// Generate image: checked
+pub fn gen_image_checked(width: i32, height: i32, checks_x: i32, checks_y: i32, col1: Color, col2: Color) Image {
+    return raw.GenImageChecked(width, height, checks_x, checks_y, col1, col2);
+}
+
+/// Generate image: white noise
+pub fn gen_image_white_noise(width: i32, height: i32, factor: f32) Image {
+    return raw.GenImageWhiteNoise(width, height, factor);
+}
+
+/// Generate image: perlin noise
+pub fn gen_image_perlin_noise(width: i32, height: i32, offset_x: i32, offset_y: i32, scale: f32) Image {
+    return raw.GenImagePerlinNoise(width, height, offset_x, offset_y, scale);
+}
+
+/// Generate image: cellular algorithm, bigger tileSize means bigger cells
+pub fn gen_image_cellular(width: i32, height: i32, tile_size: i32) Image {
+    return raw.GenImageCellular(width, height, tile_size);
+}
+
+/// Generate image: grayscale image from text data
+pub fn gen_image_text(width: i32, height: i32, text: &[u8]) Image {
+    return raw.GenImageText(width, height, z_ptr(text));
+}
+
+/// Create an image duplicate (useful for transformations)
+pub fn image_copy(image: Image) Image {
+    return raw.ImageCopy(image);
+}
+
+/// Create an image from another image piece
+pub fn image_from_image(image: Image, rec: Rectangle) Image {
+    return raw.ImageFromImage(image, rec);
+}
+
+/// Create an image from a selected channel of another image (GRAYSCALE)
+pub fn image_from_channel(image: Image, selected_channel: i32) Image {
+    return raw.ImageFromChannel(image, selected_channel);
+}
+
+/// Create an image from text (default font)
+pub fn image_text(text: &[u8], font_size: i32, color: Color) Image {
+    return raw.ImageText(z_ptr(text), font_size, color);
+}
+
+/// Create an image from text (custom sprite font)
+pub fn image_text_ex(font: Font, text: &[u8], font_size: f32, spacing: f32, tint: Color) Image {
+    return raw.ImageTextEx(font, z_ptr(text), font_size, spacing, tint);
+}
+
+/// Convert image data to desired format
+pub fn image_format(image: &mut Image, new_format: i32) void {
+    raw.ImageFormat(image, new_format);
+}
+
+/// Convert image to POT (power-of-two)
+pub fn image_to_pot(image: &mut Image, fill: Color) void {
+    raw.ImageToPOT(image, fill);
+}
+
+/// Crop an image to a defined rectangle
+pub fn image_crop(image: &mut Image, crop: Rectangle) void {
+    raw.ImageCrop(image, crop);
+}
+
+/// Crop image depending on alpha value
+pub fn image_alpha_crop(image: &mut Image, threshold: f32) void {
+    raw.ImageAlphaCrop(image, threshold);
+}
+
+/// Clear alpha channel to desired color
+pub fn image_alpha_clear(image: &mut Image, color: Color, threshold: f32) void {
+    raw.ImageAlphaClear(image, color, threshold);
+}
+
+/// Apply alpha mask to image
+pub fn image_alpha_mask(image: &mut Image, alpha_mask: Image) void {
+    raw.ImageAlphaMask(image, alpha_mask);
+}
+
+/// Premultiply alpha channel
+pub fn image_alpha_premultiply(image: &mut Image) void {
+    raw.ImageAlphaPremultiply(image);
+}
+
+/// Apply Gaussian blur using a box blur approximation
+pub fn image_blur_gaussian(image: &mut Image, blur_size: i32) void {
+    raw.ImageBlurGaussian(image, blur_size);
+}
+
+/// Apply custom square convolution kernel to image
+pub fn image_kernel_convolution(image: &mut Image, kernel: &mut f32, kernel_size: i32) void {
+    raw.ImageKernelConvolution(image, kernel, kernel_size);
+}
+
+/// Resize image (Bicubic scaling algorithm)
+pub fn image_resize(image: &mut Image, new_width: i32, new_height: i32) void {
+    raw.ImageResize(image, new_width, new_height);
+}
+
+/// Resize image (Nearest-Neighbor scaling algorithm)
+pub fn image_resize_nn(image: &mut Image, new_width: i32, new_height: i32) void {
+    raw.ImageResizeNN(image, new_width, new_height);
+}
+
+/// Resize canvas and fill with color
+pub fn image_resize_canvas(image: &mut Image, new_width: i32, new_height: i32, offset_x: i32, offset_y: i32, fill: Color) void {
+    raw.ImageResizeCanvas(image, new_width, new_height, offset_x, offset_y, fill);
+}
+
+/// Compute all mipmap levels for a provided image
+pub fn image_mipmaps(image: &mut Image) void {
+    raw.ImageMipmaps(image);
+}
+
+/// Dither image data to 16bpp or lower (Floyd-Steinberg dithering)
+pub fn image_dither(image: &mut Image, r_bpp: i32, g_bpp: i32, b_bpp: i32, a_bpp: i32) void {
+    raw.ImageDither(image, r_bpp, g_bpp, b_bpp, a_bpp);
+}
+
+/// Flip image vertically
+pub fn image_flip_vertical(image: &mut Image) void {
+    raw.ImageFlipVertical(image);
+}
+
+/// Flip image horizontally
+pub fn image_flip_horizontal(image: &mut Image) void {
+    raw.ImageFlipHorizontal(image);
+}
+
+/// Rotate image by input angle in degrees (-359 to 359)
+pub fn image_rotate(image: &mut Image, degrees: i32) void {
+    raw.ImageRotate(image, degrees);
+}
+
+/// Rotate image clockwise 90deg
+pub fn image_rotate_cw(image: &mut Image) void {
+    raw.ImageRotateCW(image);
+}
+
+/// Rotate image counter-clockwise 90deg
+pub fn image_rotate_ccw(image: &mut Image) void {
+    raw.ImageRotateCCW(image);
+}
+
+/// Modify image color: tint
+pub fn image_color_tint(image: &mut Image, color: Color) void {
+    raw.ImageColorTint(image, color);
+}
+
+/// Modify image color: invert
+pub fn image_color_invert(image: &mut Image) void {
+    raw.ImageColorInvert(image);
+}
+
+/// Modify image color: grayscale
+pub fn image_color_grayscale(image: &mut Image) void {
+    raw.ImageColorGrayscale(image);
+}
+
+/// Modify image color: contrast (-100 to 100)
+pub fn image_color_contrast(image: &mut Image, contrast: f32) void {
+    raw.ImageColorContrast(image, contrast);
+}
+
+/// Modify image color: brightness (-255 to 255)
+pub fn image_color_brightness(image: &mut Image, brightness: i32) void {
+    raw.ImageColorBrightness(image, brightness);
+}
+
+/// Modify image color: replace color
+pub fn image_color_replace(image: &mut Image, color: Color, replace: Color) void {
+    raw.ImageColorReplace(image, color, replace);
+}
+
+/// Load color data from image as a Color array (RGBA - 32bit)
+pub fn load_image_colors(image: Image) &mut Color {
+    return raw.LoadImageColors(image);
+}
+
+/// Load colors palette from image as a Color array (RGBA - 32bit)
+pub fn load_image_palette(image: Image, max_palette_size: i32, color_count: &mut i32) &mut Color {
+    return raw.LoadImagePalette(image, max_palette_size, color_count);
+}
+
+/// Unload color data loaded with LoadImageColors()
+pub fn unload_image_colors(colors: &mut Color) void {
+    raw.UnloadImageColors(colors);
+}
+
+/// Unload colors palette loaded with LoadImagePalette()
+pub fn unload_image_palette(colors: &mut Color) void {
+    raw.UnloadImagePalette(colors);
+}
+
+/// Get image alpha border rectangle
+pub fn get_image_alpha_border(image: Image, threshold: f32) Rectangle {
+    return raw.GetImageAlphaBorder(image, threshold);
+}
+
+/// Get image pixel color at (x, y) position
+pub fn get_image_color(image: Image, x: i32, y: i32) Color {
+    return raw.GetImageColor(image, x, y);
+}
+
+/// Clear image background with given color
+pub fn image_clear_background(dst: &mut Image, color: Color) void {
+    raw.ImageClearBackground(dst, color);
+}
+
+/// Draw pixel within an image
+pub fn image_draw_pixel(dst: &mut Image, pos_x: i32, pos_y: i32, color: Color) void {
+    raw.ImageDrawPixel(dst, pos_x, pos_y, color);
+}
+
+/// Draw pixel within an image (Vector version)
+pub fn image_draw_pixel_v(dst: &mut Image, position: Vector2, color: Color) void {
+    raw.ImageDrawPixelV(dst, position, color);
+}
+
+/// Draw line within an image
+pub fn image_draw_line(dst: &mut Image, start_pos_x: i32, start_pos_y: i32, end_pos_x: i32, end_pos_y: i32, color: Color) void {
+    raw.ImageDrawLine(dst, start_pos_x, start_pos_y, end_pos_x, end_pos_y, color);
+}
+
+/// Draw line within an image (Vector version)
+pub fn image_draw_line_v(dst: &mut Image, start: Vector2, end: Vector2, color: Color) void {
+    raw.ImageDrawLineV(dst, start, end, color);
+}
+
+/// Draw a line defining thickness within an image
+pub fn image_draw_line_ex(dst: &mut Image, start: Vector2, end: Vector2, thick: i32, color: Color) void {
+    raw.ImageDrawLineEx(dst, start, end, thick, color);
+}
+
+/// Draw a filled circle within an image
+pub fn image_draw_circle(dst: &mut Image, center_x: i32, center_y: i32, radius: i32, color: Color) void {
+    raw.ImageDrawCircle(dst, center_x, center_y, radius, color);
+}
+
+/// Draw a filled circle within an image (Vector version)
+pub fn image_draw_circle_v(dst: &mut Image, center: Vector2, radius: i32, color: Color) void {
+    raw.ImageDrawCircleV(dst, center, radius, color);
+}
+
+/// Draw circle outline within an image
+pub fn image_draw_circle_lines(dst: &mut Image, center_x: i32, center_y: i32, radius: i32, color: Color) void {
+    raw.ImageDrawCircleLines(dst, center_x, center_y, radius, color);
+}
+
+/// Draw circle outline within an image (Vector version)
+pub fn image_draw_circle_lines_v(dst: &mut Image, center: Vector2, radius: i32, color: Color) void {
+    raw.ImageDrawCircleLinesV(dst, center, radius, color);
+}
+
+/// Draw rectangle within an image
+pub fn image_draw_rectangle(dst: &mut Image, pos_x: i32, pos_y: i32, width: i32, height: i32, color: Color) void {
+    raw.ImageDrawRectangle(dst, pos_x, pos_y, width, height, color);
+}
+
+/// Draw rectangle within an image (Vector version)
+pub fn image_draw_rectangle_v(dst: &mut Image, position: Vector2, size: Vector2, color: Color) void {
+    raw.ImageDrawRectangleV(dst, position, size, color);
+}
+
+/// Draw rectangle within an image
+pub fn image_draw_rectangle_rec(dst: &mut Image, rec: Rectangle, color: Color) void {
+    raw.ImageDrawRectangleRec(dst, rec, color);
+}
+
+/// Draw rectangle lines within an image
+pub fn image_draw_rectangle_lines(dst: &mut Image, rec: Rectangle, thick: i32, color: Color) void {
+    raw.ImageDrawRectangleLines(dst, rec, thick, color);
+}
+
+/// Draw triangle within an image
+pub fn image_draw_triangle(dst: &mut Image, v1: Vector2, v2: Vector2, v3: Vector2, color: Color) void {
+    raw.ImageDrawTriangle(dst, v1, v2, v3, color);
+}
+
+/// Draw triangle with interpolated colors within an image
+pub fn image_draw_triangle_ex(dst: &mut Image, v1: Vector2, v2: Vector2, v3: Vector2, c1: Color, c2: Color, c3: Color) void {
+    raw.ImageDrawTriangleEx(dst, v1, v2, v3, c1, c2, c3);
+}
+
+/// Draw triangle outline within an image
+pub fn image_draw_triangle_lines(dst: &mut Image, v1: Vector2, v2: Vector2, v3: Vector2, color: Color) void {
+    raw.ImageDrawTriangleLines(dst, v1, v2, v3, color);
+}
+
+/// Draw a triangle fan defined by points within an image (first vertex is the center)
+pub fn image_draw_triangle_fan(dst: &mut Image, points: &mut Vector2, point_count: i32, color: Color) void {
+    raw.ImageDrawTriangleFan(dst, points, point_count, color);
+}
+
+/// Draw a triangle strip defined by points within an image
+pub fn image_draw_triangle_strip(dst: &mut Image, points: &mut Vector2, point_count: i32, color: Color) void {
+    raw.ImageDrawTriangleStrip(dst, points, point_count, color);
+}
+
+/// Draw a source image within a destination image (tint applied to source)
+pub fn image_draw(dst: &mut Image, src: Image, src_rec: Rectangle, dst_rec: Rectangle, tint: Color) void {
+    raw.ImageDraw(dst, src, src_rec, dst_rec, tint);
+}
+
+/// Draw text (using default font) within an image (destination)
+pub fn image_draw_text(dst: &mut Image, text: &[u8], pos_x: i32, pos_y: i32, font_size: i32, color: Color) void {
+    raw.ImageDrawText(dst, z_ptr(text), pos_x, pos_y, font_size, color);
+}
+
+/// Draw text (custom sprite font) within an image (destination)
+pub fn image_draw_text_ex(dst: &mut Image, font: Font, text: &[u8], position: Vector2, font_size: f32, spacing: f32, tint: Color) void {
+    raw.ImageDrawTextEx(dst, font, z_ptr(text), position, font_size, spacing, tint);
+}
+
+/// Load texture from file into GPU memory (VRAM)
+pub fn load_texture(file_name: &[u8]) Texture2D {
+    return raw.LoadTexture(z_ptr(file_name));
+}
+
+/// Load texture from image data
+pub fn load_texture_from_image(image: Image) Texture2D {
+    return raw.LoadTextureFromImage(image);
+}
+
+/// Load cubemap from image, multiple image cubemap layouts supported
+pub fn load_texture_cubemap(image: Image, layout: i32) TextureCubemap {
+    return raw.LoadTextureCubemap(image, layout);
+}
+
+/// Load texture for rendering (framebuffer)
+pub fn load_render_texture(width: i32, height: i32) RenderTexture2D {
+    return raw.LoadRenderTexture(width, height);
+}
+
+/// Check if a texture is valid (loaded in GPU)
+pub fn is_texture_valid(texture: Texture2D) bool {
+    return raw.IsTextureValid(texture);
+}
+
+/// Unload texture from GPU memory (VRAM)
+pub fn unload_texture(texture: Texture2D) void {
+    raw.UnloadTexture(texture);
+}
+
+/// Check if a render texture is valid (loaded in GPU)
+pub fn is_render_texture_valid(target: RenderTexture2D) bool {
+    return raw.IsRenderTextureValid(target);
+}
+
+/// Unload render texture from GPU memory (VRAM)
+pub fn unload_render_texture(target: RenderTexture2D) void {
+    raw.UnloadRenderTexture(target);
+}
+
+/// Update GPU texture with new data (pixels should be able to fill texture)
+pub fn update_texture(texture: Texture2D, pixels: &mut void) void {
+    raw.UpdateTexture(texture, pixels);
+}
+
+/// Update GPU texture rectangle with new data (pixels and rec should fit in texture)
+pub fn update_texture_rec(texture: Texture2D, rec: Rectangle, pixels: &mut void) void {
+    raw.UpdateTextureRec(texture, rec, pixels);
+}
+
+/// Generate GPU mipmaps for a texture
+pub fn gen_texture_mipmaps(texture: &mut Texture2D) void {
+    raw.GenTextureMipmaps(texture);
+}
+
+/// Set texture scaling filter mode
+pub fn set_texture_filter(texture: Texture2D, filter: TextureFilter) void {
+    raw.SetTextureFilter(texture, filter);
+}
+
+/// Set texture wrapping mode
+pub fn set_texture_wrap(texture: Texture2D, wrap: TextureWrap) void {
+    raw.SetTextureWrap(texture, wrap);
+}
+
+/// Draw a Texture2D
+pub fn draw_texture(texture: Texture2D, pos_x: i32, pos_y: i32, tint: Color) void {
+    raw.DrawTexture(texture, pos_x, pos_y, tint);
+}
+
+/// Draw a Texture2D with position defined as Vector2
+pub fn draw_texture_v(texture: Texture2D, position: Vector2, tint: Color) void {
+    raw.DrawTextureV(texture, position, tint);
+}
+
+/// Draw a Texture2D with extended parameters
+pub fn draw_texture_ex(texture: Texture2D, position: Vector2, rotation: f32, scale: f32, tint: Color) void {
+    raw.DrawTextureEx(texture, position, rotation, scale, tint);
+}
+
+/// Draw a part of a texture defined by a rectangle
+pub fn draw_texture_rec(texture: Texture2D, source: Rectangle, position: Vector2, tint: Color) void {
+    raw.DrawTextureRec(texture, source, position, tint);
+}
+
+/// Draw a part of a texture defined by a rectangle with 'pro' parameters
+pub fn draw_texture_pro(texture: Texture2D, source: Rectangle, dest: Rectangle, origin: Vector2, rotation: f32, tint: Color) void {
+    raw.DrawTexturePro(texture, source, dest, origin, rotation, tint);
+}
+
+/// Draws a texture (or part of it) that stretches or shrinks nicely
+pub fn draw_texture_n_patch(texture: Texture2D, n_patch_info: NPatchInfo, dest: Rectangle, origin: Vector2, rotation: f32, tint: Color) void {
+    raw.DrawTextureNPatch(texture, n_patch_info, dest, origin, rotation, tint);
+}
+
+/// Check if two colors are equal
+pub fn color_is_equal(col1: Color, col2: Color) bool {
+    return raw.ColorIsEqual(col1, col2);
+}
+
+/// Get color with alpha applied, alpha goes from 0.0f to 1.0f
+pub fn fade(color: Color, alpha: f32) Color {
+    return raw.Fade(color, alpha);
+}
+
+/// Get hexadecimal value for a Color (0xRRGGBBAA)
+pub fn color_to_int(color: Color) i32 {
+    return raw.ColorToInt(color);
+}
+
+/// Get Color normalized as float [0..1]
+pub fn color_normalize(color: Color) Vector4 {
+    return raw.ColorNormalize(color);
+}
+
+/// Get Color from normalized values [0..1]
+pub fn color_from_normalized(normalized: Vector4) Color {
+    return raw.ColorFromNormalized(normalized);
+}
+
+/// Get HSV values for a Color, hue [0..360], saturation/value [0..1]
+pub fn color_to_hsv(color: Color) Vector3 {
+    return raw.ColorToHSV(color);
+}
+
+/// Get a Color from HSV values, hue [0..360], saturation/value [0..1]
+pub fn color_from_hsv(hue: f32, saturation: f32, value: f32) Color {
+    return raw.ColorFromHSV(hue, saturation, value);
+}
+
+/// Get color multiplied with another color
+pub fn color_tint(color: Color, tint: Color) Color {
+    return raw.ColorTint(color, tint);
+}
+
+/// Get color with brightness correction, brightness factor goes from -1.0f to 1.0f
+pub fn color_brightness(color: Color, factor: f32) Color {
+    return raw.ColorBrightness(color, factor);
+}
+
+/// Get color with contrast correction, contrast values between -1.0f and 1.0f
+pub fn color_contrast(color: Color, contrast: f32) Color {
+    return raw.ColorContrast(color, contrast);
+}
+
+/// Get color with alpha applied, alpha goes from 0.0f to 1.0f
+pub fn color_alpha(color: Color, alpha: f32) Color {
+    return raw.ColorAlpha(color, alpha);
+}
+
+/// Get src alpha-blended into dst color with tint
+pub fn color_alpha_blend(dst: Color, src: Color, tint: Color) Color {
+    return raw.ColorAlphaBlend(dst, src, tint);
+}
+
+/// Get color lerp interpolation between two colors, factor [0.0f..1.0f]
+pub fn color_lerp(color1: Color, color2: Color, factor: f32) Color {
+    return raw.ColorLerp(color1, color2, factor);
+}
+
+/// Get Color structure from hexadecimal value
+pub fn get_color(hex_value: u32) Color {
+    return raw.GetColor(hex_value);
+}
+
+/// Get Color from a source pixel pointer of certain format
+pub fn get_pixel_color(src_ptr: &mut void, format: i32) Color {
+    return raw.GetPixelColor(src_ptr, format);
+}
+
+/// Set color formatted into destination pixel pointer
+pub fn set_pixel_color(dst_ptr: &mut void, color: Color, format: i32) void {
+    raw.SetPixelColor(dst_ptr, color, format);
+}
+
+/// Get pixel data size in bytes for certain format
+pub fn get_pixel_data_size(width: i32, height: i32, format: i32) i32 {
+    return raw.GetPixelDataSize(width, height, format);
+}
+
+/// Get the default Font
+pub fn get_font_default() Font {
+    return raw.GetFontDefault();
+}
+
+/// Load font from file into GPU memory (VRAM)
+pub fn load_font(file_name: &[u8]) Font {
+    return raw.LoadFont(z_ptr(file_name));
+}
+
+/// Load font from file with extended parameters, use NULL for codepoints and 0 for codepointCount to load the default character set, font size is provided in pixels height
+pub fn load_font_ex(file_name: &[u8], font_size: i32, codepoints: &mut i32, codepoint_count: i32) Font {
+    return raw.LoadFontEx(z_ptr(file_name), font_size, codepoints, codepoint_count);
+}
+
+/// Load font from Image (XNA style)
+pub fn load_font_from_image(image: Image, key: Color, first_char: i32) Font {
+    return raw.LoadFontFromImage(image, key, first_char);
+}
+
+/// Load font from memory buffer, fileType refers to extension: i.e. '.ttf'
+pub fn load_font_from_memory(file_type: &[u8], file_data: &u8, data_size: i32, font_size: i32, codepoints: &mut i32, codepoint_count: i32) Font {
+    return raw.LoadFontFromMemory(z_ptr(file_type), file_data, data_size, font_size, codepoints, codepoint_count);
+}
+
+/// Check if a font is valid (font data loaded, WARNING: GPU texture not checked)
+pub fn is_font_valid(font: Font) bool {
+    return raw.IsFontValid(font);
+}
+
+/// Load font data for further use
+pub fn load_font_data(file_data: &u8, data_size: i32, font_size: i32, codepoints: &mut i32, codepoint_count: i32, kind: i32, glyph_count: &mut i32) &mut GlyphInfo {
+    return raw.LoadFontData(file_data, data_size, font_size, codepoints, codepoint_count, kind, glyph_count);
+}
+
+/// Generate image font atlas using chars info
+pub fn gen_image_font_atlas(glyphs: &mut GlyphInfo, glyph_recs: &mut &mut Rectangle, glyph_count: i32, font_size: i32, padding: i32, pack_method: i32) Image {
+    return raw.GenImageFontAtlas(glyphs, glyph_recs, glyph_count, font_size, padding, pack_method);
+}
+
+/// Unload font chars info data (RAM)
+pub fn unload_font_data(glyphs: &mut GlyphInfo, glyph_count: i32) void {
+    raw.UnloadFontData(glyphs, glyph_count);
+}
+
+/// Unload font from GPU memory (VRAM)
+pub fn unload_font(font: Font) void {
+    raw.UnloadFont(font);
+}
+
+/// Export font as code file, returns true on success
+pub fn export_font_as_code(font: Font, file_name: &[u8]) bool {
+    return raw.ExportFontAsCode(font, z_ptr(file_name));
+}
+
+/// Draw current FPS
+pub fn draw_fps(pos_x: i32, pos_y: i32) void {
+    raw.DrawFPS(pos_x, pos_y);
+}
+
+/// Draw text (using default font)
+pub fn draw_text(text: &[u8], pos_x: i32, pos_y: i32, font_size: i32, color: Color) void {
+    raw.DrawText(z_ptr(text), pos_x, pos_y, font_size, color);
+}
+
+/// Draw text using font and additional parameters
+pub fn draw_text_ex(font: Font, text: &[u8], position: Vector2, font_size: f32, spacing: f32, tint: Color) void {
+    raw.DrawTextEx(font, z_ptr(text), position, font_size, spacing, tint);
+}
+
+/// Draw text using Font and pro parameters (rotation)
+pub fn draw_text_pro(font: Font, text: &[u8], position: Vector2, origin: Vector2, rotation: f32, font_size: f32, spacing: f32, tint: Color) void {
+    raw.DrawTextPro(font, z_ptr(text), position, origin, rotation, font_size, spacing, tint);
+}
+
+/// Draw one character (codepoint)
+pub fn draw_text_codepoint(font: Font, codepoint: i32, position: Vector2, font_size: f32, tint: Color) void {
+    raw.DrawTextCodepoint(font, codepoint, position, font_size, tint);
+}
+
+/// Draw multiple character (codepoint)
+pub fn draw_text_codepoints(font: Font, codepoints: &mut i32, codepoint_count: i32, position: Vector2, font_size: f32, spacing: f32, tint: Color) void {
+    raw.DrawTextCodepoints(font, codepoints, codepoint_count, position, font_size, spacing, tint);
+}
+
+/// Set vertical line spacing when drawing with line-breaks
+pub fn set_text_line_spacing(spacing: i32) void {
+    raw.SetTextLineSpacing(spacing);
+}
+
+/// Measure string width for default font
+pub fn measure_text(text: &[u8], font_size: i32) i32 {
+    return raw.MeasureText(z_ptr(text), font_size);
+}
+
+/// Measure string size for Font
+pub fn measure_text_ex(font: Font, text: &[u8], font_size: f32, spacing: f32) Vector2 {
+    return raw.MeasureTextEx(font, z_ptr(text), font_size, spacing);
+}
+
+/// Measure string size for an existing array of codepoints for Font
+pub fn measure_text_codepoints(font: Font, codepoints: &mut i32, length: i32, font_size: f32, spacing: f32) Vector2 {
+    return raw.MeasureTextCodepoints(font, codepoints, length, font_size, spacing);
+}
+
+/// Get glyph index position in font for a codepoint (unicode character), fallback to '?' if not found
+pub fn get_glyph_index(font: Font, codepoint: i32) i32 {
+    return raw.GetGlyphIndex(font, codepoint);
+}
+
+/// Get glyph font info data for a codepoint (unicode character), fallback to '?' if not found
+pub fn get_glyph_info(font: Font, codepoint: i32) GlyphInfo {
+    return raw.GetGlyphInfo(font, codepoint);
+}
+
+/// Get glyph rectangle in font atlas for a codepoint (unicode character), fallback to '?' if not found
+pub fn get_glyph_atlas_rec(font: Font, codepoint: i32) Rectangle {
+    return raw.GetGlyphAtlasRec(font, codepoint);
+}
+
+/// Load UTF-8 text encoded from codepoints array
+pub fn load_utf8(codepoints: &mut i32, length: i32) &u8 {
+    return raw.LoadUTF8(codepoints, length);
+}
+
+/// Unload UTF-8 text encoded from codepoints array
+pub fn unload_utf8(text: &[u8]) void {
+    raw.UnloadUTF8(z_ptr(text));
+}
+
+/// Load all codepoints from a UTF-8 text string, codepoints count returned by parameter
+pub fn load_codepoints(text: &[u8], count: &mut i32) &mut i32 {
+    return raw.LoadCodepoints(z_ptr(text), count);
+}
+
+/// Unload codepoints data from memory
+pub fn unload_codepoints(codepoints: &mut i32) void {
+    raw.UnloadCodepoints(codepoints);
+}
+
+/// Get total number of codepoints in a UTF-8 encoded string
+pub fn get_codepoint_count(text: &[u8]) i32 {
+    return raw.GetCodepointCount(z_ptr(text));
+}
+
+/// Get next codepoint in a UTF-8 encoded string, 0x3f('?') is returned on failure
+pub fn get_codepoint(text: &[u8], codepoint_size: &mut i32) i32 {
+    return raw.GetCodepoint(z_ptr(text), codepoint_size);
+}
+
+/// Get next codepoint in a UTF-8 encoded string, 0x3f('?') is returned on failure
+pub fn get_codepoint_next(text: &[u8], codepoint_size: &mut i32) i32 {
+    return raw.GetCodepointNext(z_ptr(text), codepoint_size);
+}
+
+/// Get previous codepoint in a UTF-8 encoded string, 0x3f('?') is returned on failure
+pub fn get_codepoint_previous(text: &[u8], codepoint_size: &mut i32) i32 {
+    return raw.GetCodepointPrevious(z_ptr(text), codepoint_size);
+}
+
+/// Encode one codepoint into UTF-8 byte array (array length returned as parameter)
+pub fn codepoint_to_utf8(codepoint: i32, utf8_size: &mut i32) &u8 {
+    return raw.CodepointToUTF8(codepoint, utf8_size);
+}
+
+/// Load text as separate lines ('\n')
+pub fn load_text_lines(text: &[u8], count: &mut i32) &mut &u8 {
+    return raw.LoadTextLines(z_ptr(text), count);
+}
+
+/// Unload text lines
+pub fn unload_text_lines(text: &mut &u8, line_count: i32) void {
+    raw.UnloadTextLines(text, line_count);
+}
+
+/// Copy one string to another, returns bytes copied
+pub fn text_copy(dst: &[u8], src: &[u8]) i32 {
+    return raw.TextCopy(z_ptr(dst), z_ptr(src));
+}
+
+/// Check if two text string are equal
+pub fn text_is_equal(text1: &[u8], text2: &[u8]) bool {
+    return raw.TextIsEqual(z_ptr(text1), z_ptr(text2));
+}
+
+/// Get text length, checks for '\0' ending
+pub fn text_length(text: &[u8]) u32 {
+    return raw.TextLength(z_ptr(text));
+}
+
+/// Get a piece of a text string
+pub fn text_subtext(text: &[u8], position: i32, length: i32) &u8 {
+    return raw.TextSubtext(z_ptr(text), position, length);
+}
+
+/// Remove text spaces, concat words
+pub fn text_remove_spaces(text: &[u8]) &u8 {
+    return raw.TextRemoveSpaces(z_ptr(text));
+}
+
+/// Get text between two strings
+pub fn get_text_between(text: &[u8], begin: &[u8], end: &[u8]) &u8 {
+    return raw.GetTextBetween(z_ptr(text), z_ptr(begin), z_ptr(end));
+}
+
+/// Replace text string with new string
+pub fn text_replace(text: &[u8], search: &[u8], replacement: &[u8]) &u8 {
+    return raw.TextReplace(z_ptr(text), z_ptr(search), z_ptr(replacement));
+}
+
+/// Replace text string with new string, memory must be MemFree()
+pub fn text_replace_alloc(text: &[u8], search: &[u8], replacement: &[u8]) &u8 {
+    return raw.TextReplaceAlloc(z_ptr(text), z_ptr(search), z_ptr(replacement));
+}
+
+/// Replace text between two specific strings
+pub fn text_replace_between(text: &[u8], begin: &[u8], end: &[u8], replacement: &[u8]) &u8 {
+    return raw.TextReplaceBetween(z_ptr(text), z_ptr(begin), z_ptr(end), z_ptr(replacement));
+}
+
+/// Replace text between two specific strings, memory must be MemFree()
+pub fn text_replace_between_alloc(text: &[u8], begin: &[u8], end: &[u8], replacement: &[u8]) &u8 {
+    return raw.TextReplaceBetweenAlloc(z_ptr(text), z_ptr(begin), z_ptr(end), z_ptr(replacement));
+}
+
+/// Insert text in a defined byte position
+pub fn text_insert(text: &[u8], insert: &[u8], position: i32) &u8 {
+    return raw.TextInsert(z_ptr(text), z_ptr(insert), position);
+}
+
+/// Insert text in a defined byte position, memory must be MemFree()
+pub fn text_insert_alloc(text: &[u8], insert: &[u8], position: i32) &u8 {
+    return raw.TextInsertAlloc(z_ptr(text), z_ptr(insert), position);
+}
+
+/// Join text strings with delimiter
+pub fn text_join(text_list: &mut &u8, count: i32, delimiter: &[u8]) &u8 {
+    return raw.TextJoin(text_list, count, z_ptr(delimiter));
+}
+
+/// Split text into multiple strings, using MAX_TEXTSPLIT_COUNT static strings
+pub fn text_split(text: &[u8], delimiter: u8, count: &mut i32) &mut &u8 {
+    return raw.TextSplit(z_ptr(text), delimiter, count);
+}
+
+/// Append text at specific position and move cursor
+pub fn text_append(text: &[u8], append: &[u8], position: &mut i32) void {
+    raw.TextAppend(z_ptr(text), z_ptr(append), position);
+}
+
+/// Find first text occurrence within a string, -1 if not found
+pub fn text_find_index(text: &[u8], search: &[u8]) i32 {
+    return raw.TextFindIndex(z_ptr(text), z_ptr(search));
+}
+
+/// Get upper case version of provided string
+pub fn text_to_upper(text: &[u8]) &u8 {
+    return raw.TextToUpper(z_ptr(text));
+}
+
+/// Get lower case version of provided string
+pub fn text_to_lower(text: &[u8]) &u8 {
+    return raw.TextToLower(z_ptr(text));
+}
+
+/// Get Pascal case notation version of provided string
+pub fn text_to_pascal(text: &[u8]) &u8 {
+    return raw.TextToPascal(z_ptr(text));
+}
+
+/// Get Snake case notation version of provided string
+pub fn text_to_snake(text: &[u8]) &u8 {
+    return raw.TextToSnake(z_ptr(text));
+}
+
+/// Get Camel case notation version of provided string
+pub fn text_to_camel(text: &[u8]) &u8 {
+    return raw.TextToCamel(z_ptr(text));
+}
+
+/// Get integer value from text
+pub fn text_to_integer(text: &[u8]) i32 {
+    return raw.TextToInteger(z_ptr(text));
+}
+
+/// Get float value from text
+pub fn text_to_float(text: &[u8]) f32 {
+    return raw.TextToFloat(z_ptr(text));
+}
+
+/// Draw a line in 3D world space
+pub fn draw_line_3d(start_pos: Vector3, end_pos: Vector3, color: Color) void {
+    raw.DrawLine3D(start_pos, end_pos, color);
+}
+
+/// Draw a point in 3D space, actually a small line
+pub fn draw_point_3d(position: Vector3, color: Color) void {
+    raw.DrawPoint3D(position, color);
+}
+
+/// Draw a circle in 3D world space
+pub fn draw_circle_3d(center: Vector3, radius: f32, rotation_axis: Vector3, rotation_angle: f32, color: Color) void {
+    raw.DrawCircle3D(center, radius, rotation_axis, rotation_angle, color);
+}
+
+/// Draw a color-filled triangle (vertex in counter-clockwise order!)
+pub fn draw_triangle_3d(v1: Vector3, v2: Vector3, v3: Vector3, color: Color) void {
+    raw.DrawTriangle3D(v1, v2, v3, color);
+}
+
+/// Draw a triangle strip defined by points
+pub fn draw_triangle_strip_3d(points: &mut Vector3, point_count: i32, color: Color) void {
+    raw.DrawTriangleStrip3D(points, point_count, color);
+}
+
+/// Draw cube
+pub fn draw_cube(position: Vector3, width: f32, height: f32, length: f32, color: Color) void {
+    raw.DrawCube(position, width, height, length, color);
+}
+
+/// Draw cube (Vector version)
+pub fn draw_cube_v(position: Vector3, size: Vector3, color: Color) void {
+    raw.DrawCubeV(position, size, color);
+}
+
+/// Draw cube wires
+pub fn draw_cube_wires(position: Vector3, width: f32, height: f32, length: f32, color: Color) void {
+    raw.DrawCubeWires(position, width, height, length, color);
+}
+
+/// Draw cube wires (Vector version)
+pub fn draw_cube_wires_v(position: Vector3, size: Vector3, color: Color) void {
+    raw.DrawCubeWiresV(position, size, color);
+}
+
+/// Draw sphere
+pub fn draw_sphere(center_pos: Vector3, radius: f32, color: Color) void {
+    raw.DrawSphere(center_pos, radius, color);
+}
+
+/// Draw sphere with extended parameters
+pub fn draw_sphere_ex(center_pos: Vector3, radius: f32, rings: i32, slices: i32, color: Color) void {
+    raw.DrawSphereEx(center_pos, radius, rings, slices, color);
+}
+
+/// Draw sphere wires
+pub fn draw_sphere_wires(center_pos: Vector3, radius: f32, rings: i32, slices: i32, color: Color) void {
+    raw.DrawSphereWires(center_pos, radius, rings, slices, color);
+}
+
+/// Draw a cylinder/cone
+pub fn draw_cylinder(position: Vector3, radius_top: f32, radius_bottom: f32, height: f32, slices: i32, color: Color) void {
+    raw.DrawCylinder(position, radius_top, radius_bottom, height, slices, color);
+}
+
+/// Draw a cylinder with base at startPos and top at endPos
+pub fn draw_cylinder_ex(start_pos: Vector3, end_pos: Vector3, start_radius: f32, end_radius: f32, sides: i32, color: Color) void {
+    raw.DrawCylinderEx(start_pos, end_pos, start_radius, end_radius, sides, color);
+}
+
+/// Draw a cylinder/cone wires
+pub fn draw_cylinder_wires(position: Vector3, radius_top: f32, radius_bottom: f32, height: f32, slices: i32, color: Color) void {
+    raw.DrawCylinderWires(position, radius_top, radius_bottom, height, slices, color);
+}
+
+/// Draw a cylinder wires with base at startPos and top at endPos
+pub fn draw_cylinder_wires_ex(start_pos: Vector3, end_pos: Vector3, start_radius: f32, end_radius: f32, sides: i32, color: Color) void {
+    raw.DrawCylinderWiresEx(start_pos, end_pos, start_radius, end_radius, sides, color);
+}
+
+/// Draw a capsule with the center of its sphere caps at startPos and endPos
+pub fn draw_capsule(start_pos: Vector3, end_pos: Vector3, radius: f32, slices: i32, rings: i32, color: Color) void {
+    raw.DrawCapsule(start_pos, end_pos, radius, slices, rings, color);
+}
+
+/// Draw capsule wireframe with the center of its sphere caps at startPos and endPos
+pub fn draw_capsule_wires(start_pos: Vector3, end_pos: Vector3, radius: f32, slices: i32, rings: i32, color: Color) void {
+    raw.DrawCapsuleWires(start_pos, end_pos, radius, slices, rings, color);
+}
+
+/// Draw a plane XZ
+pub fn draw_plane(center_pos: Vector3, size: Vector2, color: Color) void {
+    raw.DrawPlane(center_pos, size, color);
+}
+
+/// Draw a ray line
+pub fn draw_ray(ray: Ray, color: Color) void {
+    raw.DrawRay(ray, color);
+}
+
+/// Draw a grid (centered at (0, 0, 0))
+pub fn draw_grid(slices: i32, spacing: f32) void {
+    raw.DrawGrid(slices, spacing);
+}
+
+/// Load model from files (meshes and materials)
+pub fn load_model(file_name: &[u8]) Model {
+    return raw.LoadModel(z_ptr(file_name));
+}
+
+/// Load model from generated mesh (default material)
+pub fn load_model_from_mesh(mesh: Mesh) Model {
+    return raw.LoadModelFromMesh(mesh);
+}
+
+/// Check if a model is valid (loaded in GPU, VAO/VBOs)
+pub fn is_model_valid(model: Model) bool {
+    return raw.IsModelValid(model);
+}
+
+/// Unload model (including meshes) from memory (RAM and/or VRAM)
+pub fn unload_model(model: Model) void {
+    raw.UnloadModel(model);
+}
+
+/// Compute model bounding box limits (considers all meshes)
+pub fn get_model_bounding_box(model: Model) BoundingBox {
+    return raw.GetModelBoundingBox(model);
+}
+
+/// Draw a model (with texture if set)
+pub fn draw_model(model: Model, position: Vector3, scale: f32, tint: Color) void {
+    raw.DrawModel(model, position, scale, tint);
+}
+
+/// Draw a model with extended parameters
+pub fn draw_model_ex(model: Model, position: Vector3, rotation_axis: Vector3, rotation_angle: f32, scale: Vector3, tint: Color) void {
+    raw.DrawModelEx(model, position, rotation_axis, rotation_angle, scale, tint);
+}
+
+/// Draw a model wires (with texture if set)
+pub fn draw_model_wires(model: Model, position: Vector3, scale: f32, tint: Color) void {
+    raw.DrawModelWires(model, position, scale, tint);
+}
+
+/// Draw a model wires (with texture if set) with extended parameters
+pub fn draw_model_wires_ex(model: Model, position: Vector3, rotation_axis: Vector3, rotation_angle: f32, scale: Vector3, tint: Color) void {
+    raw.DrawModelWiresEx(model, position, rotation_axis, rotation_angle, scale, tint);
+}
+
+/// Draw bounding box (wires)
+pub fn draw_bounding_box(box: BoundingBox, color: Color) void {
+    raw.DrawBoundingBox(box, color);
+}
+
+/// Draw a billboard texture
+pub fn draw_billboard(camera: Camera, texture: Texture2D, position: Vector3, scale: f32, tint: Color) void {
+    raw.DrawBillboard(camera, texture, position, scale, tint);
+}
+
+/// Draw a billboard texture defined by source
+pub fn draw_billboard_rec(camera: Camera, texture: Texture2D, source: Rectangle, position: Vector3, size: Vector2, tint: Color) void {
+    raw.DrawBillboardRec(camera, texture, source, position, size, tint);
+}
+
+/// Draw a billboard texture defined by source and rotation
+pub fn draw_billboard_pro(camera: Camera, texture: Texture2D, source: Rectangle, position: Vector3, up: Vector3, size: Vector2, origin: Vector2, rotation: f32, tint: Color) void {
+    raw.DrawBillboardPro(camera, texture, source, position, up, size, origin, rotation, tint);
+}
+
+/// Upload mesh vertex data in GPU and provide VAO/VBO ids
+pub fn upload_mesh(mesh: &mut Mesh, dynamic: bool) void {
+    raw.UploadMesh(mesh, dynamic);
+}
+
+/// Update mesh vertex data in GPU for a specific buffer index
+pub fn update_mesh_buffer(mesh: Mesh, index: i32, data: &mut void, data_size: i32, offset: i32) void {
+    raw.UpdateMeshBuffer(mesh, index, data, data_size, offset);
+}
+
+/// Unload mesh data from CPU and GPU
+pub fn unload_mesh(mesh: Mesh) void {
+    raw.UnloadMesh(mesh);
+}
+
+/// Draw a 3d mesh with material and transform
+pub fn draw_mesh(mesh: Mesh, material: Material, transform: Matrix) void {
+    raw.DrawMesh(mesh, material, transform);
+}
+
+/// Draw multiple mesh instances with material and different transforms
+pub fn draw_mesh_instanced(mesh: Mesh, material: Material, transforms: &mut Matrix, instances: i32) void {
+    raw.DrawMeshInstanced(mesh, material, transforms, instances);
+}
+
+/// Compute mesh bounding box limits
+pub fn get_mesh_bounding_box(mesh: Mesh) BoundingBox {
+    return raw.GetMeshBoundingBox(mesh);
+}
+
+/// Compute mesh tangents
+pub fn gen_mesh_tangents(mesh: &mut Mesh) void {
+    raw.GenMeshTangents(mesh);
+}
+
+/// Export mesh data to file, returns true on success
+pub fn export_mesh(mesh: Mesh, file_name: &[u8]) bool {
+    return raw.ExportMesh(mesh, z_ptr(file_name));
+}
+
+/// Export mesh as code file (.h) defining multiple arrays of vertex attributes
+pub fn export_mesh_as_code(mesh: Mesh, file_name: &[u8]) bool {
+    return raw.ExportMeshAsCode(mesh, z_ptr(file_name));
+}
+
+/// Generate polygonal mesh
+pub fn gen_mesh_poly(sides: i32, radius: f32) Mesh {
+    return raw.GenMeshPoly(sides, radius);
+}
+
+/// Generate plane mesh (with subdivisions)
+pub fn gen_mesh_plane(width: f32, length: f32, res_x: i32, res_z: i32) Mesh {
+    return raw.GenMeshPlane(width, length, res_x, res_z);
+}
+
+/// Generate cuboid mesh
+pub fn gen_mesh_cube(width: f32, height: f32, length: f32) Mesh {
+    return raw.GenMeshCube(width, height, length);
+}
+
+/// Generate sphere mesh (standard sphere)
+pub fn gen_mesh_sphere(radius: f32, rings: i32, slices: i32) Mesh {
+    return raw.GenMeshSphere(radius, rings, slices);
+}
+
+/// Generate half-sphere mesh (no bottom cap)
+pub fn gen_mesh_hemi_sphere(radius: f32, rings: i32, slices: i32) Mesh {
+    return raw.GenMeshHemiSphere(radius, rings, slices);
+}
+
+/// Generate cylinder mesh
+pub fn gen_mesh_cylinder(radius: f32, height: f32, slices: i32) Mesh {
+    return raw.GenMeshCylinder(radius, height, slices);
+}
+
+/// Generate cone/pyramid mesh
+pub fn gen_mesh_cone(radius: f32, height: f32, slices: i32) Mesh {
+    return raw.GenMeshCone(radius, height, slices);
+}
+
+/// Generate torus mesh
+pub fn gen_mesh_torus(radius: f32, size: f32, rad_seg: i32, sides: i32) Mesh {
+    return raw.GenMeshTorus(radius, size, rad_seg, sides);
+}
+
+/// Generate trefoil knot mesh
+pub fn gen_mesh_knot(radius: f32, size: f32, rad_seg: i32, sides: i32) Mesh {
+    return raw.GenMeshKnot(radius, size, rad_seg, sides);
+}
+
+/// Generate heightmap mesh from image data
+pub fn gen_mesh_heightmap(heightmap: Image, size: Vector3) Mesh {
+    return raw.GenMeshHeightmap(heightmap, size);
+}
+
+/// Generate cubes-based map mesh from image data
+pub fn gen_mesh_cubicmap(cubicmap: Image, cube_size: Vector3) Mesh {
+    return raw.GenMeshCubicmap(cubicmap, cube_size);
+}
+
+/// Load materials from model file
+pub fn load_materials(file_name: &[u8], material_count: &mut i32) &mut Material {
+    return raw.LoadMaterials(z_ptr(file_name), material_count);
+}
+
+/// Load default material (Supports: DIFFUSE, SPECULAR, NORMAL maps)
+pub fn load_material_default() Material {
+    return raw.LoadMaterialDefault();
+}
+
+/// Check if a material is valid (shader assigned, map textures loaded in GPU)
+pub fn is_material_valid(material: Material) bool {
+    return raw.IsMaterialValid(material);
+}
+
+/// Unload material from GPU memory (VRAM)
+pub fn unload_material(material: Material) void {
+    raw.UnloadMaterial(material);
+}
+
+/// Set texture for a material map type (MATERIAL_MAP_DIFFUSE, MATERIAL_MAP_SPECULAR...)
+pub fn set_material_texture(material: &mut Material, map_type: i32, texture: Texture2D) void {
+    raw.SetMaterialTexture(material, map_type, texture);
+}
+
+/// Set material for a mesh
+pub fn set_model_mesh_material(model: &mut Model, mesh_id: i32, material_id: i32) void {
+    raw.SetModelMeshMaterial(model, mesh_id, material_id);
+}
+
+/// Load model animations from file
+pub fn load_model_animations(file_name: &[u8], anim_count: &mut i32) &mut ModelAnimation {
+    return raw.LoadModelAnimations(z_ptr(file_name), anim_count);
+}
+
+/// Update model animation pose (vertex buffers and bone matrices)
+pub fn update_model_animation(model: Model, anim: ModelAnimation, frame: f32) void {
+    raw.UpdateModelAnimation(model, anim, frame);
+}
+
+/// Update model animation pose, blending two animations
+pub fn update_model_animation_ex(model: Model, anim_a: ModelAnimation, frame_a: f32, anim_b: ModelAnimation, frame_b: f32, blend: f32) void {
+    raw.UpdateModelAnimationEx(model, anim_a, frame_a, anim_b, frame_b, blend);
+}
+
+/// Unload animation array data
+pub fn unload_model_animations(animations: &mut ModelAnimation, anim_count: i32) void {
+    raw.UnloadModelAnimations(animations, anim_count);
+}
+
+/// Check model animation skeleton match
+pub fn is_model_animation_valid(model: Model, anim: ModelAnimation) bool {
+    return raw.IsModelAnimationValid(model, anim);
+}
+
+/// Check collision between two spheres
+pub fn check_collision_spheres(center1: Vector3, radius1: f32, center2: Vector3, radius2: f32) bool {
+    return raw.CheckCollisionSpheres(center1, radius1, center2, radius2);
+}
+
+/// Check collision between two bounding boxes
+pub fn check_collision_boxes(box1: BoundingBox, box2: BoundingBox) bool {
+    return raw.CheckCollisionBoxes(box1, box2);
+}
+
+/// Check collision between box and sphere
+pub fn check_collision_box_sphere(box: BoundingBox, center: Vector3, radius: f32) bool {
+    return raw.CheckCollisionBoxSphere(box, center, radius);
+}
+
+/// Get collision info between ray and sphere
+pub fn get_ray_collision_sphere(ray: Ray, center: Vector3, radius: f32) RayCollision {
+    return raw.GetRayCollisionSphere(ray, center, radius);
+}
+
+/// Get collision info between ray and box
+pub fn get_ray_collision_box(ray: Ray, box: BoundingBox) RayCollision {
+    return raw.GetRayCollisionBox(ray, box);
+}
+
+/// Get collision info between ray and mesh
+pub fn get_ray_collision_mesh(ray: Ray, mesh: Mesh, transform: Matrix) RayCollision {
+    return raw.GetRayCollisionMesh(ray, mesh, transform);
+}
+
+/// Get collision info between ray and triangle
+pub fn get_ray_collision_triangle(ray: Ray, p1: Vector3, p2: Vector3, p3: Vector3) RayCollision {
+    return raw.GetRayCollisionTriangle(ray, p1, p2, p3);
+}
+
+/// Get collision info between ray and quad
+pub fn get_ray_collision_quad(ray: Ray, p1: Vector3, p2: Vector3, p3: Vector3, p4: Vector3) RayCollision {
+    return raw.GetRayCollisionQuad(ray, p1, p2, p3, p4);
+}
+
+/// Initialize audio device and context
+pub fn init_audio_device() void {
+    raw.InitAudioDevice();
+}
+
+/// Close the audio device and context
+pub fn close_audio_device() void {
+    raw.CloseAudioDevice();
+}
+
+/// Check if audio device has been initialized successfully
+pub fn is_audio_device_ready() bool {
+    return raw.IsAudioDeviceReady();
+}
+
+/// Set master volume (listener)
+pub fn set_master_volume(volume: f32) void {
+    raw.SetMasterVolume(volume);
+}
+
+/// Get master volume (listener)
+pub fn get_master_volume() f32 {
+    return raw.GetMasterVolume();
+}
+
+/// Load wave data from file
+pub fn load_wave(file_name: &[u8]) Wave {
+    return raw.LoadWave(z_ptr(file_name));
+}
+
+/// Load wave from memory buffer, fileType refers to extension: i.e. '.wav'
+pub fn load_wave_from_memory(file_type: &[u8], file_data: &u8, data_size: i32) Wave {
+    return raw.LoadWaveFromMemory(z_ptr(file_type), file_data, data_size);
+}
+
+/// Checks if wave data is valid (data loaded and parameters)
+pub fn is_wave_valid(wave: Wave) bool {
+    return raw.IsWaveValid(wave);
+}
+
+/// Load sound from file
+pub fn load_sound(file_name: &[u8]) Sound {
+    return raw.LoadSound(z_ptr(file_name));
+}
+
+/// Load sound from wave data
+pub fn load_sound_from_wave(wave: Wave) Sound {
+    return raw.LoadSoundFromWave(wave);
+}
+
+/// Create a new sound that shares the same sample data as the source sound, does not own the sound data
+pub fn load_sound_alias(source: Sound) Sound {
+    return raw.LoadSoundAlias(source);
+}
+
+/// Checks if a sound is valid (data loaded and buffers initialized)
+pub fn is_sound_valid(sound: Sound) bool {
+    return raw.IsSoundValid(sound);
+}
+
+/// Update sound buffer with new data (default data format: 32 bit float, stereo)
+pub fn update_sound(sound: Sound, data: &mut void, sample_count: i32) void {
+    raw.UpdateSound(sound, data, sample_count);
+}
+
+/// Unload wave data
+pub fn unload_wave(wave: Wave) void {
+    raw.UnloadWave(wave);
+}
+
+/// Unload sound
+pub fn unload_sound(sound: Sound) void {
+    raw.UnloadSound(sound);
+}
+
+/// Unload a sound alias (does not deallocate sample data)
+pub fn unload_sound_alias(alias: Sound) void {
+    raw.UnloadSoundAlias(alias);
+}
+
+/// Export wave data to file, returns true on success
+pub fn export_wave(wave: Wave, file_name: &[u8]) bool {
+    return raw.ExportWave(wave, z_ptr(file_name));
+}
+
+/// Export wave sample data to code (.h), returns true on success
+pub fn export_wave_as_code(wave: Wave, file_name: &[u8]) bool {
+    return raw.ExportWaveAsCode(wave, z_ptr(file_name));
+}
+
+/// Play a sound
+pub fn play_sound(sound: Sound) void {
+    raw.PlaySound(sound);
+}
+
+/// Stop playing a sound
+pub fn stop_sound(sound: Sound) void {
+    raw.StopSound(sound);
+}
+
+/// Pause a sound
+pub fn pause_sound(sound: Sound) void {
+    raw.PauseSound(sound);
+}
+
+/// Resume a paused sound
+pub fn resume_sound(sound: Sound) void {
+    raw.ResumeSound(sound);
+}
+
+/// Check if a sound is currently playing
+pub fn is_sound_playing(sound: Sound) bool {
+    return raw.IsSoundPlaying(sound);
+}
+
+/// Set volume for a sound (1.0 is max level)
+pub fn set_sound_volume(sound: Sound, volume: f32) void {
+    raw.SetSoundVolume(sound, volume);
+}
+
+/// Set pitch for a sound (1.0 is base level)
+pub fn set_sound_pitch(sound: Sound, pitch: f32) void {
+    raw.SetSoundPitch(sound, pitch);
+}
+
+/// Set pan for a sound (-1.0 left, 0.0 center, 1.0 right)
+pub fn set_sound_pan(sound: Sound, pan: f32) void {
+    raw.SetSoundPan(sound, pan);
+}
+
+/// Copy a wave to a new wave
+pub fn wave_copy(wave: Wave) Wave {
+    return raw.WaveCopy(wave);
+}
+
+/// Crop a wave to defined frames range
+pub fn wave_crop(wave: &mut Wave, init_frame: i32, final_frame: i32) void {
+    raw.WaveCrop(wave, init_frame, final_frame);
+}
+
+/// Convert wave data to desired format
+pub fn wave_format(wave: &mut Wave, sample_rate: i32, sample_size: i32, channels: i32) void {
+    raw.WaveFormat(wave, sample_rate, sample_size, channels);
+}
+
+/// Load samples data from wave as a 32bit float data array
+pub fn load_wave_samples(wave: Wave) &mut f32 {
+    return raw.LoadWaveSamples(wave);
+}
+
+/// Unload samples data loaded with LoadWaveSamples()
+pub fn unload_wave_samples(samples: &mut f32) void {
+    raw.UnloadWaveSamples(samples);
+}
+
+/// Load music stream from file
+pub fn load_music_stream(file_name: &[u8]) Music {
+    return raw.LoadMusicStream(z_ptr(file_name));
+}
+
+/// Load music stream from data
+pub fn load_music_stream_from_memory(file_type: &[u8], data: &u8, data_size: i32) Music {
+    return raw.LoadMusicStreamFromMemory(z_ptr(file_type), data, data_size);
+}
+
+/// Checks if a music stream is valid (context and buffers initialized)
+pub fn is_music_valid(music: Music) bool {
+    return raw.IsMusicValid(music);
+}
+
+/// Unload music stream
+pub fn unload_music_stream(music: Music) void {
+    raw.UnloadMusicStream(music);
+}
+
+/// Start music playing
+pub fn play_music_stream(music: Music) void {
+    raw.PlayMusicStream(music);
+}
+
+/// Check if music is playing
+pub fn is_music_stream_playing(music: Music) bool {
+    return raw.IsMusicStreamPlaying(music);
+}
+
+/// Updates buffers for music streaming
+pub fn update_music_stream(music: Music) void {
+    raw.UpdateMusicStream(music);
+}
+
+/// Stop music playing
+pub fn stop_music_stream(music: Music) void {
+    raw.StopMusicStream(music);
+}
+
+/// Pause music playing
+pub fn pause_music_stream(music: Music) void {
+    raw.PauseMusicStream(music);
+}
+
+/// Resume playing paused music
+pub fn resume_music_stream(music: Music) void {
+    raw.ResumeMusicStream(music);
+}
+
+/// Seek music to a position (in seconds)
+pub fn seek_music_stream(music: Music, position: f32) void {
+    raw.SeekMusicStream(music, position);
+}
+
+/// Set volume for music (1.0 is max level)
+pub fn set_music_volume(music: Music, volume: f32) void {
+    raw.SetMusicVolume(music, volume);
+}
+
+/// Set pitch for a music (1.0 is base level)
+pub fn set_music_pitch(music: Music, pitch: f32) void {
+    raw.SetMusicPitch(music, pitch);
+}
+
+/// Set pan for a music (-1.0 left, 0.0 center, 1.0 right)
+pub fn set_music_pan(music: Music, pan: f32) void {
+    raw.SetMusicPan(music, pan);
+}
+
+/// Get music time length (in seconds)
+pub fn get_music_time_length(music: Music) f32 {
+    return raw.GetMusicTimeLength(music);
+}
+
+/// Get current music time played (in seconds)
+pub fn get_music_time_played(music: Music) f32 {
+    return raw.GetMusicTimePlayed(music);
+}
+
+/// Load audio stream (to stream raw audio pcm data)
+pub fn load_audio_stream(sample_rate: u32, sample_size: u32, channels: u32) AudioStream {
+    return raw.LoadAudioStream(sample_rate, sample_size, channels);
+}
+
+/// Checks if an audio stream is valid (buffers initialized)
+pub fn is_audio_stream_valid(stream: AudioStream) bool {
+    return raw.IsAudioStreamValid(stream);
+}
+
+/// Unload audio stream and free memory
+pub fn unload_audio_stream(stream: AudioStream) void {
+    raw.UnloadAudioStream(stream);
+}
+
+/// Update audio stream buffers with data
+pub fn update_audio_stream(stream: AudioStream, data: &mut void, frame_count: i32) void {
+    raw.UpdateAudioStream(stream, data, frame_count);
+}
+
+/// Check if any audio stream buffers requires refill
+pub fn is_audio_stream_processed(stream: AudioStream) bool {
+    return raw.IsAudioStreamProcessed(stream);
+}
+
+/// Play audio stream
+pub fn play_audio_stream(stream: AudioStream) void {
+    raw.PlayAudioStream(stream);
+}
+
+/// Pause audio stream
+pub fn pause_audio_stream(stream: AudioStream) void {
+    raw.PauseAudioStream(stream);
+}
+
+/// Resume audio stream
+pub fn resume_audio_stream(stream: AudioStream) void {
+    raw.ResumeAudioStream(stream);
+}
+
+/// Check if audio stream is playing
+pub fn is_audio_stream_playing(stream: AudioStream) bool {
+    return raw.IsAudioStreamPlaying(stream);
+}
+
+/// Stop audio stream
+pub fn stop_audio_stream(stream: AudioStream) void {
+    raw.StopAudioStream(stream);
+}
+
+/// Set volume for audio stream (1.0 is max level)
+pub fn set_audio_stream_volume(stream: AudioStream, volume: f32) void {
+    raw.SetAudioStreamVolume(stream, volume);
+}
+
+/// Set pitch for audio stream (1.0 is base level)
+pub fn set_audio_stream_pitch(stream: AudioStream, pitch: f32) void {
+    raw.SetAudioStreamPitch(stream, pitch);
+}
+
+/// Set pan for audio stream (-1.0 to 1.0 range, 0.0 is centered)
+pub fn set_audio_stream_pan(stream: AudioStream, pan: f32) void {
+    raw.SetAudioStreamPan(stream, pan);
+}
+
+/// Default size for new audio streams
+pub fn set_audio_stream_buffer_size_default(size: i32) void {
+    raw.SetAudioStreamBufferSizeDefault(size);
+}
+

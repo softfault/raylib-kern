@@ -10,13 +10,13 @@ use raylib;
 This repository pins raylib 6.0 as a Craft resource and builds the C sources
 through Craft instead of requiring a system `libraylib`.
 
-The public shape is hand-maintained:
+The public shape is generated from raylib metadata:
 
-- `raylib`: Kern-style type aliases, constants, constructor helpers, and snake_case
-  wrappers for raylib functions.
+- `raylib`: Kern-style type aliases, constants, constructor helpers, and
+  snake_case wrappers for raylib functions.
 
 `src/raw.rn` is generated as the direct C ABI layer, but it is a private
-implementation detail used by the small modules under `src/`.
+implementation detail used only by the generated public wrapper.
 
 ## Requirements
 
@@ -99,9 +99,9 @@ between `BeginDrawing` and `EndDrawing`.
 
 ## Strings
 
-raylib's C API expects zero-terminated `const char *` strings. Recent Kern
-versions type string literals as `[]u8` byte slices, so the ergonomic wrapper
-functions accept `[]u8` directly. The binding still does not allocate or append
+raylib's C API expects zero-terminated `const char *` strings. Kern string
+literals are byte arrays that decay to `&[u8]`, so the public wrapper functions
+accept `&[u8]` directly. The binding still does not allocate or append
 the C terminator for you: pass a literal with `\0` when calling helpers such as
 `init_window`, `draw_text`, `measure_text`, or `load_texture`.
 
@@ -163,24 +163,27 @@ is raylib's parser output, not a hand-maintained copy of `raylib.h`. Craft build
 and runs the Kern host tool in `tools/raylib-bindgen` against
 `tools/rlparser/output/raylib_api.txt` from the pinned raylib resource.
 
-Only `src/raw.rn` is regenerated. The public wrapper modules are hand-maintained
-so they can use Kern naming, module boundaries, and focused convenience helpers.
+Both `src/lib.rn` and `src/raw.rn` are generated. The public layer uses
+snake_case names, `&[u8]` string inputs, typed enum parameters where raylib's C
+surface uses plain integers, and small constructor helpers. The raw layer stays
+private so package users do not depend on C-shaped names.
 
 Regenerate the checked-in bindings after updating the pinned raylib resource:
 
 ```sh
 craft build --project-path tools/raylib-bindgen
+tools/raylib-bindgen/.craft/build/dev/target/out/raylib-bindgen-0.1.0/bin/raylib-bindgen public \
+  .craft/resources/raylib-*/raylib/tools/rlparser/output/raylib_api.txt > src/lib.rn
 tools/raylib-bindgen/.craft/build/dev/target/out/raylib-bindgen-0.1.0/bin/raylib-bindgen raw \
   .craft/resources/raylib-*/raylib/tools/rlparser/output/raylib_api.txt > src/raw.rn
 ```
 
 ## Scope
 
-The generated raw layer targets raylib 6.0's stable C ABI. The public wrapper
-currently covers the window lifecycle, drawing basics, input, text, textures,
-audio device setup, color constants, and common value constructors. Additional
-raylib areas should be added as focused hand-written modules with compile
-coverage.
+The generated public layer targets raylib 6.0's stable C ABI and exposes the
+representable raylib functions as Kern-style wrappers. C varargs and callback
+ABI shapes are intentionally omitted until Kern has a suitable public contract
+for them.
 
 ## License
 
