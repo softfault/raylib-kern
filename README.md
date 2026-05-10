@@ -68,7 +68,7 @@ const MESSAGE = "Hello from Kern + raylib\0";
 fn main() i32 {
     let win = raylib.window.open(800, 450, TITLE);
     defer win.close();
-    win.target_fps(60);
+    _ = win.target_fps(60);
 
     while (win.is_open()) {
         win.frame()
