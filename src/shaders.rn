@@ -8,8 +8,9 @@
 //! let shader = raylib.shaders.load_shader("vs.glsl\0", "fs.glsl\0");
 //! defer shader.unload();
 //!
+//! let mut tint_value = raylib.WHITE.normalize();
 //! let tint = shader.location("tint\0");
-//! shader.set_value(tint, value, raylib.ShaderUniformDataType.VEC4);
+//! _ = shader.set_value(tint, tint_value..&, raylib.ShaderUniformDataType.VEC4);
 //! ```
 
 use ..raw;

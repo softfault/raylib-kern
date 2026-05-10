@@ -9,9 +9,11 @@ const TEXTURE_PATH = "missing.png\0";
 // Locks shader resource methods without requiring a real shader asset.
 fn use_shader_api() void {
     let shader = raylib.shaders.load_shader("missing.vs\0", "missing.fs\0");
+    let mut tint_value = raylib.WHITE.normalize();
+    let tint = shader.location("tint\0");
     _ = shader.is_valid();
-    _ = shader.location("tint\0");
     _ = shader.attrib_location("position\0");
+    _ = shader.set_value(tint, tint_value..&, raylib.ShaderUniformDataType.VEC4);
     shader.unload();
 }
 
@@ -130,6 +132,21 @@ fn use_window_api() void {
     win.close();
 }
 
+// Locks README-shaped first-window flow.
+fn use_first_window_example_shape() void {
+    let win = raylib.window.open(800, 450, "raylib-kern first window\0")
+        .target_fps(60);
+    defer win.close();
+
+    if (win.is_open()) {
+        win.frame()
+            .clear(raylib.RAYWHITE)
+            .text("Hello from Kern + raylib\0", 190, 200, 20, raylib.DARKGRAY)
+            .fps(10, 10)
+            .end();
+    }
+}
+
 // Touches drawing functions so signature drift breaks compilation early.
 fn use_drawing_api() void {
     let p = raylib.vector2(10.0, 20.0);
@@ -229,6 +246,59 @@ fn use_texture_api() void {
     tex.unload();
 }
 
+// Locks README-shaped texture flow.
+fn use_texture_example_shape() void {
+    let win = raylib.window.open(800, 450, "textures\0")
+        .target_fps(60);
+    defer win.close();
+
+    let logo = raylib.textures.load_texture("resources/raylib_logo.png\0")..&;
+    defer logo.unload();
+
+    if (win.is_open()) {
+        let frame = win.frame().clear(raylib.RAYWHITE);
+        logo.draw_at(raylib.vector2(40.0, 40.0), raylib.WHITE);
+        frame.end();
+    }
+}
+
+// Locks README-shaped image-to-texture flow.
+fn use_image_example_shape() void {
+    let image = raylib.images.load_image("resources/raylib_logo.png\0")..&;
+    defer image.unload();
+
+    image.flip_vertical();
+    image.draw_text(
+        "loaded from an image\0",
+        8,
+        8,
+        18,
+        raylib.BLACK,
+    );
+
+    let texture = image.to_texture();
+    defer texture.unload();
+}
+
+// Locks README-shaped audio flow.
+fn use_audio_example_shape() void {
+    let audio = raylib.audio.open();
+    defer audio.close();
+
+    let sound = raylib.audio.load_sound("resources/click.wav\0")..&;
+    defer sound.unload();
+
+    sound.set_volume(0.8).play();
+
+    let music = raylib.audio.load_music_stream("resources/theme.ogg\0")..&;
+    defer music.unload();
+
+    music.play();
+    if (music.is_playing()) {
+        music.update();
+    }
+}
+
 // Touches module paths so the focused public modules remain part of the API.
 fn use_module_api() void {
     let rec = raylib.rectangle(
@@ -285,9 +355,13 @@ fn main() i32 {
     // without opening a real window in CI or headless development shells.
     if (false) {
         use_window_api();
+        use_first_window_example_shape();
         use_drawing_api();
         use_input_api();
         use_texture_api();
+        use_texture_example_shape();
+        use_image_example_shape();
+        use_audio_example_shape();
         use_module_api();
         use_shader_api();
         use_text_api();

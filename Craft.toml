@@ -2,7 +2,7 @@
 name = "raylib"
 version = "0.1.0"
 kern = "0.7.5"
-description = "Kern bindings for raylib"
+description = "Kern wrapper for raylib"
 readme = "README.md"
 license = "MIT"
 authors = ["softfault <givenyoung46@gmail.com>"]

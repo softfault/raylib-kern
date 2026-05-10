@@ -1,7 +1,8 @@
 # raylib-kern
 
-`raylib-kern` provides Kern bindings for [raylib](https://www.raylib.com/).
-The Craft package name is `raylib`, so applications import it with:
+`raylib-kern` provides a Kern-shaped wrapper for
+[raylib](https://www.raylib.com/). The Craft package name is `raylib`, so
+applications import it with:
 
 ```kern
 use raylib;
@@ -66,9 +67,9 @@ const TITLE = "raylib-kern first window\0";
 const MESSAGE = "Hello from Kern + raylib\0";
 
 fn main() i32 {
-    let win = raylib.window.open(800, 450, TITLE);
+    let win = raylib.window.open(800, 450, TITLE)
+        .target_fps(60);
     defer win.close();
-    _ = win.target_fps(60);
 
     while (win.is_open()) {
         win.frame()
@@ -122,7 +123,8 @@ if (raylib.MouseButton.LEFT.pressed()) {
 ```kern
 const LOGO = "resources/raylib_logo.png\0";
 
-let win = raylib.window.open(800, 450, "textures\0");
+let win = raylib.window.open(800, 450, "textures\0")
+    .target_fps(60);
 defer win.close();
 
 let logo = raylib.textures.load_texture(LOGO)..&;
