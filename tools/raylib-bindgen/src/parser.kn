@@ -11,12 +11,12 @@ pub struct Line {
 static EMPTY = "";
 
 pub fn next_line(text: &[u8], start: usize) ?Line {
-    if (start >= text.len()) {
+    if (start >= text.@len()) {
         return .None;
     }
 
     let mut end = start;
-    while (end < text.len() and text.[end] != b'\n') {
+    while (end < text.@len() and text.[end] != b'\n') {
         end += 1;
     }
 
@@ -25,7 +25,7 @@ pub fn next_line(text: &[u8], start: usize) ?Line {
         line_end -= 1;
     }
 
-    let next = if (end < text.len()) end + 1 else end;
+    let next = if (end < text.@len()) end + 1 else end;
     return .{ Some: Line.{ text: text.&[start...line_end], next: next } };
 }
 
@@ -37,7 +37,7 @@ pub fn strip_prefix_or_empty(text: &[u8], prefix: &[u8]) &[u8] {
 }
 
 pub fn last_space(text: &[u8]) ?usize {
-    let mut i = text.len();
+    let mut i = text.@len();
     while (i > 0) {
         i -= 1;
         if (text.[i] == b' ') {

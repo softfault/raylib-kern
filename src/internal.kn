@@ -4,7 +4,7 @@ use base.mem.null_ptr;
 
 /// Returns the C pointer for a zero-terminated byte string.
 pub fn z_ptr(text_z: &[u8]) &u8 {
-    if (text_z.len() == 0) {
+    if (text_z.@len() == 0) {
         return null_ptr[u8]();
     }
     return text_z.[0].&;

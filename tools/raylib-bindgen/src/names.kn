@@ -48,11 +48,11 @@ static NPATCH_LAYOUT = "NPatchLayout";
 
 /// Returns true when a C define name is suitable to expose as a public constant.
 pub fn is_public_define_name(name: &[u8]) bool {
-    if (name.len() == 0) {
+    if (name.@len() == 0) {
         return false;
     }
     let mut i = 0;
-    while (i < name.len()) {
+    while (i < name.@len()) {
         let byte = name.[i];
         if (!((byte >= b'A' and byte <= b'Z') or (byte >= b'0' and byte <= b'9') or byte == b'_')) {
             return false;
@@ -112,7 +112,7 @@ fn enum_value_prefix(name: &[u8]) &[u8] {
 /// Strips the conventional C enum prefix from one enum value.
 pub fn enum_variant_name(enum_name: &[u8], value_name: &[u8]) &[u8] {
     let prefix = enum_value_prefix(enum_name);
-    if (prefix.len() == 0) {
+    if (prefix.@len() == 0) {
         return value_name;
     }
     return match (value_name.strip_prefix(prefix)) {
@@ -153,7 +153,7 @@ fn enum_name_for_value(value_name: &[u8]) &[u8] {
 /// Returns true when a public define would duplicate a non-flag enum value.
 pub fn skip_public_enum_define_alias(value: &[u8]) bool {
     let enum_name = enum_name_for_value(value);
-    if (enum_name.len() == 0 or enum_is_flags(enum_name)) {
+    if (enum_name.@len() == 0 or enum_is_flags(enum_name)) {
         return false;
     }
     // Non-flag enum values are already exposed through the typed enum alias.

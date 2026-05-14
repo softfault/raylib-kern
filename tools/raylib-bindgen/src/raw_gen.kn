@@ -34,8 +34,8 @@ impl &mut FunctionState {
     pub fn should_emit() bool {
         return self.active
             and !self.skip
-            and self.name.len() != 0
-            and self.ret.len() != 0;
+            and self.name.@len() != 0
+            and self.ret.@len() != 0;
     }
 
     pub fn finish() void {
@@ -46,7 +46,7 @@ impl &mut FunctionState {
 // Extracts the C type and field-name split from one rlparser struct field line.
 fn field_parts(line: &[u8]) ?Line {
     let .{ Some: split } = line.find("]: ") else return .None;
-    let mut body = line.&[split + 3...line.len()];
+    let mut body = line.&[split + 3...line.@len()];
     match (body.find(" //")) {
         .{ Some: comment } => body = body.&[0...comment],
         .None => {},
@@ -59,7 +59,7 @@ fn field_parts(line: &[u8]) ?Line {
 fn emit_raw_struct_field(out: &mut Emitter, line: &[u8]) void {
     let .{ Some: parts } = field_parts(line) else return;
     let .{ Some: split } = line.find("]: ") else return;
-    let name = line.&[split + 3 + parts.next...line.len()];
+    let name = line.&[split + 3 + parts.next...line.@len()];
     let clean_name = sanitize_name(match (name.find(" //")) {
         .{ Some: comment } => name.&[0...comment],
         .None => name,
@@ -77,11 +77,11 @@ fn parse_param(
     alloc: &mut base.mem.alloc.Allocator,
 ) bool {
     let .{ Some: split } = line.find("]: ") else return true;
-    let rest = line.&[split + 3...line.len()];
+    let rest = line.&[split + 3...line.@len()];
     let .{ Some: type_marker } = rest.find(" (type: ") else return true;
     let name = rest.&[0...type_marker].trim_ascii();
     let type_start = type_marker + 8;
-    let mut type_end = rest.len();
+    let mut type_end = rest.@len();
     if (type_end > 0 and rest.[type_end - 1] == b')') {
         type_end -= 1;
     }
@@ -228,7 +228,7 @@ pub fn emit_raw(text: &[u8]) i32 {
             let .{ Some: close } = line.find_byte(b']') else continue;
             let .{ Some: colon } = line.find("]: ") else continue;
             let name = line.&[open + 1...close];
-            let value = line.&[colon + 3...line.len()].trim_ascii();
+            let value = line.&[colon + 3...line.@len()].trim_ascii();
             if (enum_is_flags(enum_name)) {
                 // Flag enums are generated as constants so bitwise combinations stay usable.
                 emit_flag_value(
@@ -257,7 +257,7 @@ pub fn emit_raw(text: &[u8]) i32 {
             // Alias entries are split across adjacent Type/Name lines.
             let alias_name_raw = strip_prefix_or_empty(item2.text, "  Name: ");
             let alias_name = if (alias_name_raw.starts_with("*")) {
-                alias_name_raw.&[1...alias_name_raw.len()]
+                alias_name_raw.&[1...alias_name_raw.@len()]
             } else {
                 alias_name_raw
             };

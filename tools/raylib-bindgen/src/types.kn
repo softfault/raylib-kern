@@ -9,13 +9,13 @@ use ..names.{enum_backing_type, enum_variant_name, mapped_enum_param_type};
 fn remove_words(text: &[u8]) &[u8] {
     let mut out = text.trim_ascii();
     if (out.starts_with("const ")) {
-        out = out.&[6...out.len()].trim_ascii();
+        out = out.&[6...out.@len()].trim_ascii();
     }
     if (out.starts_with("struct ")) {
-        out = out.&[7...out.len()].trim_ascii();
+        out = out.&[7...out.@len()].trim_ascii();
     }
     if (out.starts_with("enum ")) {
-        out = out.&[5...out.len()].trim_ascii();
+        out = out.&[5...out.@len()].trim_ascii();
     }
     return out;
 }
@@ -53,7 +53,7 @@ pub fn emit_kern_type(out: &mut Emitter, c_type: &[u8]) void {
 
     let mut stars = 0usize;
     let mut i = 0;
-    while (i < clean.len()) {
+    while (i < clean.@len()) {
         if (clean.[i] == b'*') {
             stars += 1usize;
         }
@@ -65,7 +65,7 @@ pub fn emit_kern_type(out: &mut Emitter, c_type: &[u8]) void {
     let gpa = gpa().on(page)..&;
     defer no_ptr..&.deinit(gpa);
     i = 0;
-    while (i < clean.len()) {
+    while (i < clean.@len()) {
         if (clean.[i] != b'*') {
             let _ = no_ptr..&.try_push_char(gpa, clean.[i]);
         }
@@ -88,7 +88,7 @@ pub fn emit_kern_type(out: &mut Emitter, c_type: &[u8]) void {
         .None => {},
     }
 
-    if (array_size.len() != 0) {
+    if (array_size.@len() != 0) {
         out.fmt("[{}]", .{ array_size });
     }
 
@@ -114,7 +114,7 @@ pub fn emit_param_type(
     c_type: &[u8],
 ) void {
     let enum_type = mapped_enum_param_type(function_name, param_name, c_type);
-    if (enum_type.len() != 0) {
+    if (enum_type.@len() != 0) {
         out.write(enum_type);
         return;
     }
