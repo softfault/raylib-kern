@@ -26,7 +26,7 @@ pub fn next_line(text: &[u8], start: usize) ?Line {
     }
 
     let next = if (end < text.len()) end + 1 else end;
-    return .{ Some: Line.{ text: text.&[start .. line_end], next: next } };
+    return .{ Some: Line.{ text: text.&[start...line_end], next: next } };
 }
 
 pub fn strip_prefix_or_empty(text: &[u8], prefix: &[u8]) &[u8] {

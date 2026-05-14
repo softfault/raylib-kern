@@ -2,9 +2,9 @@
 
 use ..raw;
 
-pub const RAYLIB_VERSION_MAJOR = 6;
-pub const RAYLIB_VERSION_MINOR = 0;
-pub const RAYLIB_VERSION_PATCH = 0;
+pub const RAYLIB_VERSION_MAJOR = 6i32;
+pub const RAYLIB_VERSION_MINOR = 0i32;
+pub const RAYLIB_VERSION_PATCH = 0i32;
 
 /// raylib-compatible value types.
 ///
@@ -74,34 +74,34 @@ pub type CameraMode = raw.CameraMode;
 pub type CameraProjection = raw.CameraProjection;
 pub type NPatchLayout = raw.NPatchLayout;
 
-pub const FLAG_VSYNC_HINT = u32.{64};
-pub const FLAG_FULLSCREEN_MODE = u32.{2};
-pub const FLAG_WINDOW_RESIZABLE = u32.{4};
-pub const FLAG_WINDOW_UNDECORATED = u32.{8};
-pub const FLAG_WINDOW_HIDDEN = u32.{128};
-pub const FLAG_WINDOW_MINIMIZED = u32.{512};
-pub const FLAG_WINDOW_MAXIMIZED = u32.{1024};
-pub const FLAG_WINDOW_UNFOCUSED = u32.{2048};
-pub const FLAG_WINDOW_TOPMOST = u32.{4096};
-pub const FLAG_WINDOW_ALWAYS_RUN = u32.{256};
-pub const FLAG_WINDOW_TRANSPARENT = u32.{16};
-pub const FLAG_WINDOW_HIGHDPI = u32.{8192};
-pub const FLAG_WINDOW_MOUSE_PASSTHROUGH = u32.{16384};
-pub const FLAG_BORDERLESS_WINDOWED_MODE = u32.{32768};
-pub const FLAG_MSAA_4X_HINT = u32.{32};
-pub const FLAG_INTERLACED_HINT = u32.{65536};
+pub const FLAG_VSYNC_HINT = 64u32;
+pub const FLAG_FULLSCREEN_MODE = 2u32;
+pub const FLAG_WINDOW_RESIZABLE = 4u32;
+pub const FLAG_WINDOW_UNDECORATED = 8u32;
+pub const FLAG_WINDOW_HIDDEN = 128u32;
+pub const FLAG_WINDOW_MINIMIZED = 512u32;
+pub const FLAG_WINDOW_MAXIMIZED = 1024u32;
+pub const FLAG_WINDOW_UNFOCUSED = 2048u32;
+pub const FLAG_WINDOW_TOPMOST = 4096u32;
+pub const FLAG_WINDOW_ALWAYS_RUN = 256u32;
+pub const FLAG_WINDOW_TRANSPARENT = 16u32;
+pub const FLAG_WINDOW_HIGHDPI = 8192u32;
+pub const FLAG_WINDOW_MOUSE_PASSTHROUGH = 16384u32;
+pub const FLAG_BORDERLESS_WINDOWED_MODE = 32768u32;
+pub const FLAG_MSAA_4X_HINT = 32u32;
+pub const FLAG_INTERLACED_HINT = 65536u32;
 
-pub const GESTURE_NONE = u32.{0};
-pub const GESTURE_TAP = u32.{1};
-pub const GESTURE_DOUBLETAP = u32.{2};
-pub const GESTURE_HOLD = u32.{4};
-pub const GESTURE_DRAG = u32.{8};
-pub const GESTURE_SWIPE_RIGHT = u32.{16};
-pub const GESTURE_SWIPE_LEFT = u32.{32};
-pub const GESTURE_SWIPE_UP = u32.{64};
-pub const GESTURE_SWIPE_DOWN = u32.{128};
-pub const GESTURE_PINCH_IN = u32.{256};
-pub const GESTURE_PINCH_OUT = u32.{512};
+pub const GESTURE_NONE = 0u32;
+pub const GESTURE_TAP = 1u32;
+pub const GESTURE_DOUBLETAP = 2u32;
+pub const GESTURE_HOLD = 4u32;
+pub const GESTURE_DRAG = 8u32;
+pub const GESTURE_SWIPE_RIGHT = 16u32;
+pub const GESTURE_SWIPE_LEFT = 32u32;
+pub const GESTURE_SWIPE_UP = 64u32;
+pub const GESTURE_SWIPE_DOWN = 128u32;
+pub const GESTURE_PINCH_IN = 256u32;
+pub const GESTURE_PINCH_OUT = 512u32;
 
 impl Color {
     /// Creates a `Color` from red, green, blue, and alpha channels.

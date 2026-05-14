@@ -10,7 +10,7 @@ use base.mem.alloc.gpa;
 use std.fs;
 use std.io;
 use std.proc;
-use sys.mem.Page;
+use std.mem.Page;
 use .raw_gen.emit_raw;
 
 // Reports a generator error in a consistent, script-friendly format.

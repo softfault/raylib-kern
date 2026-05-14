@@ -1,8 +1,8 @@
-//! Generates the low-level `raw.rn` ABI module from raylib rlparser text.
+//! Generates the low-level `raw.kn` ABI module from raylib rlparser text.
 
 use base.io.Write;
 use base.mem.alloc.gpa;
-use sys.mem.Page;
+use std.mem.Page;
 use ..emit.{Emitter, emitter};
 use ..names.{enum_is_flags, sanitize_name};
 use ..parser.{Line, last_space, next_line, strip_prefix_or_empty};
@@ -46,22 +46,22 @@ impl &mut FunctionState {
 // Extracts the C type and field-name split from one rlparser struct field line.
 fn field_parts(line: &[u8]) ?Line {
     let .{ Some: split } = line.find("]: ") else return .None;
-    let mut body = line.&[split + 3 .. line.len()];
+    let mut body = line.&[split + 3...line.len()];
     match (body.find(" //")) {
-        .{ Some: comment } => body = body.&[0 .. comment],
+        .{ Some: comment } => body = body.&[0...comment],
         .None => {},
     }
     let .{ Some: space } = last_space(body) else return .None;
-    return .{ Some: Line.{ text: body.&[0 .. space].trim_ascii(), next: space + 1 } };
+    return .{ Some: Line.{ text: body.&[0...space].trim_ascii(), next: space + 1 } };
 }
 
 // Emits one Kern field declaration for a parsed C struct field.
 fn emit_raw_struct_field(out: &mut Emitter, line: &[u8]) void {
     let .{ Some: parts } = field_parts(line) else return;
     let .{ Some: split } = line.find("]: ") else return;
-    let name = line.&[split + 3 + parts.next .. line.len()];
+    let name = line.&[split + 3 + parts.next...line.len()];
     let clean_name = sanitize_name(match (name.find(" //")) {
-        .{ Some: comment } => name.&[0 .. comment],
+        .{ Some: comment } => name.&[0...comment],
         .None => name,
     }.trim_ascii());
     out.fmt("    pub {}: ", .{ clean_name });
@@ -77,30 +77,32 @@ fn parse_param(
     alloc: &mut base.mem.alloc.Allocator,
 ) bool {
     let .{ Some: split } = line.find("]: ") else return true;
-    let rest = line.&[split + 3 .. line.len()];
+    let rest = line.&[split + 3...line.len()];
     let .{ Some: type_marker } = rest.find(" (type: ") else return true;
-    let name = rest.&[0 .. type_marker].trim_ascii();
+    let name = rest.&[0...type_marker].trim_ascii();
     let type_start = type_marker + 8;
     let mut type_end = rest.len();
     if (type_end > 0 and rest.[type_end - 1] == b')') {
         type_end -= 1;
     }
-    let c_type = rest.&[type_start .. type_end].trim_ascii();
+    let c_type = rest.&[type_start...type_end].trim_ascii();
     if (c_type == "..." or c_type == "va_list" or c_type.ends_with("Callback")) {
         // Kern cannot express C varargs/callback ABI here, so omit the whole function.
         return false;
     }
     if (!out.is_empty()) {
-        if (!out.push_str(alloc, ", ")) return false;
+        if (out.try_push_str(alloc, ", ").is_err()) return false;
     }
-    if (!out.push_str(alloc, sanitize_name(name)) or !out.push_str(alloc, ": ")) {
+    if (out.try_push_str(alloc, sanitize_name(name)).is_err()
+        or out.try_push_str(alloc, ": ").is_err())
+    {
         return false;
     }
 
     let mut tmp = base.coll.String.{};
     defer tmp..&.deinit(alloc);
     let mut writer = tmp..&.writer(alloc);
-    let type_writer = &mut Write.{ writer..& };
+    let type_writer = (writer..& as &mut Write);
     let mut emitter = emitter(type_writer);
     emit_param_type(
         emitter..&,
@@ -111,7 +113,7 @@ fn parse_param(
     if (writer..&.did_fail()) {
         return false;
     }
-    return out.push_str(alloc, tmp.&.as_str());
+    return out.try_push_str(alloc, tmp.&.as_str()).is_ok();
 }
 
 // Emits the accumulated function signature unless a skipped parameter made the
@@ -133,7 +135,7 @@ pub fn emit_raw(text: &[u8]) i32 {
     let page = Page.{}..&;
     let gpa = gpa().on(page)..&;
     let mut stdout_file = std.io.stdout();
-    let stdout_writer = &mut Write.{ stdout_file..& };
+    let stdout_writer = (stdout_file..& as &mut Write);
     let mut emitter = emitter(stdout_writer);
     let out = emitter..&;
     let mut in_struct = false;
@@ -142,7 +144,7 @@ pub fn emit_raw(text: &[u8]) i32 {
     let mut struct_open = false;
     let mut enum_open = false;
     let empty = "";
-    let mut enum_name = empty.&[0 .. 0];
+    let mut enum_name = empty.&[0...0];
     let mut function = FunctionState.{};
     defer function.params..&.deinit(gpa);
 
@@ -225,8 +227,8 @@ pub fn emit_raw(text: &[u8]) i32 {
             let .{ Some: open } = line.find_byte(b'[') else continue;
             let .{ Some: close } = line.find_byte(b']') else continue;
             let .{ Some: colon } = line.find("]: ") else continue;
-            let name = line.&[open + 1 .. close];
-            let value = line.&[colon + 3 .. line.len()].trim_ascii();
+            let name = line.&[open + 1...close];
+            let value = line.&[colon + 3...line.len()].trim_ascii();
             if (enum_is_flags(enum_name)) {
                 // Flag enums are generated as constants so bitwise combinations stay usable.
                 emit_flag_value(
@@ -255,7 +257,7 @@ pub fn emit_raw(text: &[u8]) i32 {
             // Alias entries are split across adjacent Type/Name lines.
             let alias_name_raw = strip_prefix_or_empty(item2.text, "  Name: ");
             let alias_name = if (alias_name_raw.starts_with("*")) {
-                alias_name_raw.&[1 .. alias_name_raw.len()]
+                alias_name_raw.&[1...alias_name_raw.len()]
             } else {
                 alias_name_raw
             };

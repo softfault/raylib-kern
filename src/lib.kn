@@ -1,6 +1,6 @@
 //! Kern-first raylib wrapper.
 //!
-//! `raw.rn` is generated from raylib's C ABI and kept private. The public API
+//! `raw.kn` is generated from raylib's C ABI and kept private. The public API
 //! is organized by raylib domain modules, with a small root prelude for common
 //! value types, constructors, and color constants.
 //!

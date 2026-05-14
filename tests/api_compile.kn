@@ -44,7 +44,7 @@ fn use_text_api() void {
     _ = TEXT.between("h\0", "o\0");
     _ = TEXT.replace("h\0", "H\0");
     _ = TEXT.insert("!\0", 5);
-    _ = TEXT.split(u8.{44}, count..&);
+    _ = TEXT.split(44u8, count..&);
     _ = TEXT.to_snake();
     _ = TEXT.to_camel();
     _ = font.draw(
@@ -350,7 +350,8 @@ fn use_module_api() void {
 }
 
 // Entry point for the compile-only test.
-fn main() i32 {
+#[test]
+fn api_compile() i32 {
     // Keep these calls behind an impossible branch so the test locks API shape
     // without opening a real window in CI or headless development shells.
     if (false) {

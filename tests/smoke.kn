@@ -1,11 +1,11 @@
 //! Smoke tests for constants and pure constructors.
 
-use base.test;
+use base.test.{Report, report};
 use std.io;
 use raylib;
 
 // Verifies representative color constants against raylib's palette values.
-fn check_color_constants(t: &mut test.Report[io.File]) void {
+fn check_color_constants(t: &mut Report[io.File]) void {
     let white = raylib.WHITE;
     (white.r == 255).should().sum(@loc(), t);
     (white.g == 255).should().sum(@loc(), t);
@@ -15,7 +15,7 @@ fn check_color_constants(t: &mut test.Report[io.File]) void {
 }
 
 // Verifies pure value constructors without opening a window.
-fn check_constructors(t: &mut test.Report[io.File]) void {
+fn check_constructors(t: &mut Report[io.File]) void {
     let v = raylib.vector2(3.0, 4.0);
     (v.x == 3.0).should().sum(@loc(), t);
     (v.y == 4.0).should().sum(@loc(), t);
@@ -33,24 +33,25 @@ fn check_constructors(t: &mut test.Report[io.File]) void {
 }
 
 // Verifies selected generated enum constants keep their expected values.
-fn check_input_constants(t: &mut test.Report[io.File]) void {
+fn check_input_constants(t: &mut Report[io.File]) void {
     ((match (raylib.Key.A) {
-        .A => 65,
-        _ => 0,
-    }) == 65).should().sum(@loc(), t);
+        .A => 65i32,
+        _ => 0i32,
+    }) == 65i32).should().sum(@loc(), t);
     ((match (raylib.Key.ESCAPE) {
-        .ESCAPE => 256,
-        _ => 0,
-    }) == 256).should().sum(@loc(), t);
+        .ESCAPE => 256i32,
+        _ => 0i32,
+    }) == 256i32).should().sum(@loc(), t);
     ((match (raylib.MouseButton.LEFT) {
-        .LEFT => 1,
-        _ => 0,
-    }) == 1).should().sum(@loc(), t);
+        .LEFT => 1i32,
+        _ => 0i32,
+    }) == 1i32).should().sum(@loc(), t);
 }
 
 // Entry point for the smoke test binary.
-fn main() i32 {
-    let t = test.report(io.stderr())..&;
+#[test]
+fn smoke() i32 {
+    let t = report(io.stderr())..&;
     check_color_constants(t);
     check_constructors(t);
     check_input_constants(t);

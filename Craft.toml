@@ -1,7 +1,7 @@
 [package]
 name = "raylib"
 version = "0.1.0"
-kern = "0.7.5"
+kern = "0.7.6"
 description = "Kern wrapper for raylib"
 readme = "README.md"
 license = "MIT"
@@ -9,27 +9,27 @@ authors = ["softfault <givenyoung46@gmail.com>"]
 repository = "https://github.com/softfault/raylib-kern.git"
 
 [lib]
-root = "src/lib.rn"
+root = "src/lib.kn"
 
 [example]
 roots = [
-    "examples/basic_window.rn",
+    "examples/basic_window.kn",
 ]
 
 [test]
 roots = [
-    "tests/smoke.rn",
-    "tests/api_compile.rn",
+    "tests/smoke.kn",
+    "tests/api_compile.kn",
 ]
 
 [craft.fmt]
 exclude = [
-    "src/raw.rn",
+    "src/raw.kn",
 ]
 
 [craft.style]
 exclude = [
-    "src/raw.rn",
+    "src/raw.kn",
 ]
 
 [resources]

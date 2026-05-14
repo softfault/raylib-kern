@@ -19,7 +19,7 @@ The public API is hand-maintained and organized by raylib domain:
   `raylib.audio`, `raylib.files`, and `raylib.automation`: focused modules for
   the complete Kern-facing wrappers in each area.
 
-`src/raw.rn` is generated as the direct C ABI layer. It is package-internal and
+`src/raw.kn` is generated as the direct C ABI layer. It is package-internal and
 only used by the public modules. Resource behavior is exposed on the resource
 values themselves: load or generate through the domain module, then call methods
 such as `texture.draw_at(...)`, `image.resize(...)`, `sound.play()`, and
@@ -190,7 +190,7 @@ is raylib's parser output, not a hand-maintained copy of `raylib.h`. Craft build
 and runs the Kern host tool in `tools/raylib-bindgen` against
 `tools/rlparser/output/raylib_api.txt` from the pinned raylib resource.
 
-Only `src/raw.rn` is regenerated. The public wrapper modules are hand-maintained
+Only `src/raw.kn` is regenerated. The public wrapper modules are hand-maintained
 so they can use Kern naming, module boundaries, focused convenience helpers, and
 documentation that explains raylib's ownership and frame-loop expectations.
 
@@ -199,7 +199,7 @@ Regenerate the checked-in bindings after updating the pinned raylib resource:
 ```sh
 craft build --project-path tools/raylib-bindgen
 tools/raylib-bindgen/.craft/build/dev/target/out/raylib-bindgen-0.1.0/bin/raylib-bindgen raw \
-  .craft/resources/raylib-*/raylib/tools/rlparser/output/raylib_api.txt > src/raw.rn
+  .craft/resources/raylib-*/raylib/tools/rlparser/output/raylib_api.txt > src/raw.kn
 ```
 
 ## Scope
